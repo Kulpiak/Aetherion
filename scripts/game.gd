@@ -998,6 +998,8 @@ func _draw_loot(drop: Dictionary) -> void:
 func _draw_enemy(enemy: Dictionary) -> void:
  var p: Vector2 = enemy["pos"]
  var kind := int(enemy["type"])
+ var is_boss := bool(enemy.get("is_boss",false))
+ var sprite_size := 126.0 if is_boss else 80.0
  var chasing := player_pos.distance_to(p) < 300.0
  var attacking := float(enemy.get("attack_anim",0.0)) > 0.0
  var frame := 1 if chasing and int(Time.get_ticks_msec()/145)%2 == 0 else 0
@@ -1006,13 +1008,20 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var enemy_facing: Vector2 = enemy.get("facing",Vector2.DOWN)
  var lunge := enemy_facing * (7.0 if attacking else 0.0)
  var body_color := Color(1.0,0.55,0.48,1.0) if float(enemy.get("hit_flash",0.0)) > 0.0 else Color.WHITE
- draw_ellipse_shadow(p+Vector2(0,13),22,8)
+ draw_ellipse_shadow(p+Vector2(0,13),sprite_size*0.48,14.0 if is_boss else 8.0)
+ if is_boss:
+  var boss_pulse := 0.72 + sin(float(Time.get_ticks_msec())/190.0)*0.16
+  draw_circle(p,76.0,Color(0.55,0.16,0.25,0.09*boss_pulse))
+  draw_arc(p,72.0,0.0,TAU,48,Color(0.95,0.35,0.32,0.65),4.0,true)
  if attacking:
-  draw_arc(p,37.0,0.0,TAU,28,Color(1.0,0.28,0.22,0.72),3.0,true)
- draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-40+lunge.x,p.y-44+bob+lunge.y,80,80),Rect2((5+kind)*128,frame*128,128,128),body_color,false)
- draw_rect(Rect2(p.x-19,p.y-31,38,5),Color("#251f28"))
- draw_rect(Rect2(p.x-18,p.y-30,36.0*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),3),Color("#d94d52"))
- draw_string(ThemeDB.fallback_font,p+Vector2(-38,-36),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("#f4ead2"))
+  draw_arc(p,37.0 if not is_boss else 66.0,0.0,TAU,28,Color(1.0,0.28,0.22,0.72),3.0,true)
+ var sprite_rect := Rect2(p.x-sprite_size*0.5+lunge.x,p.y-sprite_size*0.55+bob+lunge.y,sprite_size,sprite_size)
+ draw_texture_rect_region(SPRITE_ATLAS,sprite_rect,Rect2((5+kind)*128,frame*128,128,128),body_color,false)
+ var bar_width := 100.0 if is_boss else 38.0
+ var bar_y := p.y-sprite_size*0.53-10.0
+ draw_rect(Rect2(p.x-bar_width*0.5,bar_y,bar_width,6 if is_boss else 5),Color("#251f28"))
+ draw_rect(Rect2(p.x-bar_width*0.5+1,bar_y+1,(bar_width-2)*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),4 if is_boss else 3),Color("#e34d5c") if is_boss else Color("#d94d52"))
+ draw_string(ThemeDB.fallback_font,p+Vector2(-bar_width*0.5,bar_y-7),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,15 if is_boss else 10,Color("#ffe0d5") if is_boss else Color("#f4ead2"))
 
 func draw_ellipse_shadow(center: Vector2, width: float, height: float) -> void:
  var points := PackedVector2Array()
