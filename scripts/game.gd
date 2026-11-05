@@ -409,7 +409,8 @@ func _process(delta: float) -> void:
  for i in range(damage_numbers.size()-1,-1,-1):
   var number: Dictionary = damage_numbers[i]
   number["life"] = float(number["life"]) - delta
-  number["pos"] = Vector2(number["pos"]) + Vector2(0,-34.0*delta)
+  var number_pos: Vector2 = number["pos"]
+  number["pos"] = number_pos + Vector2(0,-34.0*delta)
   if float(number["life"]) <= 0.0:
    damage_numbers.remove_at(i)
   else:
@@ -964,7 +965,8 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var frame := 1 if chasing and int(Time.get_ticks_msec()/145)%2 == 0 else 0
  var phase := float(enemy.get("walk_phase",0.0))
  var bob := sin(phase)*3.0 if chasing else sin(float(Time.get_ticks_msec())/260.0+float(kind))*1.5
- var lunge := Vector2(enemy.get("facing",Vector2.DOWN)) * (7.0 if attacking else 0.0)
+ var enemy_facing: Vector2 = enemy.get("facing",Vector2.DOWN)
+ var lunge := enemy_facing * (7.0 if attacking else 0.0)
  var body_color := Color(1.0,0.55,0.48,1.0) if float(enemy.get("hit_flash",0.0)) > 0.0 else Color.WHITE
  draw_ellipse_shadow(p+Vector2(0,13),22,8)
  if attacking:
