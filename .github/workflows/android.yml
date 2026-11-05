@@ -34,6 +34,11 @@ jobs:
           cp /tmp/godot-templates/templates/android_debug.apk "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
           cp /tmp/godot-templates/templates/android_release.apk "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
 
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+
       - name: Configure Android signing
         run: |
           mkdir -p "$HOME/.android"
