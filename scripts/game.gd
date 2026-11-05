@@ -97,6 +97,8 @@ var rng := RandomNumberGenerator.new()
 var camera: Camera2D
 var ui: CanvasLayer
 var status: Label
+var hp_bar: ProgressBar
+var ether_bar: ProgressBar
 var quest_label: Label
 var msg: Label
 var panel: PanelContainer
@@ -143,6 +145,8 @@ func _build_ui() -> void:
  status = Label.new()
  status.add_theme_font_size_override("font_size",16)
  left.add_child(status)
+ hp_bar = _create_hud_bar(left,Color("#e45b69"))
+ ether_bar = _create_hud_bar(left,Color("#55c9df"))
  quest_label = Label.new()
  quest_label.add_theme_font_size_override("font_size",14)
  left.add_child(quest_label)
@@ -187,6 +191,24 @@ func _build_ui() -> void:
  panel.custom_minimum_size = Vector2(410,290)
  root.add_child(panel)
  panel.hide()
+
+func _create_hud_bar(parent: Node, fill_color: Color) -> ProgressBar:
+ var bar := ProgressBar.new()
+ bar.custom_minimum_size = Vector2(245,13)
+ bar.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+ bar.show_percentage = false
+ var background := StyleBoxFlat.new()
+ background.bg_color = Color("#101722")
+ background.border_color = Color("#617487")
+ background.set_border_width_all(1)
+ background.set_corner_radius_all(5)
+ var fill := StyleBoxFlat.new()
+ fill.bg_color = fill_color
+ fill.set_corner_radius_all(4)
+ bar.add_theme_stylebox_override("background",background)
+ bar.add_theme_stylebox_override("fill",fill)
+ parent.add_child(bar)
+ return bar
 
 func _button(parent: Node, label_text: String, callback: Callable, w: float=132.0, h: float=36.0) -> void:
  var button := Button.new()
@@ -882,7 +904,13 @@ func _notification(what: int) -> void:
 
 func _update_hud() -> void:
  if not is_instance_valid(status): return
- status.text = "Wędrowiec | %s | POZ. %d\\nHP %d/%d  ETER %d/%d  ZŁOTO %d" % [race,level,int(hp),int(max_hp),int(ether),int(max_ether),gold]
+ status.text = "WĘDROWIEC  •  %s  •  POZ. %d  •  ZŁOTO %d" % [race.to_upper(),level,gold]
+ if is_instance_valid(hp_bar):
+  hp_bar.max_value = max_hp
+  hp_bar.value = hp
+ if is_instance_valid(ether_bar):
+  ether_bar.max_value = max_ether
+  ether_bar.value = ether
  var objectives := ["ZADANIE: porozmawiaj z Kronikarzem.","ZADANIE: pokonaj 5 stworzeń (%d/5)." % mini(kills,5),"ZADANIE: wróć do Kronikarza po nagrodę.","ZADANIE: dotrzyj do wschodnich ruin i zbadaj ich centrum.","ROZDZIAŁ I: zbadaj tajemnicę Strażnika Rdzenia.","ZADANIE: pokonaj Strażnika Rdzenia.","ROZDZIAŁ I UKOŃCZONY — Aetherion jest bezpieczne."]
  quest_label.text = objectives[clampi(quest,0,6)]
 
