@@ -664,15 +664,28 @@ func _quest_interact() -> void:
 
 func _draw_npc() -> void:
  var p := START_POS + Vector2(0,-48)
- var bob := sin(float(Time.get_ticks_msec())/420.0)*2.0
- draw_rect(Rect2(p.x-10,p.y-1+bob,20,22),Color("#66543e"))
- draw_rect(Rect2(p.x-8,p.y-14+bob,16,14),Color("#d6b98a"))
- draw_rect(Rect2(p.x-10,p.y-18+bob,20,7),Color("#4b392e"))
- draw_rect(Rect2(p.x-7,p.y-5+bob,14,3),Color("#d5ad58"))
- draw_rect(Rect2(p.x-5,p.y+20+bob,5,7),Color("#382f2a"))
- draw_rect(Rect2(p.x+1,p.y+20+bob,5,7),Color("#382f2a"))
- draw_circle(p+Vector2(0,-28+bob),5,Color("#f3d477"))
- draw_string(ThemeDB.fallback_font,p+Vector2(-50,-36),"KRONIKARZ",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("#ffe7a6"))
+ var now := float(Time.get_ticks_msec())/1000.0
+ var bob := sin(now*2.4)*2.0
+ draw_ellipse_shadow(p+Vector2(0,31),38,10)
+ draw_circle(p+Vector2(0,-13+bob),25,Color(0.92,0.72,0.38,0.08))
+ draw_colored_polygon(PackedVector2Array([p+Vector2(-17,2+bob),p+Vector2(0,-7+bob),p+Vector2(17,2+bob),p+Vector2(23,34+bob),p+Vector2(-23,34+bob)]),Color("#66513f"))
+ draw_colored_polygon(PackedVector2Array([p+Vector2(-13,1+bob),p+Vector2(0,-5+bob),p+Vector2(13,1+bob),p+Vector2(9,28+bob),p+Vector2(-9,28+bob)]),Color("#a58a63"))
+ draw_rect(Rect2(p.x-5,p.y+28+bob,4,9),Color("#342f31"))
+ draw_rect(Rect2(p.x+2,p.y+28+bob,4,9),Color("#342f31"))
+ draw_circle(p+Vector2(0,-16+bob),11,Color("#d7b58b"))
+ draw_arc(p+Vector2(0,-17+bob),12.0,PI,TAU,20,Color("#493b36"),5.0,true)
+ draw_circle(p+Vector2(-4,-16+bob),1.4,Color("#302d2b"))
+ draw_circle(p+Vector2(4,-16+bob),1.4,Color("#302d2b"))
+ draw_line(p+Vector2(16,-3+bob),p+Vector2(24,35+bob),Color("#8c6848"),4.0,true)
+ draw_line(p+Vector2(16,-3+bob),p+Vector2(24,35+bob),Color("#d8bd82"),1.2,true)
+ var crystal := p+Vector2(15,-12+bob+sin(now*3.0)*2.0)
+ draw_circle(crystal,8.0,Color(0.3,0.9,0.9,0.18))
+ draw_colored_polygon(PackedVector2Array([crystal+Vector2(0,-9),crystal+Vector2(6,-1),crystal+Vector2(3,8),crystal+Vector2(-4,6),crystal+Vector2(-6,-2)]),Color("#83e7df"))
+ draw_string(ThemeDB.fallback_font,p+Vector2(-48,-43+bob),"KRONIKARZ",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("#ffe7a6"))
+ if quest < 6:
+  var marker := p+Vector2(0,-63+bob+sin(now*4.0)*3.0)
+  draw_circle(marker,12.0,Color(0.96,0.73,0.3,0.88))
+  draw_string(ThemeDB.fallback_font,marker+Vector2(-4,6),"!",HORIZONTAL_ALIGNMENT_LEFT,-1,17,Color("#392b1b"))
 
 func _show_panel(panel_name: String) -> void:
  if not started: return
