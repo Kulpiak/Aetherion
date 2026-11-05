@@ -102,6 +102,10 @@ var panel: PanelContainer
 var virtual_stick: VirtualStick
 var bolt_cd := 0.0
 var bolt_anim := 0.0
+var dash_cd := 0.0
+var dash_anim := 0.0
+var dash_from := Vector2.ZERO
+var dash_to := Vector2.ZERO
 
 func _ready() -> void:
  rng.randomize()
@@ -169,11 +173,12 @@ func _build_ui() -> void:
  bottom.alignment = BoxContainer.ALIGNMENT_END
  bottom.add_theme_constant_override("separation",6)
  root.add_child(bottom)
- _button(bottom,"ATAK",_attack,78,54)
- _button(bottom,"ETER",_skill,78,54)
- _button(bottom,"PROMIEŃ",_skill_bolt,82,54)
- _button(bottom,"FORMA",_transform,78,54)
- _button(bottom,"MIKSTURA",_potion,90,54)
+ _button(bottom,"ATAK",_attack,72,58)
+ _button(bottom,"FALA",_skill,72,58)
+ _button(bottom,"PROMIEŃ",_skill_bolt,82,58)
+ _button(bottom,"SZARŻA",_skill_dash,76,58)
+ _button(bottom,"FORMA",_transform,72,58)
+ _button(bottom,"MIKSTURA",_potion,82,58)
  panel = PanelContainer.new()
  panel.set_anchors_preset(Control.PRESET_CENTER)
  panel.position = Vector2(-205,-145)
@@ -185,6 +190,27 @@ func _button(parent: Node, label_text: String, callback: Callable, w: float=132.
  var button := Button.new()
  button.text = label_text
  button.custom_minimum_size = Vector2(w,h)
+ button.add_theme_font_size_override("font_size",13 if h >= 50 else 14)
+ button.add_theme_color_override("font_color",Color("#eaf7ff"))
+ button.add_theme_color_override("font_hover_color",Color("#ffffff"))
+ button.add_theme_color_override("font_pressed_color",Color("#b9f6ef"))
+ var normal := StyleBoxFlat.new()
+ normal.bg_color = Color("#142638")
+ normal.border_color = Color("#4b9eae")
+ normal.set_border_width_all(2)
+ normal.set_corner_radius_all(10)
+ normal.shadow_color = Color(0,0,0,0.35)
+ normal.shadow_size = 4
+ var hover := normal.duplicate()
+ hover.bg_color = Color("#24506a")
+ hover.border_color = Color("#8be8e6")
+ var pressed := normal.duplicate()
+ pressed.bg_color = Color("#0d1728")
+ pressed.border_color = Color("#f0c879")
+ button.add_theme_stylebox_override("normal",normal)
+ button.add_theme_stylebox_override("hover",hover)
+ button.add_theme_stylebox_override("pressed",pressed)
+ button.add_theme_stylebox_override("focus",hover)
  button.pressed.connect(callback)
  parent.add_child(button)
 
@@ -239,6 +265,10 @@ func _process(delta: float) -> void:
  skill_anim = maxf(0.0,skill_anim-delta)
  bolt_cd = maxf(0.0,bolt_cd-delta)
  bolt_anim = maxf(0.0,bolt_anim-delta)
+ dash_cd = maxf(0.0,dash_cd-delta)
+ dash_anim = maxf(0.0,dash_anim-delta)
+ if dash_anim > 0.0:
+  player_pos = dash_from.lerp(dash_to,1.0-dash_anim/0.32)
  transform_cd = maxf(0.0,transform_cd-delta)
  if transformed:
   transform_left -= delta
@@ -373,6 +403,31 @@ func _skill_bolt() -> void:
  else:
   enemies[index] = enemy
  _say("PROMIEŃ ETERIUM!")
+
+func _skill_dash() -> void:
+ if not started or dash_cd > 0.0:
+  return
+ if ether < 16.0:
+  _say("Za mało Eterium na Szarżę.")
+  return
+ var index := _nearest_enemy(310.0)
+ if index < 0:
+  _say("Brak celu dla Szarży.")
+  return
+ var enemy: Dictionary = enemies[index]
+ var direction: Vector2 = (enemy["pos"] - player_pos).normalized()
+ dash_from = player_pos
+ dash_to = enemy["pos"] - direction * 58.0
+ player_facing = direction
+ dash_anim = 0.32
+ dash_cd = 5.0
+ ether -= 16.0
+ enemy["hp"] -= atk * 2.4 + (12 if transformed else 0)
+ if enemy["hp"] <= 0.0:
+  _kill_enemy(index)
+ else:
+  enemies[index] = enemy
+ _say("SZARŻA ETERYCZNA!")
 
 func _transform() -> void:
  if not started: return
@@ -720,6 +775,13 @@ func draw_ellipse_shadow(center: Vector2, width: float, height: float) -> void:
 
 func _draw_combat_effects() -> void:
  var now := float(Time.get_ticks_msec()) / 1000.0
+ if dash_anim > 0.0:
+  var progress := 1.0 - dash_anim / 0.32
+  var alpha := 1.0 - progress
+  for trail in range(4):
+   var point := dash_from.lerp(dash_to,progress-float(trail)*0.12)
+   draw_circle(point,18.0-float(trail)*2.5,Color(0.35,0.85,1.0,alpha*0.22))
+  draw_line(dash_from,dash_to,Color(0.55,0.95,1.0,alpha*0.65),7.0,true)
  if bolt_anim > 0.0:
   var beam_start := player_pos + Vector2(0,-8)
   draw_line(beam_start,attack_target,Color(0.35,0.95,1.0,0.9),9.0,true)
