@@ -20,6 +20,7 @@ jobs:
     env:
       GODOT_VERSION: 4.4.1
       ANDROID_HOME: /usr/lib/android-sdk
+      ANDROID_SDK_ROOT: /usr/lib/android-sdk
       JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
     steps:
       - name: Checkout
@@ -36,8 +37,12 @@ jobs:
 
       - name: Install Android SDK components
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+          yes | sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null || true
+          sdkmanager --sdk_root="$ANDROID_SDK_ROOT" "platform-tools" "platforms;android-35" "build-tools;35.0.1" "cmdline-tools;latest"
+          test -x "$ANDROID_SDK_ROOT/platform-tools/adb"
+          test -d "$ANDROID_SDK_ROOT/platforms/android-35"
+          test -d "$ANDROID_SDK_ROOT/build-tools/35.0.1"
+          ls -la "$ANDROID_SDK_ROOT/build-tools/35.0.1"
 
       - name: Configure Android signing
         run: |
@@ -58,12 +63,17 @@ jobs:
           EOF
           test -d "$ANDROID_HOME/platform-tools"
           test -d "$JAVA_HOME"
+          java -version
+          sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --list_installed
 
       - name: Validate project scripts
         run: godot --headless --path . --editor --quit
 
       - name: Export Android debug APK
-        run: godot --headless --path . --export-debug "Android" build/Aetherion-debug.apk
+        run: |
+          godot --headless --path . --export-debug "Android" build/Aetherion-debug.apk
+          test -s build/Aetherion-debug.apk
+          ls -lh build/Aetherion-debug.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
