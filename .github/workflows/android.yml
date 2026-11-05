@@ -1,0 +1,32 @@
+name: Build Aetherion Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '**.gd'
+      - '**.tscn'
+      - '**.godot'
+      - 'assets/**'
+      - 'export_presets.cfg'
+      - '.github/workflows/android.yml'
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Prepare export directory
+        run: mkdir -p build
+      - name: Export Android debug APK
+        run: godot --headless --verbose --path . --export-debug "Android" build/Aetherion-debug.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Aetherion-debug-apk
+          path: build/Aetherion-debug.apk
+          if-no-files-found: error
