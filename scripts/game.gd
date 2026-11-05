@@ -40,6 +40,16 @@ var skill_anim := 0.0
 var quest := 0
 var kills := 0
 var inventory := {"Mikstura HP":3,"Odłamek Eterium":0,"Skóra bestii":0}
+var equipment := {"Broń":"Ostrze Wędrowca","Pancerz":"Tunika Wędrowca"}
+var owned_gear: Array[String] = ["Ostrze Wędrowca","Tunika Wędrowca"]
+const GEAR_STATS := {
+ "Ostrze Wędrowca":{"slot":"Broń","atk":0,"def":0,"hp":0},
+ "Tunika Wędrowca":{"slot":"Pancerz","atk":0,"def":0,"hp":0},
+ "Ostrze Eterium":{"slot":"Broń","atk":7,"def":0,"hp":0},
+ "Pancerz Łowcy":{"slot":"Pancerz","atk":0,"def":4,"hp":30}
+}
+var boss_spawned := false
+var boss_defeated := false
 var enemies: Array[Dictionary] = []
 var loot_drops: Array[Dictionary] = []
 var started := false
@@ -99,6 +109,8 @@ func _build_ui() -> void:
  _button(right,"POSTAĆ",func(): _show_panel("Postać"))
  _button(right,"TORBA",func(): _show_panel("Ekwipunek"))
  _button(right,"SKILLE",func(): _show_panel("Umiejętności"))
+ _button(right,"RZEMIOSŁO",func(): _show_panel("Rzemiosło"))
+ _button(right,"MAPA",func(): _show_panel("Mapa"))
  _button(right,"ZADANIE",_quest_interact)
  _button(right,"ZAPISZ",_save_game)
  _button(right,"WCZYTAJ",_load_game)
@@ -221,6 +233,18 @@ func _process(delta: float) -> void:
      gold = maxi(0,gold-8)
      _say("Odrodzenie przy kręgu. Utracono 8 złota.")
   enemies[i] = enemy
+ for i in range(loot_drops.size()-1,-1,-1):
+  var drop: Dictionary = loot_drops[i]
+  drop["life"] = float(drop.get("life",60.0)) - delta
+  if player_pos.distance_to(drop["pos"]) <= 42.0:
+   var item_name := str(drop["item"])
+   inventory[item_name] = int(inventory.get(item_name,0)) + 1
+   _say("Zebrano: %s" % item_name)
+   loot_drops.remove_at(i)
+  elif float(drop["life"]) <= 0.0:
+   loot_drops.remove_at(i)
+  else:
+   loot_drops[i] = drop
  _update_hud()
  queue_redraw()
 
@@ -296,9 +320,18 @@ func _kill_enemy(index: int) -> void:
  xp += 20
  gold += 5
  kills += 1
- if rng.randf() < 0.35: inventory["Skóra bestii"] += 1
- if rng.randf() < 0.2: inventory["Odłamek Eterium"] += 1
- _say("Pokonano %s! +20 XP, +5 złota." % enemy["name"])
+ if rng.randf() < 0.35:
+  loot_drops.append({"item":"Skóra bestii","pos":enemy["pos"]+Vector2(rng.randf_range(-16,16),rng.randf_range(-16,16)),"life":60.0})
+ if rng.randf() < 0.2:
+  loot_drops.append({"item":"Odłamek Eterium","pos":enemy["pos"]+Vector2(rng.randf_range(-16,16),rng.randf_range(-16,16)),"life":60.0})
+ if bool(enemy.get("is_boss",false)):
+  boss_defeated = true
+  quest = 6
+  gold += 250
+  xp += 300
+  _say("STRAŻNIK RDZENIA POKONANY! +250 złota, +300 XP.")
+ else:
+  _say("Pokonano %s! +20 XP, +5 złota." % enemy["name"])
  while xp >= level * 100:
   xp -= level * 100
   level += 1
@@ -309,6 +342,8 @@ func _kill_enemy(index: int) -> void:
   hp = max_hp
   ether = max_ether
   _say("AWANS! Poziom %d" % level)
+ if quest == 5 and bool(enemy.get("is_boss",false)):
+  quest = 6
  if quest == 1 and kills >= 5:
   quest = 2
   gold += 35
@@ -348,8 +383,15 @@ func _quest_interact() -> void:
   quest = 3
   gold += 25
   _say("Nagroda odebrana! +25 złota. Nowe zadanie: zbadaj Wschodnie Ruiny.")
- elif quest >= 4:
-  _say("Rozdział I ukończony. Kronikarz przygotowuje kolejną wyprawę.")
+ elif quest == 4:
+  quest = 5
+  boss_spawned = true
+  enemies.append({"name":"Strażnik Rdzenia","pos":RUINS_POS+Vector2(0,105),"hp":620.0,"max_hp":620.0,"damage":22.0,"speed":58.0,"alive":true,"type":3,"timer":0.0,"respawn":0.0,"is_boss":true})
+  _say("NOWE ZADANIE: pokonaj Strażnika Rdzenia we Wschodnich Ruinach!")
+ elif quest == 5:
+  _say("Strażnik Rdzenia czeka we Wschodnich Ruinach.")
+ elif quest >= 6:
+  _say("Rozdział I ukończony. Aetherion jest bezpieczne — dalsza wyprawa czeka.")
  else:
   _say("Pokonaj 5 stworzeń, a potem wróć po nagrodę.")
  _update_hud()
@@ -381,15 +423,70 @@ func _show_panel(panel_name: String) -> void:
  if panel_name == "Postać":
   body.text = "Rasa: %s\\nPoziom: %d\\nHP: %d/%d\\nEterium: %d/%d\\nAtak: %d Obrona: %d\\nZłoto: %d" % [race,level,int(hp),int(max_hp),int(ether),int(max_ether),atk,defense,gold]
  elif panel_name == "Ekwipunek":
-  body.text = "Mikstura HP: %d\\nSkóra bestii: %d\\nOdłamki Eterium: %d\\nBroń: Ostrze Wędrowca\\nPancerz: Tunika Wędrowca" % [inventory["Mikstura HP"],inventory["Skóra bestii"],inventory["Odłamek Eterium"]]
+  body.text = "Mikstury HP: %d\\nSkóra bestii: %d\\nOdłamki Eterium: %d\\nBroń: %s\\nPancerz: %s" % [inventory["Mikstura HP"],inventory["Skóra bestii"],inventory["Odłamek Eterium"],equipment["Broń"],equipment["Pancerz"]]
+ elif panel_name == "Rzemiosło":
+  body.text = "Wytwarzaj wyposażenie z materiałów z potworów.\\nOstrze Eterium: 4 skóry + 3 odłamki (Atak +7).\\nPancerz Łowcy: 5 skór + 2 odłamki (Obrona +4, HP +30).\\nMikstura HP: 2 skóry + 1 odłamek."
+ elif panel_name == "Mapa":
+  body.text = "KAMIENNY KRĄG — bezpieczna strefa i Kronikarz.\\nZIELONE OSTĘPY — polowania na stworzenia.\\nWSCHODNIE RUINY — rozdział I i Strażnik Rdzenia.\\nTwoja pozycja: %d, %d" % [int(player_pos.x),int(player_pos.y)]
  else:
   body.text = "Technika Eterium: koszt 20, obrażenia obszarowe, cooldown 4 s.\\nPrzebudzenie Rdzenia: koszt 28, czas 16 s, cooldown 32 s.\\nVarkari: gałęzie Żar / Pryzmat / Instynkt."
  box.add_child(body)
+ if panel_name == "Rzemiosło":
+  _button(box,"WYT WÓRZ OSTRZE ETERIUM",func(): _craft_item("Ostrze Eterium"),370,34)
+  _button(box,"WYT WÓRZ PANCERZ ŁOWCY",func(): _craft_item("Pancerz Łowcy"),370,34)
+  _button(box,"WYT WÓRZ MIKSTURĘ",func(): _craft_item("Mikstura HP"),370,34)
+ if panel_name == "Ekwipunek":
+  for item_name in owned_gear:
+   if item_name != equipment.get(str(GEAR_STATS[item_name]["slot"]),""):
+    _button(box,"ZAŁÓŻ: "+item_name,func(): _equip_gear(item_name),370,32)
  _button(box,"ZAMKNIJ",func(): panel.hide(),370,38)
+
+func _craft_item(item_name: String) -> void:
+ if item_name == "Ostrze Eterium":
+  if int(inventory["Skóra bestii"]) < 4 or int(inventory["Odłamek Eterium"]) < 3:
+   _say("Brakuje materiałów na Ostrze Eterium.")
+   return
+  inventory["Skóra bestii"] -= 4
+  inventory["Odłamek Eterium"] -= 3
+ elif item_name == "Pancerz Łowcy":
+  if int(inventory["Skóra bestii"]) < 5 or int(inventory["Odłamek Eterium"]) < 2:
+   _say("Brakuje materiałów na Pancerz Łowcy.")
+   return
+  inventory["Skóra bestii"] -= 5
+  inventory["Odłamek Eterium"] -= 2
+ elif item_name == "Mikstura HP":
+  if int(inventory["Skóra bestii"]) < 2 or int(inventory["Odłamek Eterium"]) < 1:
+   _say("Brakuje materiałów na miksturę.")
+   return
+  inventory["Skóra bestii"] -= 2
+  inventory["Odłamek Eterium"] -= 1
+  inventory["Mikstura HP"] += 1
+  _say("Wytworzono miksturę HP.")
+  _show_panel("Rzemiosło")
+  return
+ if not owned_gear.has(item_name):
+  owned_gear.append(item_name)
+ _equip_gear(item_name)
+ _say("Wytworzono i założono: %s." % item_name)
+ _show_panel("Ekwipunek")
+
+func _equip_gear(item_name: String) -> void:
+ if not GEAR_STATS.has(item_name):
+  return
+ var slot := str(GEAR_STATS[item_name]["slot"])
+ var old_item := str(equipment.get(slot,""))
+ var old_stats: Dictionary = GEAR_STATS.get(old_item,{})
+ var new_stats: Dictionary = GEAR_STATS[item_name]
+ atk += int(new_stats.get("atk",0)) - int(old_stats.get("atk",0))
+ defense += int(new_stats.get("def",0)) - int(old_stats.get("def",0))
+ max_hp += int(new_stats.get("hp",0)) - int(old_stats.get("hp",0))
+ hp = minf(hp,max_hp)
+ equipment[slot] = item_name
+ _update_hud()
 
 func _save_game() -> void:
  if not started: return
- var data := {"race":race,"pos":[player_pos.x,player_pos.y],"hp":hp,"ether":ether,"level":level,"xp":xp,"gold":gold,"atk":atk,"defense":defense,"quest":quest,"kills":kills,"inventory":inventory}
+ var data := {"race":race,"pos":[player_pos.x,player_pos.y],"hp":hp,"ether":ether,"level":level,"xp":xp,"gold":gold,"atk":atk,"defense":defense,"quest":quest,"kills":kills,"inventory":inventory,"equipment":equipment,"owned_gear":owned_gear,"boss_spawned":boss_spawned,"boss_defeated":boss_defeated}
  var file := FileAccess.open(SAVE_PATH,FileAccess.WRITE)
  if file:
   file.store_string(JSON.stringify(data))
@@ -417,7 +514,16 @@ func _load_game() -> void:
  quest = int(data.get("quest",0))
  kills = int(data.get("kills",0))
  inventory = data.get("inventory",inventory)
+ equipment = data.get("equipment",equipment)
+ owned_gear = data.get("owned_gear",owned_gear)
+ boss_spawned = bool(data.get("boss_spawned",false))
+ boss_defeated = bool(data.get("boss_defeated",false))
  max_hp = float(RACES[race]["hp"])+(level-1)*10
+ for item_name in equipment.values():
+  var gear_stats: Dictionary = GEAR_STATS.get(str(item_name),{})
+  max_hp += int(gear_stats.get("hp",0))
+  atk += int(gear_stats.get("atk",0))
+  defense += int(gear_stats.get("def",0))
  max_ether = float(RACES[race]["ep"])+(level-1)*7
  started = true
  panel.hide()
@@ -431,8 +537,8 @@ func _say(message: String) -> void:
 func _update_hud() -> void:
  if not is_instance_valid(status): return
  status.text = "Wędrowiec | %s | POZ. %d\\nHP %d/%d  ETER %d/%d  ZŁOTO %d" % [race,level,int(hp),int(max_hp),int(ether),int(max_ether),gold]
- var objectives := ["ZADANIE: porozmawiaj z Kronikarzem.","ZADANIE: pokonaj 5 stworzeń (%d/5)." % mini(kills,5),"ZADANIE: wróć do Kronikarza po nagrodę.","ZADANIE: dotrzyj do wschodnich ruin i zbadaj ich centrum.","ROZDZIAŁ I: UKOŃCZONY — dalsza przygoda wkrótce."]
- quest_label.text = objectives[clampi(quest,0,4)]
+ var objectives := ["ZADANIE: porozmawiaj z Kronikarzem.","ZADANIE: pokonaj 5 stworzeń (%d/5)." % mini(kills,5),"ZADANIE: wróć do Kronikarza po nagrodę.","ZADANIE: dotrzyj do wschodnich ruin i zbadaj ich centrum.","ROZDZIAŁ I: zbadaj tajemnicę Strażnika Rdzenia.","ZADANIE: pokonaj Strażnika Rdzenia.","ROZDZIAŁ I UKOŃCZONY — Aetherion jest bezpieczne."]
+ quest_label.text = objectives[clampi(quest,0,6)]
 
 func _draw() -> void:
  _draw_world()
@@ -442,6 +548,8 @@ func _draw() -> void:
  for enemy in enemies:
   if enemy["alive"]:
    _draw_enemy(enemy)
+ for drop in loot_drops:
+  _draw_loot(drop)
  if started:
   _draw_combat_effects()
   _draw_player()
