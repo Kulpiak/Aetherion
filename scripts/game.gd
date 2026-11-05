@@ -669,7 +669,7 @@ func _draw_landmarks() -> void:
 
 func _draw_loot(drop: Dictionary) -> void:
  var p: Vector2 = drop["pos"]
- var shard := drop["item"] == "Odłamek Eterium"
+ var shard: bool = str(drop.get("item", "")) == "Odłamek Eterium"
  var glow := 0.72 + sin(float(Time.get_ticks_msec())/170.0)*0.18
  draw_circle(p,10.0,Color(0.1,0.08,0.06,0.45))
  draw_circle(p+Vector2(0,-3),6.0,Color(0.35,0.9,1.0,glow) if shard else Color(0.72,0.9,0.48,glow))
@@ -719,7 +719,7 @@ func _draw_combat_effects() -> void:
   draw_circle(player_pos,12.0+progress*9.0,Color(0.5,0.95,1.0,alpha*0.35))
 
 func _draw_player() -> void:
- var moving := held["left"] or held["right"] or held["up"] or held["down"] or Input.is_action_pressed("ui_left") or Input.is_action_pressed("ui_right") or Input.is_action_pressed("ui_up") or Input.is_action_pressed("ui_down")
+ var moving: bool = bool(held["left"]) or bool(held["right"]) or bool(held["up"]) or bool(held["down"]) or Input.is_action_pressed("ui_left") or Input.is_action_pressed("ui_right") or Input.is_action_pressed("ui_up") or Input.is_action_pressed("ui_down")
  var bob := sin(walk_phase)*2.0 if moving else 0.0
  var p := player_pos
  var race_index := maxi(0,RACES.keys().find(race))
