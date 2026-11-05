@@ -1,18 +1,32 @@
-# Aetherion — projekt Godot 4
+# Aetherion — KI: Legends of Power
 
-## Budowanie APK
-1. Otwórz zakładkę **Actions** w repozytorium.
-2. Uruchom workflow **Build Aetherion Android APK**.
-3. Po udanym buildzie pobierz artefakt **Aetherion-debug-apk**.
+## Pobieranie i instalacja APK na Androidzie
+1. Otwórz najnowszy udany build w zakładce **Actions** repozytorium.
+2. W sekcji **Artifacts** pobierz `Aetherion-debug-apk`.
+3. Rozpakuj pobrany plik ZIP i uruchom `Aetherion-debug.apk` na telefonie.
+4. Jeśli Android zapyta, zezwól aplikacji Pliki/przeglądarce na instalowanie aplikacji z tego źródła.
+5. Gra działa jako lokalne **offline PvE** — po instalacji nie wymaga połączenia z internetem.
 
-Pierwszy eksport Android wymaga szablonów eksportu Godot oraz konfiguracji Android SDK/JDK w środowisku CI. Jeżeli workflow zgłosi błąd, analizujemy logi i poprawiamy konfigurację.
-
-## Aktualny zakres
-Pierwsza wersja to offline PvE: wybór rasy, poruszanie się, walka, przeciwnicy, doświadczenie, loot, zadanie startowe i zapis lokalny. Nie ma jeszcze serwera ani multiplayera.
+## Aktualny zakres offline
+- Wybór jednej z pięciu ras i rozwój poziomu postaci.
+- Dotykowe poruszanie, kamera, podstawowy atak, technika obszarowa i forma.
+- Wrogowie z pościgiem, atakiem, HP i odradzaniem.
+- Doświadczenie, złoto, mikstury i losowe łupy widoczne na ziemi.
+- Podnoszenie materiałów przez podejście do nich.
+- Ekwipunek, broń i pancerz z bonusami statystyk.
+- Rzemiosło: Ostrze Eterium, Pancerz Łowcy i mikstury.
+- Łańcuch zadania startowego, Wschodnie Ruiny i boss Strażnik Rdzenia.
+- Lokalny zapis postępu: przycisk **ZAPISZ / WCZYTAJ**, automatyczny zapis co 30 sekund oraz zapis przy wstrzymaniu aplikacji.
 
 ## Sterowanie
-- Dotykowe przyciski kierunkowe po lewej stronie dolnego paska.
-- ATAK, TECHNIKA, FORMA i MIKSTURA po prawej.
-- Panel postaci, torby, skilli i zadania w górnym prawym rogu.
+- Przyciski kierunkowe na dolnym pasku poruszają postacią.
+- **ATAK** — podstawowy atak.
+- **TECHNIKA** — umiejętność obszarowa.
+- **FORMA** — czasowe przebudzenie.
+- **MIKSTURA** — leczenie.
+- Przyciski w prawym górnym rogu otwierają postać, torbę, umiejętności, rzemiosło i mapę.
+- **ZADANIE** służy do rozmowy z Kronikarzem i badania ruin.
+- **ZAPISZ / WCZYTAJ** obsługują lokalny zapis.
 
-Projekt jest w trakcie rozwoju; nie zakładamy, że build jest poprawny, dopóki GitHub Actions go nie potwierdzi.
+## Status projektu
+To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między graczami i synchronizacja online nie są jeszcze zaimplementowane. Każdy build traktujemy jako potwierdzony dopiero po poprawnym przejściu walidacji Godot i eksporcie APK w GitHub Actions; zachowanie w grze wymaga jeszcze testu na urządzeniu.
