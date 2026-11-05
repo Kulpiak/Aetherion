@@ -35,6 +35,8 @@ jobs:
           unzip -q /tmp/godot-templates.tpz -d /tmp/godot-templates
           cp /tmp/godot-templates/templates/android_debug.apk "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
           cp /tmp/godot-templates/templates/android_release.apk "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
+          cp /tmp/godot-templates/templates/android_source.zip "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
+          ls -lh "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
 
       - name: Install Android SDK components
         run: |
