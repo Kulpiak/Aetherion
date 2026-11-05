@@ -1005,7 +1005,11 @@ func _draw_enemy(enemy: Dictionary) -> void:
  draw_string(ThemeDB.fallback_font,p+Vector2(-38,-36),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("#f4ead2"))
 
 func draw_ellipse_shadow(center: Vector2, width: float, height: float) -> void:
- draw_rect(Rect2(center.x-width/2.0,center.y-height/2.0,width,height),Color(0,0,0,0.28))
+ var points := PackedVector2Array()
+ for point_index in range(28):
+  var angle := TAU * float(point_index) / 28.0
+  points.append(center + Vector2(cos(angle)*width*0.5,sin(angle)*height*0.5))
+ draw_colored_polygon(points,Color(0.015,0.025,0.035,0.34))
 
 func _draw_combat_effects() -> void:
  var now := float(Time.get_ticks_msec()) / 1000.0
