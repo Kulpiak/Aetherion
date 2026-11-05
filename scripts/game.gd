@@ -50,6 +50,7 @@ const GEAR_STATS := {
 }
 var boss_spawned := false
 var boss_defeated := false
+var autosave_timer := 0.0
 var enemies: Array[Dictionary] = []
 var loot_drops: Array[Dictionary] = []
 var started := false
@@ -183,6 +184,10 @@ func _start_game(selected_race: String) -> void:
 
 func _process(delta: float) -> void:
  if not started: return
+ autosave_timer += delta
+ if autosave_timer >= 30.0:
+  autosave_timer = 0.0
+  _save_game(true)
  attack_cd = maxf(0.0,attack_cd-delta)
  attack_anim = maxf(0.0,attack_anim-delta)
  skill_cd = maxf(0.0,skill_cd-delta)
@@ -490,13 +495,24 @@ func _equip_gear(item_name: String) -> void:
  equipment[slot] = item_name
  _update_hud()
 
-func _save_game() -> void:
+func _save_game(silent: bool=false) -> void:
  if not started: return
- var data := {"race":race,"pos":[player_pos.x,player_pos.y],"hp":hp,"ether":ether,"level":level,"xp":xp,"gold":gold,"atk":atk,"defense":defense,"quest":quest,"kills":kills,"inventory":inventory,"equipment":equipment,"owned_gear":owned_gear,"boss_spawned":boss_spawned,"boss_defeated":boss_defeated}
+ var saved_loot: Array[Dictionary] = []
+ for drop in loot_drops:
+  saved_loot.append({"item":str(drop.get("item","")),"pos":[drop["pos"].x,drop["pos"].y],"life":float(drop.get("life",60.0))})
+ var boss_state: Dictionary = {}
+ for enemy in enemies:
+  if bool(enemy.get("is_boss",false)):
+   boss_state = {"name":str(enemy["name"]),"pos":[enemy["pos"].x,enemy["pos"].y],"hp":float(enemy["hp"]),"max_hp":float(enemy["max_hp"]),"damage":float(enemy["damage"]),"speed":float(enemy["speed"])}
+   break
+ var data := {"race":race,"pos":[player_pos.x,player_pos.y],"hp":hp,"ether":ether,"level":level,"xp":xp,"gold":gold,"atk":atk,"defense":defense,"quest":quest,"kills":kills,"inventory":inventory,"equipment":equipment,"owned_gear":owned_gear,"boss_spawned":boss_spawned,"boss_defeated":boss_defeated,"loot_drops":saved_loot,"boss_state":boss_state}
  var file := FileAccess.open(SAVE_PATH,FileAccess.WRITE)
  if file:
   file.store_string(JSON.stringify(data))
-  _say("Zapisano lokalnie.")
+  if not silent:
+   _say("Zapisano lokalnie.")
+ else:
+  _say("Nie udało się zapisać postępu.")
 
 func _load_game() -> void:
  if not FileAccess.file_exists(SAVE_PATH):
@@ -507,7 +523,9 @@ func _load_game() -> void:
  if typeof(data) != TYPE_DICTIONARY:
   _say("Uszkodzony zapis.")
   return
- race = data.get("race","Varkari")
+ race = str(data.get("race","Varkari"))
+ if not RACES.has(race):
+  race = "Varkari"
  var p: Array = data.get("pos",[START_POS.x,START_POS.y])
  player_pos = Vector2(float(p[0]),float(p[1]))
  level = int(data.get("level",1))
@@ -524,6 +542,11 @@ func _load_game() -> void:
  owned_gear = data.get("owned_gear",owned_gear)
  boss_spawned = bool(data.get("boss_spawned",false))
  boss_defeated = bool(data.get("boss_defeated",false))
+ loot_drops.clear()
+ for saved_drop in data.get("loot_drops",[]):
+  if typeof(saved_drop) == TYPE_DICTIONARY:
+   var drop_pos: Array = saved_drop.get("pos",[player_pos.x,player_pos.y])
+   loot_drops.append({"item":str(saved_drop.get("item","Skóra bestii")),"pos":Vector2(float(drop_pos[0]),float(drop_pos[1])),"life":float(saved_drop.get("life",60.0))})
  max_hp = float(RACES[race]["hp"])+(level-1)*10
  for item_name in equipment.values():
   var gear_stats: Dictionary = GEAR_STATS.get(str(item_name),{})
@@ -531,8 +554,24 @@ func _load_game() -> void:
   atk += int(gear_stats.get("atk",0))
   defense += int(gear_stats.get("def",0))
  if boss_spawned and not boss_defeated:
-  enemies.append({"name":"Strażnik Rdzenia","pos":RUINS_POS+Vector2(0,105),"hp":620.0,"max_hp":620.0,"damage":22.0,"speed":58.0,"alive":true,"type":3,"timer":0.0,"respawn":0.0,"is_boss":true})
+  var saved_boss: Dictionary = data.get("boss_state",{})
+  var boss_pos := RUINS_POS+Vector2(0,105)
+  var boss_hp := 620.0
+  var boss_max_hp := 620.0
+  if not saved_boss.is_empty():
+   var saved_boss_pos: Array = saved_boss.get("pos",[boss_pos.x,boss_pos.y])
+   boss_pos = Vector2(float(saved_boss_pos[0]),float(saved_boss_pos[1]))
+   boss_hp = float(saved_boss.get("hp",620.0))
+   boss_max_hp = float(saved_boss.get("max_hp",620.0))
+  var existing_boss := -1
+  for i in range(enemies.size()-1,-1,-1):
+   if bool(enemies[i].get("is_boss",false)):
+    existing_boss = i
+    enemies.remove_at(i)
+  enemies.append({"name":"Strażnik Rdzenia","pos":boss_pos,"hp":boss_hp,"max_hp":boss_max_hp,"damage":22.0,"speed":58.0,"alive":true,"type":3,"timer":0.0,"respawn":0.0,"is_boss":true})
  max_ether = float(RACES[race]["ep"])+(level-1)*7
+ hp = clampf(hp,1.0,max_hp)
+ ether = clampf(ether,0.0,max_ether)
  started = true
  panel.hide()
  camera.position = player_pos
@@ -541,6 +580,11 @@ func _load_game() -> void:
 
 func _say(message: String) -> void:
  if is_instance_valid(msg): msg.text = message
+
+func _notification(what: int) -> void:
+ if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
+  if started:
+   _save_game(true)
 
 func _update_hud() -> void:
  if not is_instance_valid(status): return
