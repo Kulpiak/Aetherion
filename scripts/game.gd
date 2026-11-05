@@ -947,9 +947,25 @@ func _draw_world() -> void:
  draw_texture_rect(WORLD_TEXTURE,Rect2(Vector2.ZERO,WORLD_SIZE),false)
 
 func _draw_landmarks() -> void:
- var pulse := 0.7 + sin(float(Time.get_ticks_msec()) / 420.0) * 0.2
+ var now := float(Time.get_ticks_msec()) / 1000.0
+ var pulse := 0.7 + sin(now * 2.4) * 0.2
  draw_circle(START_POS,116.0,Color(0.35,0.95,0.9,0.07 * pulse))
  draw_circle(RUINS_POS,150.0,Color(0.55,0.85,1.0,0.045 * pulse))
+ var font := ThemeDB.fallback_font
+ var label_color := Color(0.91,0.94,0.82,0.82)
+ draw_string(font,Vector2(210,112),"KAMIENNY KRĄG",HORIZONTAL_ALIGNMENT_LEFT,-1,24,label_color)
+ draw_string(font,Vector2(260,610),"ZIELONE OSTĘPY",HORIZONTAL_ALIGNMENT_LEFT,-1,25,Color(0.78,0.93,0.72,0.82))
+ draw_string(font,Vector2(1360,90),"KORONA GÓR",HORIZONTAL_ALIGNMENT_LEFT,-1,25,Color(0.91,0.95,0.97,0.84))
+ draw_string(font,Vector2(180,980),"ZŁOTE PUSTKOWIA",HORIZONTAL_ALIGNMENT_LEFT,-1,25,Color(0.99,0.87,0.62,0.86))
+ draw_string(font,Vector2(1450,1320),"POPIELNE ZIEMIE",HORIZONTAL_ALIGNMENT_LEFT,-1,25,Color(1.0,0.72,0.55,0.86))
+ draw_string(font,Vector2(1070,205),"KRYPTA KRYSZTAŁÓW",HORIZONTAL_ALIGNMENT_LEFT,-1,21,Color(0.68,0.94,1.0,0.88))
+ draw_string(font,Vector2(1450,635),"WSCHODNIE RUINY",HORIZONTAL_ALIGNMENT_LEFT,-1,24,Color(0.96,0.84,0.67,0.9))
+ var marker := RUINS_POS + Vector2(0,-190.0+sin(now*4.0)*8.0)
+ if quest >= 3 and quest <= 5:
+  draw_line(player_pos,marker,Color(0.36,0.86,1.0,0.18),2.0,true)
+  draw_circle(marker,15.0+sin(now*5.0)*3.0,Color(0.3,0.85,1.0,0.22))
+  draw_arc(marker,23.0,0.0,TAU,32,Color(0.55,0.94,1.0,0.85),3.0,true)
+  draw_string(font,marker+Vector2(-50,-28),"CEL ZADANIA",HORIZONTAL_ALIGNMENT_CENTER,-1,14,Color(0.72,0.96,1.0,0.95))
 
 func _draw_damage_number(number: Dictionary) -> void:
  var life := float(number["life"])
