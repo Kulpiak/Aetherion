@@ -1,21 +1,32 @@
 # Aetherion — status projektu
 
 ## Kierunek
-- Godot 4.x, GDScript, Android, 2D pixel art, widok top-down.
-- Najpierw kompletna grywalna gra offline/PvE; multiplayer dopiero w kolejnym etapie.
-- Uniwersum i systemy autorskie, bez kopiowania chronionych postaci, nazw ani assetów.
+- Godot 4.4.1, GDScript, Android, 2D top-down, orientacja pozioma.
+- Pierwszy cel: kompletna gra offline/PvE; multiplayer dopiero po ustabilizowaniu gry.
+- Autorskie uniwersum i systemy, bez kopiowania chronionych postaci, nazw ani assetów.
 
-## Etapy
-1. Grywalny rdzeń PvE: ruch, kamera, walka, przeciwnicy, drop, questy, zapis.
-2. Rozbudowa świata: regiony, NPC, bossowie, ekwipunek, crafting i progres ras.
-3. Testy na Androidzie i stabilny build APK przez GitHub Actions.
-4. Dopiero potem backend autorytatywny i multiplayer.
+## Zaimplementowane w prototypie
+- Wybór jednej z pięciu ras, lokalny zapis i odczyt postępu.
+- Ruch dotykowy, kamera śledząca gracza i duży świat 1920×1440.
+- Walka podstawowa, fala obszarowa, promień, szarża i czasowa transformacja.
+- Przeciwnicy z ruchem do gracza, atakiem, reakcją na trafienie, odradzaniem i dropem.
+- Obrażenia wyświetlane nad celem, efekty trafień, aura transformacji i animowany promień.
+- Strażnik Rdzenia z większą sylwetką, aurą i paskiem zdrowia bossa.
+- Zadania startowe, Kronikarz, rozwój postaci, złoto, ekwipunek, mikstury i crafting.
+- Panel mapy z ilustracją świata, nazwami regionów i znacznikiem celu zadania.
+- Paski HP/Eterium, przebudowane przyciski walki oraz stylizowane okna UI.
+
+## W trakcie przebudowy i walidacji
+- Kolejne iteracje wyglądu oraz czytelności interfejsu na rzeczywistych ekranach Androida.
+- Lepsze, pełne animacje kierunkowe postaci i przeciwników.
+- Dopracowanie regionów jako odrębnych, eksplorowalnych obszarów z własnymi zawartościami.
+- Testy na fizycznym telefonie, wydajność, skalowanie i ergonomia dotyku.
+
+## Ograniczenia, których nie ukrywamy
+- Obecne sprite'y są wstępną grafiką atlasową, a nie finalną, wysokiej jakości grafiką anime.
+- Świat jest obecnie jedną mapą, nie zestawem kompletnych osobnych lokacji i wnętrz.
+- Gra jest offline PvE. Nie ma jeszcze serwera, kont online, gildii, czatu, handlu ani PvP.
+- Sukces GitHub Actions potwierdza walidację i eksport APK w CI; nie zastępuje testu na fizycznym urządzeniu.
 
 ## Zasada jakości
-Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie przejdą rzeczywistego builda i testów. Każdy etap ma mieć działający, możliwy do sprawdzenia rezultat.
-
-## Najbliższe poprawki prototypu
-- kamera śledząca gracza;
-- trwałe sterowanie dotykowe (press/release);
-- animacje kierunkowe postaci i przeciwników;
-- weryfikacja eksportu Android i workflow CI.
+Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie przejdą odpowiedniego builda i testów. Każdy etap musi mieć możliwy do sprawdzenia rezultat.
