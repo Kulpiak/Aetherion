@@ -29,7 +29,22 @@ class VirtualStick extends Control:
  func _axis_from(point: Vector2) -> Vector2:
   var value := (point - size * 0.5) / 54.0
   return value.limit_length(1.0)
- func _draw() -> void:
+ func _refresh_action_buttons() -> void:
+ if action_buttons.size() < 6:
+  return
+ action_buttons[0].disabled = attack_cd > 0.0
+ action_buttons[1].disabled = skill_cd > 0.0 or ether < 20.0
+ action_buttons[1].text = "✦\\nFALA" if skill_cd <= 0.0 else "✦\\n%.1fs" % skill_cd
+ action_buttons[2].disabled = bolt_cd > 0.0 or ether < 28.0
+ action_buttons[2].text = "◎\\nPROMIEŃ" if bolt_cd <= 0.0 else "◎\\n%.1fs" % bolt_cd
+ action_buttons[3].disabled = dash_cd > 0.0 or ether < 16.0
+ action_buttons[3].text = "➤\\nSZARŻA" if dash_cd <= 0.0 else "➤\\n%.1fs" % dash_cd
+ action_buttons[4].disabled = not transformed and (transform_cd > 0.0 or ether < 28.0)
+ action_buttons[4].text = "✧\\n%.0fs" % transform_left if transformed else ("✧\\nFORMA" if transform_cd <= 0.0 else "✧\\n%.0fs" % transform_cd)
+ action_buttons[5].disabled = int(inventory.get("Mikstura HP",0)) <= 0 or hp >= max_hp
+ action_buttons[5].tooltip_text = "Mikstury HP: %d" % int(inventory.get("Mikstura HP",0))
+
+func _draw() -> void:
   var center := size * 0.5
   draw_circle(center,67,Color(0.025,0.055,0.075,0.72))
   draw_arc(center,67,0.0,TAU,48,Color(0.45,0.83,0.9,0.8),3.0,true)
@@ -99,6 +114,7 @@ var ui: CanvasLayer
 var status: Label
 var hp_bar: ProgressBar
 var ether_bar: ProgressBar
+var action_buttons: Array[Button] = []
 var quest_label: Label
 var msg: Label
 var panel: PanelContainer
@@ -179,12 +195,13 @@ func _build_ui() -> void:
  bottom.alignment = BoxContainer.ALIGNMENT_END
  bottom.add_theme_constant_override("separation",6)
  root.add_child(bottom)
- _button(bottom,"⚔\\nATAK",_attack,70,62)
- _button(bottom,"✦\\nFALA",_skill,70,62)
- _button(bottom,"◎\\nPROMIEŃ",_skill_bolt,78,62)
- _button(bottom,"➤\\nSZARŻA",_skill_dash,74,62)
- _button(bottom,"✧\\nFORMA",_transform,70,62)
- _button(bottom,"+\\nHP",_potion,66,62)
+ action_buttons.clear()
+ action_buttons.append(_button(bottom,"⚔\\nATAK",_attack,70,62))
+ action_buttons.append(_button(bottom,"✦\\nFALA",_skill,70,62))
+ action_buttons.append(_button(bottom,"◎\\nPROMIEŃ",_skill_bolt,78,62))
+ action_buttons.append(_button(bottom,"➤\\nSZARŻA",_skill_dash,74,62))
+ action_buttons.append(_button(bottom,"✧\\nFORMA",_transform,70,62))
+ action_buttons.append(_button(bottom,"+\\nHP",_potion,66,62))
  panel = PanelContainer.new()
  panel.set_anchors_preset(Control.PRESET_CENTER)
  panel.position = Vector2(-205,-145)
@@ -222,11 +239,11 @@ func _create_hud_bar(parent: Node, fill_color: Color) -> ProgressBar:
  parent.add_child(bar)
  return bar
 
-func _button(parent: Node, label_text: String, callback: Callable, w: float=132.0, h: float=36.0) -> void:
+func _button(parent: Node, label_text: String, callback: Callable, w: float=132.0, h: float=36.0) -> Button:
  var button := Button.new()
  button.text = label_text
  button.custom_minimum_size = Vector2(w,h)
- button.add_theme_font_size_override("font_size",18 if h >= 55 else 14)
+ button.add_theme_font_size_override("font_size",15 if h >= 55 else 14)
  button.add_theme_color_override("font_color",Color("#eaf7ff"))
  button.add_theme_color_override("font_hover_color",Color("#ffffff"))
  button.add_theme_color_override("font_pressed_color",Color("#b9f6ef"))
@@ -251,6 +268,7 @@ func _button(parent: Node, label_text: String, callback: Callable, w: float=132.
  button.add_theme_stylebox_override("focus",hover)
  button.pressed.connect(callback)
  parent.add_child(button)
+ return button
 
 func _move_button(parent: Node, label_text: String, direction: String) -> void:
  var button := Button.new()
@@ -949,6 +967,7 @@ func _update_hud() -> void:
   ether_bar.value = ether
  var objectives := ["ZADANIE: porozmawiaj z Kronikarzem.","ZADANIE: pokonaj 5 stworzeń (%d/5)." % mini(kills,5),"ZADANIE: wróć do Kronikarza po nagrodę.","ZADANIE: dotrzyj do wschodnich ruin i zbadaj ich centrum.","ROZDZIAŁ I: zbadaj tajemnicę Strażnika Rdzenia.","ZADANIE: pokonaj Strażnika Rdzenia.","ROZDZIAŁ I UKOŃCZONY — Aetherion jest bezpieczne."]
  quest_label.text = objectives[clampi(quest,0,6)]
+ _refresh_action_buttons()
 
 func _draw() -> void:
  _draw_world()
