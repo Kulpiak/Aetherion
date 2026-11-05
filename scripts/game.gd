@@ -173,12 +173,12 @@ func _build_ui() -> void:
  bottom.alignment = BoxContainer.ALIGNMENT_END
  bottom.add_theme_constant_override("separation",6)
  root.add_child(bottom)
- _button(bottom,"ATAK",_attack,72,58)
- _button(bottom,"FALA",_skill,72,58)
- _button(bottom,"PROMIEŃ",_skill_bolt,82,58)
- _button(bottom,"SZARŻA",_skill_dash,76,58)
- _button(bottom,"FORMA",_transform,72,58)
- _button(bottom,"MIKSTURA",_potion,82,58)
+ _button(bottom,"⚔\\nATAK",_attack,70,62)
+ _button(bottom,"✦\\nFALA",_skill,70,62)
+ _button(bottom,"◎\\nPROMIEŃ",_skill_bolt,78,62)
+ _button(bottom,"➤\\nSZARŻA",_skill_dash,74,62)
+ _button(bottom,"✧\\nFORMA",_transform,70,62)
+ _button(bottom,"+\\nHP",_potion,66,62)
  panel = PanelContainer.new()
  panel.set_anchors_preset(Control.PRESET_CENTER)
  panel.position = Vector2(-205,-145)
@@ -190,23 +190,25 @@ func _button(parent: Node, label_text: String, callback: Callable, w: float=132.
  var button := Button.new()
  button.text = label_text
  button.custom_minimum_size = Vector2(w,h)
- button.add_theme_font_size_override("font_size",13 if h >= 50 else 14)
+ button.add_theme_font_size_override("font_size",18 if h >= 55 else 14)
  button.add_theme_color_override("font_color",Color("#eaf7ff"))
  button.add_theme_color_override("font_hover_color",Color("#ffffff"))
  button.add_theme_color_override("font_pressed_color",Color("#b9f6ef"))
+ button.add_theme_color_override("font_disabled_color",Color("#718391"))
+ button.tooltip_text = label_text.replace("\\n"," — ")
  var normal := StyleBoxFlat.new()
- normal.bg_color = Color("#142638")
- normal.border_color = Color("#4b9eae")
+ normal.bg_color = Color("#101c2b")
+ normal.border_color = Color("#67b9c5")
  normal.set_border_width_all(2)
- normal.set_corner_radius_all(10)
- normal.shadow_color = Color(0,0,0,0.35)
- normal.shadow_size = 4
+ normal.set_corner_radius_all(13)
+ normal.shadow_color = Color(0,0,0,0.48)
+ normal.shadow_size = 6
  var hover := normal.duplicate()
- hover.bg_color = Color("#24506a")
- hover.border_color = Color("#8be8e6")
+ hover.bg_color = Color("#23465c")
+ hover.border_color = Color("#b5f5ef")
  var pressed := normal.duplicate()
- pressed.bg_color = Color("#0d1728")
- pressed.border_color = Color("#f0c879")
+ pressed.bg_color = Color("#08111d")
+ pressed.border_color = Color("#f4cf7b")
  button.add_theme_stylebox_override("normal",normal)
  button.add_theme_stylebox_override("hover",hover)
  button.add_theme_stylebox_override("pressed",pressed)
@@ -604,38 +606,103 @@ func _draw_npc() -> void:
 
 func _show_panel(panel_name: String) -> void:
  if not started: return
- panel.custom_minimum_size = Vector2(410, 290)
- panel.position = Vector2(-205, -145)
+ panel.custom_minimum_size = Vector2(520, 380) if panel_name == "Ekwipunek" else Vector2(440, 320)
+ panel.position = Vector2(-260, -190) if panel_name == "Ekwipunek" else Vector2(-220, -160)
  _clear_panel()
  panel.show()
  var box := VBoxContainer.new()
+ box.add_theme_constant_override("separation", 9)
  panel.add_child(box)
+ var header := HBoxContainer.new()
+ box.add_child(header)
  var title := Label.new()
- title.text = panel_name
- title.add_theme_font_size_override("font_size",22)
- box.add_child(title)
+ title.text = panel_name.to_upper()
+ title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+ title.add_theme_font_size_override("font_size", 22)
+ title.add_theme_color_override("font_color", Color("#f1d99f"))
+ header.add_child(title)
+ _button(header, "X", func(): panel.hide(), 38, 34)
+ if panel_name == "Ekwipunek":
+  var summary := Label.new()
+  summary.text = "PLECAK  •  ZŁOTO %d  •  PRZEDMIOTY %d" % [gold, inventory.size()+owned_gear.size()]
+  summary.add_theme_color_override("font_color", Color("#a8d5df"))
+  box.add_child(summary)
+  var grid := GridContainer.new()
+  grid.columns = 3
+  grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+  grid.add_theme_constant_override("h_separation", 8)
+  grid.add_theme_constant_override("v_separation", 8)
+  box.add_child(grid)
+  for item_name in inventory.keys():
+   var count := int(inventory[item_name])
+   var icon := "✚" if item_name == "Mikstura HP" else ("◆" if item_name == "Odłamek Eterium" else "◈")
+   var item_button := Button.new()
+   item_button.text = "%s\\n%s\\n× %d" % [icon, str(item_name), count]
+   item_button.custom_minimum_size = Vector2(150, 78)
+   item_button.add_theme_font_size_override("font_size", 13)
+   item_button.tooltip_text = "Otwórz szczegóły: " + str(item_name)
+   var item_style := StyleBoxFlat.new()
+   item_style.bg_color = Color("#17283a")
+   item_style.border_color = Color("#4c8292")
+   item_style.set_border_width_all(2)
+   item_style.set_corner_radius_all(10)
+   item_button.add_theme_stylebox_override("normal", item_style)
+   item_button.pressed.connect(func(): _show_item_detail(str(item_name)))
+   grid.add_child(item_button)
+  for gear_name in owned_gear:
+   var gear_button := Button.new()
+   var slot_name := str(GEAR_STATS[gear_name]["slot"])
+   gear_button.text = "⚔\\n%s\\n%s" % [gear_name, "ZAŁOŻONE" if equipment.get(slot_name,"") == gear_name else "W PLECAKU"]
+   gear_button.custom_minimum_size = Vector2(150, 78)
+   gear_button.add_theme_font_size_override("font_size", 12)
+   gear_button.pressed.connect(func(): _show_item_detail(gear_name))
+   grid.add_child(gear_button)
+  var hint := Label.new()
+  hint.text = "Dotknij przedmiotu, aby zobaczyć opis i dostępne akcje."
+  hint.add_theme_font_size_override("font_size", 12)
+  hint.add_theme_color_override("font_color", Color("#9bb7c9"))
+  box.add_child(hint)
+  return
  var body := Label.new()
  body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  if panel_name == "Postać":
-  body.text = "Rasa: %s\\nPoziom: %d\\nHP: %d/%d\\nEterium: %d/%d\\nAtak: %d Obrona: %d\\nZłoto: %d" % [race,level,int(hp),int(max_hp),int(ether),int(max_ether),atk,defense,gold]
- elif panel_name == "Ekwipunek":
-  body.text = "Mikstury HP: %d\\nSkóra bestii: %d\\nOdłamki Eterium: %d\\nBroń: %s\\nPancerz: %s" % [inventory["Mikstura HP"],inventory["Skóra bestii"],inventory["Odłamek Eterium"],equipment["Broń"],equipment["Pancerz"]]
+  body.text = "Rasa: %s\\nPoziom: %d  •  XP: %d\\nHP: %d/%d\\nEterium: %d/%d\\nAtak: %d  •  Obrona: %d\\nZłoto: %d\\nPokonani przeciwnicy: %d" % [race,level,xp,int(hp),int(max_hp),int(ether),int(max_ether),atk,defense,gold,kills]
  elif panel_name == "Rzemiosło":
   body.text = "Wytwarzaj wyposażenie z materiałów z potworów.\\nOstrze Eterium: 4 skóry + 3 odłamki (Atak +7).\\nPancerz Łowcy: 5 skór + 2 odłamki (Obrona +4, HP +30).\\nMikstura HP: 2 skóry + 1 odłamek."
  elif panel_name == "Mapa":
   body.text = "KAMIENNY KRĄG — bezpieczna strefa i Kronikarz.\\nZIELONE OSTĘPY — polowania na stworzenia.\\nWSCHODNIE RUINY — rozdział I i Strażnik Rdzenia.\\nTwoja pozycja: %d, %d" % [int(player_pos.x),int(player_pos.y)]
  else:
-  body.text = "Technika Eterium: koszt 20, fala obszarowa, cooldown 4 s.\\nPromień Eterium: koszt 28, zasięg 285, potrójne obrażenia, cooldown 6 s.\\nPrzebudzenie Rdzenia: 16 s.\\nGałęzie rozwoju: Żar / Pryzmat / Instynkt."
+  body.text = "Technika Eterium: koszt 20, fala obszarowa, cooldown 4 s.\\nPromień Eterium: koszt 28, zasięg 285, potrójne obrażenia, cooldown 6 s.\\nSzarża: koszt 16, zasięg 310, cooldown 5 s.\\nPrzebudzenie Rdzenia: 16 s."
  box.add_child(body)
  if panel_name == "Rzemiosło":
   _button(box,"WYT WÓRZ OSTRZE ETERIUM",func(): _craft_item("Ostrze Eterium"),370,34)
-  _button(box,"WYT WÓRZ PANCERZ ŁOWCY",func(): _craft_item("Pancerz Łowcy"),370,34)
+  _button(box,"WYT WÓRZ PANCERZ ŁOWCY",func(): _craft_item("Pancerz ŁOWCY"),370,34)
   _button(box,"WYT WÓRZ MIKSTURĘ",func(): _craft_item("Mikstura HP"),370,34)
- if panel_name == "Ekwipunek":
-  for item_name in owned_gear:
-   if item_name != equipment.get(str(GEAR_STATS[item_name]["slot"]),""):
-    _button(box,"ZAŁÓŻ: "+item_name,func(): _equip_gear(item_name),370,32)
  _button(box,"ZAMKNIJ",func(): panel.hide(),370,38)
+
+func _show_item_detail(item_name: String) -> void:
+ _clear_panel()
+ var box := VBoxContainer.new()
+ box.add_theme_constant_override("separation", 12)
+ panel.add_child(box)
+ var title := Label.new()
+ title.text = item_name.to_upper()
+ title.add_theme_font_size_override("font_size", 20)
+ title.add_theme_color_override("font_color", Color("#f1d99f"))
+ box.add_child(title)
+ var description := Label.new()
+ description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+ if GEAR_STATS.has(item_name):
+  var stats: Dictionary = GEAR_STATS[item_name]
+  description.text = "Slot: %s\\nAtak: +%d\\nObrona: +%d\\nMaksymalne HP: +%d\\n%s" % [stats["slot"],stats["atk"],stats["def"],stats["hp"],"Aktualnie założone" if equipment.get(str(stats["slot"]),"") == item_name else "Gotowe do założenia"]
+ else:
+  description.text = "Ilość w plecaku: %d\\n%s" % [int(inventory.get(item_name,0)), "Przywraca 60 HP." if item_name == "Mikstura HP" else "Materiał wykorzystywany w rzemiośle."]
+ box.add_child(description)
+ if GEAR_STATS.has(item_name) and equipment.get(str(GEAR_STATS[item_name]["slot"]),"") != item_name:
+  _button(box,"ZAŁÓŻ PRZEDMIOT",func(): _equip_gear(item_name); _show_panel("Ekwipunek"),320,42)
+ elif item_name == "Mikstura HP" and int(inventory.get(item_name,0)) > 0:
+  _button(box,"UŻYJ MIKSTURĘ",func(): _potion(); _show_panel("Ekwipunek"),320,42)
+ _button(box,"WRÓĆ DO PLECAKA",func(): _show_panel("Ekwipunek"),320,38)
 
 func _craft_item(item_name: String) -> void:
  if item_name != "Mikstura HP" and owned_gear.has(item_name):
