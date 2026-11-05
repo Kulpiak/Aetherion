@@ -295,38 +295,54 @@ func _kill_enemy(index: int) -> void:
 
 func _quest_interact() -> void:
  if not started: return
+ # Etap ruin ma własny punkt interakcji — nie może być blokowany dystansem do Kronikarza.
+ if quest == 3:
+  if player_pos.distance_to(RUINS_POS) > 135.0:
+   _say("Wschodnie Ruiny są zaznaczone na mapie. Udaj się do ich centrum.")
+   return
+  quest = 4
+  gold += 75
+  xp += 100
+  _say("Ruiny zbadane! +75 złota, +100 XP. Rozdział I ukończony!")
+  while xp >= level * 100:
+   xp -= level * 100
+   level += 1
+   max_hp += 10
+   max_ether += 7
+   atk += 2
+   defense += 1
+   hp = max_hp
+   ether = max_ether
+  _update_hud()
+  return
  if player_pos.distance_to(START_POS) > 145.0:
   _say("Kronikarz czeka przy Kamiennym Kręgu.")
   return
  if quest == 0:
   quest = 1
   kills = 0
-  _say("Zadanie: pokonaj 5 stworzeń.")
+  _say("Kronikarz: pokonaj 5 stworzeń nękających okolicę.")
  elif quest == 2:
   quest = 3
   gold += 25
-  _say("Nagroda odebrana! Nowe zadanie: zbadaj wschodnie ruiny.")
- elif quest == 3:
-  if player_pos.distance_to(RUINS_POS) > 135.0:
-   _say("Znajdź wschodnie ruiny i zbadaj ich centrum.")
-  else:
-   quest = 4
-   gold += 75
-   xp += 100
-   _say("Ruiny zbadane! Otrzymujesz 75 złota i 100 XP. Rozdział I ukończony!")
-   while xp >= level * 100:
-    xp -= level * 100
-    level += 1
-    max_hp += 10
-    max_ether += 7
-    atk += 2
-    defense += 1
-    hp = max_hp
-    ether = max_ether
+  _say("Nagroda odebrana! +25 złota. Nowe zadanie: zbadaj Wschodnie Ruiny.")
  elif quest >= 4:
-  _say("Rozdział I ukończony. Kolejne przygody wkrótce.")
+  _say("Rozdział I ukończony. Kronikarz przygotowuje kolejną wyprawę.")
  else:
-  _say("Wykonaj aktualne zadanie i wróć.")
+  _say("Pokonaj 5 stworzeń, a potem wróć po nagrodę.")
+ _update_hud()
+
+func _draw_npc() -> void:
+ var p := START_POS + Vector2(0,-48)
+ var bob := sin(float(Time.get_ticks_msec())/420.0)*2.0
+ draw_rect(Rect2(p.x-10,p.y-1+bob,20,22),Color("#66543e"))
+ draw_rect(Rect2(p.x-8,p.y-14+bob,16,14),Color("#d6b98a"))
+ draw_rect(Rect2(p.x-10,p.y-18+bob,20,7),Color("#4b392e"))
+ draw_rect(Rect2(p.x-7,p.y-5+bob,14,3),Color("#d5ad58"))
+ draw_rect(Rect2(p.x-5,p.y+20+bob,5,7),Color("#382f2a"))
+ draw_rect(Rect2(p.x+1,p.y+20+bob,5,7),Color("#382f2a"))
+ draw_circle(p+Vector2(0,-28+bob),5,Color("#f3d477"))
+ draw_string(ThemeDB.fallback_font,p+Vector2(-50,-36),"KRONIKARZ",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("#ffe7a6"))
 
 func _show_panel(panel_name: String) -> void:
  if not started: return
@@ -399,6 +415,8 @@ func _update_hud() -> void:
 func _draw() -> void:
  _draw_world()
  _draw_landmarks()
+ if started:
+  _draw_npc()
  for enemy in enemies:
   if enemy["alive"]:
    _draw_enemy(enemy)
