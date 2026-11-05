@@ -1,5 +1,42 @@
 extends Node2D
 
+class VirtualStick extends Control:
+ signal vector_changed(value: Vector2)
+ var active := false
+ var axis := Vector2.ZERO
+ func _ready() -> void:
+  mouse_filter = Control.MOUSE_FILTER_STOP
+  custom_minimum_size = Vector2(152,152)
+ func _gui_input(event: InputEvent) -> void:
+  if event is InputEventScreenTouch:
+   active = event.pressed
+   axis = _axis_from(event.position) if active else Vector2.ZERO
+   vector_changed.emit(axis)
+   queue_redraw()
+  elif event is InputEventScreenDrag and active:
+   axis = _axis_from(event.position)
+   vector_changed.emit(axis)
+   queue_redraw()
+  elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+   active = event.pressed
+   axis = _axis_from(event.position) if active else Vector2.ZERO
+   vector_changed.emit(axis)
+   queue_redraw()
+  elif event is InputEventMouseMotion and active:
+   axis = _axis_from(event.position)
+   vector_changed.emit(axis)
+   queue_redraw()
+ func _axis_from(point: Vector2) -> Vector2:
+  var value := (point - size * 0.5) / 54.0
+  return value.limit_length(1.0)
+ func _draw() -> void:
+  var center := size * 0.5
+  draw_circle(center,67,Color(0.025,0.055,0.075,0.72))
+  draw_arc(center,67,0.0,TAU,48,Color(0.45,0.83,0.9,0.8),3.0,true)
+  draw_circle(center,43,Color(0.15,0.28,0.32,0.45))
+  draw_circle(center + axis * 39.0,25,Color(0.34,0.78,0.83,0.9))
+  draw_arc(center + axis * 39.0,25,0.0,TAU,32,Color(0.82,0.97,0.94,0.95),2.0,true)
+
 const SAVE_PATH := "user://aetherion_save.json"
 const SPRITE_ATLAS: Texture2D = preload("res://assets/aetherion_sprites.svg")
 const WORLD_SIZE := Vector2(1920, 1440)
@@ -61,6 +98,9 @@ var status: Label
 var quest_label: Label
 var msg: Label
 var panel: PanelContainer
+var virtual_stick: VirtualStick
+var bolt_cd := 0.0
+var bolt_anim := 0.0
 
 func _ready() -> void:
  rng.randomize()
@@ -115,20 +155,24 @@ func _build_ui() -> void:
  _button(right,"ZADANIE",_quest_interact)
  _button(right,"ZAPISZ",_save_game)
  _button(right,"WCZYTAJ",_load_game)
+ virtual_stick = VirtualStick.new()
+ virtual_stick.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+ virtual_stick.position = Vector2(18,-174)
+ virtual_stick.size = Vector2(152,152)
+ virtual_stick.vector_changed.connect(_on_virtual_stick)
+ root.add_child(virtual_stick)
  var bottom := HBoxContainer.new()
- bottom.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
- bottom.position = Vector2(8,-70)
- bottom.size = Vector2(944,62)
- bottom.alignment = BoxContainer.ALIGNMENT_CENTER
+ bottom.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+ bottom.position = Vector2(-520,-72)
+ bottom.size = Vector2(510,62)
+ bottom.alignment = BoxContainer.ALIGNMENT_END
+ bottom.add_theme_constant_override("separation",6)
  root.add_child(bottom)
- _move_button(bottom,"◀","left")
- _move_button(bottom,"▲","up")
- _move_button(bottom,"▼","down")
- _move_button(bottom,"▶","right")
  _button(bottom,"ATAK",_attack,78,54)
- _button(bottom,"TECHNIKA",_skill,94,54)
+ _button(bottom,"ETER",_skill,78,54)
+ _button(bottom,"PROMIEŃ",_skill_bolt,82,54)
  _button(bottom,"FORMA",_transform,78,54)
- _button(bottom,"MIKSTURA",_potion,94,54)
+ _button(bottom,"MIKSTURA",_potion,90,54)
  panel = PanelContainer.new()
  panel.set_anchors_preset(Control.PRESET_CENTER)
  panel.position = Vector2(-205,-145)
@@ -192,6 +236,8 @@ func _process(delta: float) -> void:
  attack_anim = maxf(0.0,attack_anim-delta)
  skill_cd = maxf(0.0,skill_cd-delta)
  skill_anim = maxf(0.0,skill_anim-delta)
+ bolt_cd = maxf(0.0,bolt_cd-delta)
+ bolt_anim = maxf(0.0,bolt_anim-delta)
  transform_cd = maxf(0.0,transform_cd-delta)
  if transformed:
   transform_left -= delta
@@ -256,6 +302,12 @@ func _process(delta: float) -> void:
  _update_hud()
  queue_redraw()
 
+func _on_virtual_stick(value: Vector2) -> void:
+ held["left"] = value.x < -0.18
+ held["right"] = value.x > 0.18
+ held["up"] = value.y < -0.18
+ held["down"] = value.y > 0.18
+
 func _nearest_enemy(max_distance: float) -> int:
  var best := -1
  var nearest := max_distance
@@ -297,6 +349,29 @@ func _skill() -> void:
    if enemy["hp"] <= 0.0: _kill_enemy(i)
    else: enemies[i] = enemy
  _say("Technika Eterium!")
+
+func _skill_bolt() -> void:
+ if not started or bolt_cd > 0.0:
+  return
+ if ether < 28.0:
+  _say("Za mało Eterium na Promień.")
+  return
+ var index := _nearest_enemy(285.0)
+ if index < 0:
+  _say("Brak celu dla Promienia.")
+  return
+ ether -= 28.0
+ bolt_cd = 6.0
+ bolt_anim = 0.38
+ var enemy := enemies[index]
+ player_facing = (enemy["pos"]-player_pos).normalized()
+ attack_target = enemy["pos"]
+ enemy["hp"] -= atk * 3 + (18 if transformed else 0)
+ if enemy["hp"] <= 0.0:
+  _kill_enemy(index)
+ else:
+  enemies[index] = enemy
+ _say("PROMIEŃ ETERIUM!")
 
 func _transform() -> void:
  if not started: return
@@ -437,7 +512,7 @@ func _show_panel(panel_name: String) -> void:
  elif panel_name == "Mapa":
   body.text = "KAMIENNY KRĄG — bezpieczna strefa i Kronikarz.\\nZIELONE OSTĘPY — polowania na stworzenia.\\nWSCHODNIE RUINY — rozdział I i Strażnik Rdzenia.\\nTwoja pozycja: %d, %d" % [int(player_pos.x),int(player_pos.y)]
  else:
-  body.text = "Technika Eterium: koszt 20, obrażenia obszarowe, cooldown 4 s.\\nPrzebudzenie Rdzenia: koszt 28, czas 16 s, cooldown 32 s.\\nVarkari: gałęzie Żar / Pryzmat / Instynkt."
+  body.text = "Technika Eterium: koszt 20, fala obszarowa, cooldown 4 s.\\nPromień Eterium: koszt 28, zasięg 285, potrójne obrażenia, cooldown 6 s.\\nPrzebudzenie Rdzenia: 16 s.\\nGałęzie rozwoju: Żar / Pryzmat / Instynkt."
  box.add_child(body)
  if panel_name == "Rzemiosło":
   _button(box,"WYT WÓRZ OSTRZE ETERIUM",func(): _craft_item("Ostrze Eterium"),370,34)
@@ -642,6 +717,25 @@ func _draw_landmarks() -> void:
  draw_circle(START_POS,12,Color("#67c6d0"))
  draw_circle(START_POS,6,Color("#b7f2e9"))
  draw_string(ThemeDB.fallback_font,START_POS+Vector2(-72,-130),"KAMIENNY KRĄG",HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color("#fff0c4"))
+ # Kryształowe Miasto — kamienne place, domy kupieckie i eteryczne latarnie.
+ for i in range(6):
+  var bx := 270.0 + float(i % 3) * 112.0
+  var by := 205.0 + float(i / 3) * 126.0
+  draw_rect(Rect2(bx-28,by-23,56,48),Color("#514b49"))
+  draw_rect(Rect2(bx-24,by-19,48,40),Color("#9a8061"))
+  draw_rect(Rect2(bx-20,by-15,40,32),Color("#66594f"))
+  draw_colored_polygon(PackedVector2Array([Vector2(bx-34,by-23),Vector2(bx,by-49),Vector2(bx+34,by-23)]),Color("#3e5861"))
+  draw_rect(Rect2(bx-5,by-5,10,22),Color("#342f34"))
+  draw_rect(Rect2(bx-17,by-10,8,9),Color("#8bd5d5"))
+  draw_rect(Rect2(bx+9,by-10,8,9),Color("#8bd5d5"))
+ for i in range(4):
+  var lx := 300.0 + float(i) * 82.0
+  draw_rect(Rect2(lx-3,START_POS.y+130,6,26),Color("#5d5145"))
+  draw_circle(Vector2(lx,START_POS.y+127),10,Color("#67cbd1"))
+  draw_circle(Vector2(lx,START_POS.y+127),4,Color("#e0ffff"))
+ draw_rect(Rect2(410,START_POS.y+160,140,18),Color("#756d5e"))
+ draw_rect(Rect2(418,START_POS.y+164,124,10),Color("#b4a48a"))
+ draw_string(ThemeDB.fallback_font,Vector2(270,145),"KRYPTAŁOWE MIASTO",HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("#e6f5dc"))
  # Wschodnie ruiny — cel pierwszego rozdziału
  draw_rect(Rect2(RUINS_POS.x-100,RUINS_POS.y-70,200,140),Color("#263b37"))
  draw_rect(Rect2(RUINS_POS.x-88,RUINS_POS.y-58,176,116),Color("#756d58"))
@@ -693,6 +787,10 @@ func draw_ellipse_shadow(center: Vector2, width: float, height: float) -> void:
 
 func _draw_combat_effects() -> void:
  var now := float(Time.get_ticks_msec()) / 1000.0
+ if bolt_anim > 0.0:
+  var beam_start := player_pos + Vector2(0,-8)
+  draw_line(beam_start,attack_target,Color(0.35,0.95,1.0,0.9),9.0,true)
+  draw_line(beam_start,attack_target,Color(0.9,1.0,1.0,0.95),3.0,true)
  if attack_anim > 0.0:
   var progress := 1.0 - attack_anim / 0.24
   var sweep := progress * 1.25
