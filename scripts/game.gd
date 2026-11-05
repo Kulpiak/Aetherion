@@ -210,6 +210,9 @@ func _process(delta: float) -> void:
  for i in range(enemies.size()):
   var enemy := enemies[i]
   if not enemy["alive"]:
+   if bool(enemy.get("is_boss",false)):
+    enemies[i] = enemy
+    continue
    enemy["respawn"] += delta
    if enemy["respawn"] >= 18.0:
     enemy["alive"] = true
@@ -442,6 +445,9 @@ func _show_panel(panel_name: String) -> void:
  _button(box,"ZAMKNIJ",func(): panel.hide(),370,38)
 
 func _craft_item(item_name: String) -> void:
+ if item_name != "Mikstura HP" and owned_gear.has(item_name):
+  _say("Ten przedmiot już posiadasz.")
+  return
  if item_name == "Ostrze Eterium":
   if int(inventory["Skóra bestii"]) < 4 or int(inventory["Odłamek Eterium"]) < 3:
    _say("Brakuje materiałów na Ostrze Eterium.")
@@ -507,8 +513,8 @@ func _load_game() -> void:
  level = int(data.get("level",1))
  xp = int(data.get("xp",0))
  gold = int(data.get("gold",0))
- atk = int(data.get("atk",15))
- defense = int(data.get("defense",4))
+ atk = int(RACES[race]["atk"])+(level-1)*2
+ defense = int(RACES[race]["def"])+(level-1)
  hp = float(data.get("hp",140))
  ether = float(data.get("ether",100))
  quest = int(data.get("quest",0))
@@ -524,6 +530,8 @@ func _load_game() -> void:
   max_hp += int(gear_stats.get("hp",0))
   atk += int(gear_stats.get("atk",0))
   defense += int(gear_stats.get("def",0))
+ if boss_spawned and not boss_defeated:
+  enemies.append({"name":"Strażnik Rdzenia","pos":RUINS_POS+Vector2(0,105),"hp":620.0,"max_hp":620.0,"damage":22.0,"speed":58.0,"alive":true,"type":3,"timer":0.0,"respawn":0.0,"is_boss":true})
  max_ether = float(RACES[race]["ep"])+(level-1)*7
  started = true
  panel.hide()
