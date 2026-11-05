@@ -676,8 +676,8 @@ func _draw_npc() -> void:
 
 func _show_panel(panel_name: String) -> void:
  if not started: return
- panel.custom_minimum_size = Vector2(520, 380) if panel_name == "Ekwipunek" else Vector2(440, 320)
- panel.position = Vector2(-260, -190) if panel_name == "Ekwipunek" else Vector2(-220, -160)
+ panel.custom_minimum_size = Vector2(520, 380) if panel_name == "Ekwipunek" else (Vector2(660, 520) if panel_name == "Mapa" else Vector2(440, 320))
+ panel.position = Vector2(-260, -190) if panel_name == "Ekwipunek" else (Vector2(-330, -260) if panel_name == "Mapa" else Vector2(-220, -160))
  _clear_panel()
  panel.show()
  var box := VBoxContainer.new()
@@ -692,6 +692,15 @@ func _show_panel(panel_name: String) -> void:
  title.add_theme_color_override("font_color", Color("#f1d99f"))
  header.add_child(title)
  _button(header, "X", func(): panel.hide(), 38, 34)
+ if panel_name == "Mapa":
+  var map_view := TextureRect.new()
+  map_view.texture = WORLD_TEXTURE
+  map_view.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+  map_view.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+  map_view.custom_minimum_size = Vector2(610, 365)
+  map_view.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+  map_view.size_flags_vertical = Control.SIZE_EXPAND_FILL
+  box.add_child(map_view)
  if panel_name == "Ekwipunek":
   var summary := Label.new()
   summary.text = "PLECAK  •  ZŁOTO %d  •  PRZEDMIOTY %d" % [gold, inventory.size()+owned_gear.size()]
@@ -740,7 +749,8 @@ func _show_panel(panel_name: String) -> void:
  elif panel_name == "Rzemiosło":
   body.text = "Wytwarzaj wyposażenie z materiałów z potworów.\\nOstrze Eterium: 4 skóry + 3 odłamki (Atak +7).\\nPancerz Łowcy: 5 skór + 2 odłamki (Obrona +4, HP +30).\\nMikstura HP: 2 skóry + 1 odłamek."
  elif panel_name == "Mapa":
-  body.text = "KAMIENNY KRĄG — bezpieczna strefa i Kronikarz.\\nZIELONE OSTĘPY — polowania na stworzenia.\\nWSCHODNIE RUINY — rozdział I i Strażnik Rdzenia.\\nTwoja pozycja: %d, %d" % [int(player_pos.x),int(player_pos.y)]
+  var objective_text := "CEL: Wschodnie Ruiny" if quest >= 3 and quest <= 5 else ("CEL: wróć do Kronikarza" if quest == 2 else "CEL: Kamienny Krąg i pierwsze polowanie")
+  body.text = "%s\\nPozycja: %d, %d\\n\\nKamienny Krąg • Zielone Ostępy • Korona Gór\\nKrypta Kryształów • Złote Pustkowia\\nWschodnie Ruiny • Popielne Ziemie" % [objective_text,int(player_pos.x),int(player_pos.y)]
  else:
   body.text = "Technika Eterium: koszt 20, fala obszarowa, cooldown 4 s.\\nPromień Eterium: koszt 28, zasięg 285, potrójne obrażenia, cooldown 6 s.\\nSzarża: koszt 16, zasięg 310, cooldown 5 s.\\nPrzebudzenie Rdzenia: 16 s."
  box.add_child(body)
