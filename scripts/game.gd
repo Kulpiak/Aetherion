@@ -106,6 +106,7 @@ var dash_cd := 0.0
 var dash_anim := 0.0
 var dash_from := Vector2.ZERO
 var dash_to := Vector2.ZERO
+var player_hit_flash := 0.0
 
 func _ready() -> void:
  rng.randomize()
@@ -126,7 +127,7 @@ func _ready() -> void:
 func _spawn_enemies() -> void:
  for i in range(18):
   var enemy_hp := 42.0 + float(i % 4) * 13.0
-  enemies.append({"name":ENEMY_NAMES[i%4],"pos":Vector2(rng.randf_range(90,1830),rng.randf_range(90,1350)),"hp":enemy_hp,"max_hp":enemy_hp,"damage":7.0+float(i%4)*2.0,"speed":42.0+float(i%4)*8.0,"alive":true,"type":i%4,"timer":0.0,"respawn":0.0})
+  enemies.append({"name":ENEMY_NAMES[i%4],"pos":Vector2(rng.randf_range(90,1830),rng.randf_range(90,1350)),"hp":enemy_hp,"max_hp":enemy_hp,"damage":7.0+float(i%4)*2.0,"speed":42.0+float(i%4)*8.0,"alive":true,"type":i%4,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN})
 
 func _build_ui() -> void:
  ui = CanvasLayer.new()
@@ -323,6 +324,7 @@ func _process(delta: float) -> void:
  bolt_cd = maxf(0.0,bolt_cd-delta)
  bolt_anim = maxf(0.0,bolt_anim-delta)
  dash_cd = maxf(0.0,dash_cd-delta)
+ player_hit_flash = maxf(0.0,player_hit_flash-delta)
  dash_anim = maxf(0.0,dash_anim-delta)
  if dash_anim > 0.0:
   player_pos = dash_from.lerp(dash_to,1.0-dash_anim/0.32)
@@ -361,13 +363,19 @@ func _process(delta: float) -> void:
     enemy["respawn"] = 0.0
    enemies[i] = enemy
    continue
+  enemy["attack_anim"] = maxf(0.0,float(enemy.get("attack_anim",0.0))-delta)
+  enemy["hit_flash"] = maxf(0.0,float(enemy.get("hit_flash",0.0))-delta)
   var difference: Vector2 = player_pos - enemy["pos"]
   if difference.length() < 300.0 and difference.length() > 36.0:
+   enemy["facing"] = difference.normalized()
+   enemy["walk_phase"] = float(enemy.get("walk_phase",0.0)) + delta * 9.0
    enemy["pos"] += difference.normalized() * enemy["speed"] * delta
   elif difference.length() <= 36.0:
    enemy["timer"] += delta
    if enemy["timer"] > 1.3:
     enemy["timer"] = 0.0
+    enemy["attack_anim"] = 0.34
+    player_hit_flash = 0.18
     hp -= maxf(2.0,enemy["damage"]-float(defense))
     if hp <= 0.0:
      hp = max_hp
@@ -418,6 +426,8 @@ func _attack() -> void:
  attack_angle = player_facing.angle()
  attack_target = enemy["pos"]
  attack_anim = 0.24
+ enemy["hit_flash"] = 0.18
+ enemy["pos"] += player_facing * 9.0
  enemy["hp"] -= atk + (8 if transformed else 0)
  if enemy["hp"] <= 0.0: _kill_enemy(index)
  else: enemies[index] = enemy
@@ -433,6 +443,8 @@ func _skill() -> void:
  for i in range(enemies.size()):
   var enemy := enemies[i]
   if enemy["alive"] and player_pos.distance_to(enemy["pos"]) < 170.0:
+   enemy["hit_flash"] = 0.18
+   enemy["pos"] += (enemy["pos"]-player_pos).normalized() * 7.0
    enemy["hp"] -= atk * 2
    if enemy["hp"] <= 0.0: _kill_enemy(i)
    else: enemies[i] = enemy
@@ -454,6 +466,8 @@ func _skill_bolt() -> void:
  var enemy := enemies[index]
  player_facing = (enemy["pos"]-player_pos).normalized()
  attack_target = enemy["pos"]
+ enemy["hit_flash"] = 0.2
+ enemy["pos"] += (enemy["pos"]-player_pos).normalized() * 12.0
  enemy["hp"] -= atk * 3 + (18 if transformed else 0)
  if enemy["hp"] <= 0.0:
   _kill_enemy(index)
@@ -479,6 +493,8 @@ func _skill_dash() -> void:
  dash_anim = 0.32
  dash_cd = 5.0
  ether -= 16.0
+ enemy["hit_flash"] = 0.22
+ enemy["pos"] += direction * 14.0
  enemy["hp"] -= atk * 2.4 + (12 if transformed else 0)
  if enemy["hp"] <= 0.0:
   _kill_enemy(index)
@@ -886,10 +902,16 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var p: Vector2 = enemy["pos"]
  var kind := int(enemy["type"])
  var chasing := player_pos.distance_to(p) < 300.0
- var frame := 1 if chasing and int(Time.get_ticks_msec()/180)%2 == 0 else 0
- var bob := sin(float(Time.get_ticks_msec())/190.0+float(kind))*2.0
+ var attacking := float(enemy.get("attack_anim",0.0)) > 0.0
+ var frame := 1 if chasing and int(Time.get_ticks_msec()/145)%2 == 0 else 0
+ var phase := float(enemy.get("walk_phase",0.0))
+ var bob := sin(phase)*3.0 if chasing else sin(float(Time.get_ticks_msec())/260.0+float(kind))*1.5
+ var lunge := Vector2(enemy.get("facing",Vector2.DOWN)) * (7.0 if attacking else 0.0)
+ var body_color := Color(1.0,0.55,0.48,1.0) if float(enemy.get("hit_flash",0.0)) > 0.0 else Color.WHITE
  draw_ellipse_shadow(p+Vector2(0,13),22,8)
- draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-40,p.y-44+bob,80,80),Rect2((5+kind)*128,frame*128,128,128),Color.WHITE,false)
+ if attacking:
+  draw_arc(p,37.0,0.0,TAU,28,Color(1.0,0.28,0.22,0.72),3.0,true)
+ draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-40+lunge.x,p.y-44+bob+lunge.y,80,80),Rect2((5+kind)*128,frame*128,128,128),body_color,false)
  draw_rect(Rect2(p.x-19,p.y-31,38,5),Color("#251f28"))
  draw_rect(Rect2(p.x-18,p.y-30,36.0*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),3),Color("#d94d52"))
  draw_string(ThemeDB.fallback_font,p+Vector2(-38,-36),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("#f4ead2"))
@@ -942,7 +964,8 @@ func _draw_player() -> void:
  var race_index := maxi(0,RACES.keys().find(race))
  draw_ellipse_shadow(p+Vector2(0,15),25,9)
  var frame := 1 if moving and int(Time.get_ticks_msec()/145)%2 == 0 else 0
- draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-44,p.y-52+bob,88,88),Rect2(race_index*128,frame*128,128,128),Color.WHITE,false)
+ var hero_tint := Color(1.0,0.55,0.48,1.0) if player_hit_flash > 0.0 else Color.WHITE
+ draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-44,p.y-52+bob,88,88),Rect2(race_index*128,frame*128,128,128),hero_tint,false)
  if transformed:
   draw_rect(Rect2(p.x-19,p.y-31+bob,38,3),Color("#ffb34f"))
   draw_rect(Rect2(p.x-23,p.y-27+bob,46,2),Color("#ffdc82"))
