@@ -3,6 +3,7 @@ extends Node2D
 const SAVE_PATH := "user://aetherion_save.json"
 const WORLD_SIZE := Vector2(1920, 1440)
 const START_POS := Vector2(480, 380)
+const RUINS_POS := Vector2(1600, 720)
 const RACES := {
  "Terranie":{"hp":125,"ep":90,"atk":13,"def":5},
  "Varkari":{"hp":140,"ep":100,"atk":15,"def":4},
@@ -14,6 +15,8 @@ const ENEMY_NAMES := ["Dzik Eterowy","Strażnik Ruin","Pęknięty Łowca","Golem
 const ENEMY_COLORS := [Color("#a96b48"),Color("#8c9b9e"),Color("#684f87"),Color("#777b83")]
 var race := "Varkari"
 var player_pos := START_POS
+var player_facing := Vector2.DOWN
+var walk_phase := 0.0
 var held := {"left":false,"right":false,"up":false,"down":false}
 var hp := 140.0
 var max_hp := 140.0
@@ -178,6 +181,8 @@ func _process(delta: float) -> void:
  if held["down"] or Input.is_action_pressed("ui_down"): direction.y += 1.0
  if direction.length() > 1.0: direction = direction.normalized()
  if direction != Vector2.ZERO:
+  player_facing = direction
+  walk_phase += delta * 11.0
   player_pos += direction * (205.0 if transformed else 165.0) * delta
  player_pos.x = clampf(player_pos.x,24.0,WORLD_SIZE.x-24.0)
  player_pos.y = clampf(player_pos.y,24.0,WORLD_SIZE.y-24.0)
@@ -300,7 +305,26 @@ func _quest_interact() -> void:
  elif quest == 2:
   quest = 3
   gold += 25
-  _say("Nowe zadanie: zbadaj wschodnie ruiny.")
+  _say("Nagroda odebrana! Nowe zadanie: zbadaj wschodnie ruiny.")
+ elif quest == 3:
+  if player_pos.distance_to(RUINS_POS) > 135.0:
+   _say("Znajdź wschodnie ruiny i zbadaj ich centrum.")
+  else:
+   quest = 4
+   gold += 75
+   xp += 100
+   _say("Ruiny zbadane! Otrzymujesz 75 złota i 100 XP. Rozdział I ukończony!")
+   while xp >= level * 100:
+    xp -= level * 100
+    level += 1
+    max_hp += 10
+    max_ether += 7
+    atk += 2
+    defense += 1
+    hp = max_hp
+    ether = max_ether
+ elif quest >= 4:
+  _say("Rozdział I ukończony. Kolejne przygody wkrótce.")
  else:
   _say("Wykonaj aktualne zadanie i wróć.")
 
@@ -369,41 +393,155 @@ func _say(message: String) -> void:
 func _update_hud() -> void:
  if not is_instance_valid(status): return
  status.text = "Wędrowiec | %s | POZ. %d\\nHP %d/%d  ETER %d/%d  ZŁOTO %d" % [race,level,int(hp),int(max_hp),int(ether),int(max_ether),gold]
- var objectives := ["ZADANIE: porozmawiaj z Kronikarzem.","ZADANIE: pokonaj 5 stworzeń (%d/5)." % mini(kills,5),"ZADANIE: wróć do Kronikarza.","ZADANIE: zbadaj wschodnie ruiny."]
- quest_label.text = objectives[clampi(quest,0,3)]
+ var objectives := ["ZADANIE: porozmawiaj z Kronikarzem.","ZADANIE: pokonaj 5 stworzeń (%d/5)." % mini(kills,5),"ZADANIE: wróć do Kronikarza po nagrodę.","ZADANIE: dotrzyj do wschodnich ruin i zbadaj ich centrum.","ROZDZIAŁ I: UKOŃCZONY — dalsza przygoda wkrótce."]
+ quest_label.text = objectives[clampi(quest,0,4)]
 
 func _draw() -> void:
- var tile_colors := [Color("#315d3d"),Color("#356744"),Color("#585347"),Color("#6e6f77"),Color("#23475b"),Color("#82663e"),Color("#19362a"),Color("#5b7e66")]
+ _draw_world()
+ _draw_landmarks()
+ for enemy in enemies:
+  if enemy["alive"]:
+   _draw_enemy(enemy)
+ if started:
+  _draw_player()
+
+func _draw_world() -> void:
+ var tile_colors := [Color("#284b38"),Color("#2d543d"),Color("#315941"),Color("#355d43"),Color("#294d3b"),Color("#385d43")]
  for x in range(0,int(WORLD_SIZE.x),32):
   for y in range(0,int(WORLD_SIZE.y),32):
-   var n := int((x/32*7+y/32*11)%8)
-   draw_rect(Rect2(x,y,32,32),tile_colors[n])
-   if n == 0: draw_rect(Rect2(x+7,y+9,2,2),Color("#65915a"))
- draw_rect(Rect2(430,0,100,WORLD_SIZE.y),Color("#6c6555"))
- draw_circle(START_POS,104,Color("#74777b"))
- draw_circle(START_POS,78,Color("#363e43"))
+   var seed_value := int((x / 32 * 17 + y / 32 * 29 + x * y / 97) % tile_colors.size())
+   var tile_color: Color = tile_colors[seed_value]
+   draw_rect(Rect2(x,y,32,32),tile_color)
+   if seed_value == 0 or seed_value == 3:
+    draw_rect(Rect2(x+7+(seed_value%3)*5,y+8,2,2),Color("#52764a"))
+    draw_rect(Rect2(x+20,y+22-(seed_value%2)*5,2,2),Color("#1d3c30"))
+   if seed_value == 2:
+    draw_rect(Rect2(x+13,y+13,3,2),Color("#426849"))
+ draw_rect(Rect2(430,0,100,WORLD_SIZE.y),Color("#625d4b"))
+ draw_rect(Rect2(446,0,68,WORLD_SIZE.y),Color("#786e56"))
+ for y in range(0,int(WORLD_SIZE.y),48):
+  draw_rect(Rect2(477,y,5,22),Color("#8c8064"))
+
+func _draw_landmarks() -> void:
+ # Kamienny Krąg — centralna strefa startowa
+ draw_circle(START_POS,112,Color("#1b332d"))
+ draw_circle(START_POS,102,Color("#777b78"))
+ draw_circle(START_POS,82,Color("#414c4a"))
+ draw_circle(START_POS,68,Color("#69716c"))
+ draw_circle(START_POS,52,Color("#35413e"))
  for k in range(8):
   var angle := TAU*float(k)/8.0
-  draw_circle(START_POS+Vector2(cos(angle),sin(angle))*91,10,Color("#b4b9bb"))
- draw_string(ThemeDB.fallback_font,START_POS+Vector2(-70,-130),"KAMIENNY KRĄG",HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color("#fff0c4"))
- for enemy in enemies:
-  if not enemy["alive"]: continue
-  var p: Vector2 = enemy["pos"]
-  draw_circle(p,15,ENEMY_COLORS[int(enemy["type"])])
-  draw_circle(p+Vector2(-5,-4),3,Color("#f5e6c9"))
-  draw_circle(p+Vector2(5,-4),3,Color("#f5e6c9"))
-  draw_rect(Rect2(p.x-18,p.y-25,36,4),Color("#351e22"))
-  draw_rect(Rect2(p.x-18,p.y-25,36.0*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),4),Color("#dc4b4b"))
-  draw_string(ThemeDB.fallback_font,p+Vector2(-35,-30),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color.WHITE)
- if started:
-  var race_index := RACES.keys().find(race)
-  var bob := sin(float(Time.get_ticks_msec())/140.0)*2.0
-  var body_color := Color("#e0bd91")
-  if race_index == 1: body_color = Color("#a9b6c6")
-  elif race_index == 2: body_color = Color("#76c9d5")
-  elif race_index == 3: body_color = Color("#83bd83")
-  elif race_index == 4: body_color = Color("#8271a8")
-  draw_circle(player_pos+Vector2(0,-8+bob),12,body_color)
-  draw_rect(Rect2(player_pos.x-9,player_pos.y+2+bob,18,18),Color("#303744"))
-  draw_rect(Rect2(player_pos.x-3,player_pos.y+3+bob,6,11),Color("#c84b4b"))
-  if transformed: draw_arc(player_pos,29,0,TAU,32,Color("#ffb34f"),4)
+  var stone_pos := START_POS+Vector2(cos(angle),sin(angle))*91
+  draw_rect(Rect2(stone_pos.x-9,stone_pos.y-7,18,14),Color("#a4aaa1"))
+  draw_rect(Rect2(stone_pos.x-6,stone_pos.y-9,12,3),Color("#c2c7b9"))
+ draw_circle(START_POS,12,Color("#67c6d0"))
+ draw_circle(START_POS,6,Color("#b7f2e9"))
+ draw_string(ThemeDB.fallback_font,START_POS+Vector2(-72,-130),"KAMIENNY KRĄG",HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color("#fff0c4"))
+ # Wschodnie ruiny — cel pierwszego rozdziału
+ draw_rect(Rect2(RUINS_POS.x-100,RUINS_POS.y-70,200,140),Color("#263b37"))
+ draw_rect(Rect2(RUINS_POS.x-88,RUINS_POS.y-58,176,116),Color("#756d58"))
+ draw_rect(Rect2(RUINS_POS.x-72,RUINS_POS.y-42,144,84),Color("#394b45"))
+ for offset in [Vector2(-68,-38),Vector2(52,-38),Vector2(-68,28),Vector2(52,28)]:
+  draw_rect(Rect2(RUINS_POS+offset,Vector2(16,16)),Color("#b2a88c"))
+  draw_rect(Rect2(RUINS_POS+offset+Vector2(3,3),Vector2(10,10)),Color("#777967"))
+ draw_rect(Rect2(RUINS_POS.x-14,RUINS_POS.y-28,28,56),Color("#202f2c"))
+ draw_circle(RUINS_POS,15,Color("#58c4d0"))
+ draw_circle(RUINS_POS,7,Color("#b3f5e9"))
+ draw_string(ThemeDB.fallback_font,RUINS_POS+Vector2(-63,-92),"WSCHODNIE RUINY",HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color("#f3dfad"))
+ # Rozrzucone głazy i drzewa jako czytelne punkty orientacyjne
+ for i in range(24):
+  var px := float((i*173+91)%int(WORLD_SIZE.x))
+  var py := float((i*257+143)%int(WORLD_SIZE.y))
+  if Vector2(px,py).distance_to(START_POS) < 150 or Vector2(px,py).distance_to(RUINS_POS) < 150:
+   continue
+  if i%3 == 0:
+   draw_rect(Rect2(px-8,py-3,16,12),Color("#594f42"))
+   draw_rect(Rect2(px-5,py-7,10,7),Color("#786b55"))
+  else:
+   draw_rect(Rect2(px-4,py-5,8,16),Color("#493d31"))
+   draw_rect(Rect2(px-13,py-15,26,17),Color("#1b3e2d"))
+   draw_rect(Rect2(px-9,py-22,18,12),Color("#285438"))
+
+func _draw_enemy(enemy: Dictionary) -> void:
+ var p: Vector2 = enemy["pos"]
+ var kind := int(enemy["type"])
+ var bob := sin(float(Time.get_ticks_msec())/190.0+float(kind))*2.0
+ var colors := [Color("#a96b48"),Color("#8c9b9e"),Color("#684f87"),Color("#777b83")]
+ var main_color: Color = colors[kind]
+ draw_ellipse_shadow(p+Vector2(0,12),18,7)
+ if kind == 0:
+  # Dzik Eterowy — masywny korpus, pysk i kły
+  draw_rect(Rect2(p.x-14,p.y-9+bob,28,19),main_color)
+  draw_rect(Rect2(p.x-10,p.y-15+bob,17,10),main_color.lightened(0.12))
+  draw_rect(Rect2(p.x+7,p.y-5+bob,11,9),Color("#d39b70"))
+  draw_rect(Rect2(p.x+12,p.y-2+bob,4,5),Color("#f4e2bd"))
+  draw_rect(Rect2(p.x-9,p.y+8+bob,5,7),Color("#513d36"))
+  draw_rect(Rect2(p.x+6,p.y+8+bob,5,7),Color("#513d36"))
+  draw_rect(Rect2(p.x-6,p.y-10+bob,3,3),Color("#fff0bd"))
+ elif kind == 1:
+  # Strażnik Ruin — kamienny konstrukt
+  draw_rect(Rect2(p.x-12,p.y-15+bob,24,27),main_color)
+  draw_rect(Rect2(p.x-16,p.y-8+bob,7,15),main_color.darkened(0.2))
+  draw_rect(Rect2(p.x+9,p.y-8+bob,7,15),main_color.darkened(0.2))
+  draw_rect(Rect2(p.x-8,p.y-20+bob,16,8),main_color.lightened(0.18))
+  draw_rect(Rect2(p.x-6,p.y-12+bob,4,3),Color("#73d8df"))
+  draw_rect(Rect2(p.x+3,p.y-12+bob,4,3),Color("#73d8df"))
+ else:
+  # Łowca i golem — sylwetki z pikselowych płyt
+  draw_rect(Rect2(p.x-11,p.y-13+bob,22,25),main_color)
+  draw_rect(Rect2(p.x-7,p.y-19+bob,14,9),main_color.lightened(0.16))
+  draw_rect(Rect2(p.x-14,p.y-5+bob,6,15),main_color.darkened(0.15))
+  draw_rect(Rect2(p.x+8,p.y-5+bob,6,15),main_color.darkened(0.15))
+  draw_rect(Rect2(p.x-6,p.y-10+bob,3,3),Color("#ffe7a8"))
+  draw_rect(Rect2(p.x+3,p.y-10+bob,3,3),Color("#ffe7a8"))
+ draw_rect(Rect2(p.x-19,p.y-29,38,5),Color("#251f28"))
+ draw_rect(Rect2(p.x-18,p.y-28,36.0*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),3),Color("#d94d52"))
+ draw_string(ThemeDB.fallback_font,p+Vector2(-38,-34),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("#f4ead2"))
+
+func draw_ellipse_shadow(center: Vector2, width: float, height: float) -> void:
+ draw_rect(Rect2(center.x-width/2.0,center.y-height/2.0,width,height),Color(0,0,0,0.28))
+
+func _draw_player() -> void:
+ var bob := sin(walk_phase)*2.0 if (held["left"] or held["right"] or held["up"] or held["down"]) else 0.0
+ var p := player_pos
+ var race_index := RACES.keys().find(race)
+ var skin := Color("#e0bd91")
+ var armor := Color("#34485a")
+ var accent := Color("#c84b55")
+ if race_index == 1:
+  skin = Color("#a9b6c6")
+  armor = Color("#39465c")
+  accent = Color("#e3a44d")
+ elif race_index == 2:
+  skin = Color("#76c9d5")
+  armor = Color("#315b70")
+  accent = Color("#8ce9e4")
+ elif race_index == 3:
+  skin = Color("#83bd83")
+  armor = Color("#365b42")
+  accent = Color("#d4d17a")
+ elif race_index == 4:
+  skin = Color("#8271a8")
+  armor = Color("#38334e")
+  accent = Color("#b58be8")
+ draw_ellipse_shadow(p+Vector2(0,14),22,8)
+ # Płaszcz, tors i pas — pixel-art bez gładkich kół
+ draw_rect(Rect2(p.x-9,p.y-1+bob,18,17),armor)
+ draw_rect(Rect2(p.x-12,p.y+4+bob,5,12),armor.darkened(0.18))
+ draw_rect(Rect2(p.x+7,p.y+4+bob,5,12),armor.darkened(0.18))
+ draw_rect(Rect2(p.x-8,p.y+15+bob,6,7),Color("#292f3a"))
+ draw_rect(Rect2(p.x+2,p.y+15+bob,6,7),Color("#292f3a"))
+ draw_rect(Rect2(p.x-9,p.y+8+bob,18,3),accent)
+ draw_rect(Rect2(p.x-6,p.y-12+bob,12,12),skin)
+ draw_rect(Rect2(p.x-8,p.y-15+bob,16,5),skin.darkened(0.1))
+ draw_rect(Rect2(p.x-6,p.y-7+bob,3,2),Color("#20242c"))
+ draw_rect(Rect2(p.x+3,p.y-7+bob,3,2),Color("#20242c"))
+ # Kierunkowe detale twarzy
+ if player_facing.x < -0.2:
+  draw_rect(Rect2(p.x-10,p.y-7+bob,3,3),Color("#f1d7b5"))
+ elif player_facing.x > 0.2:
+  draw_rect(Rect2(p.x+7,p.y-7+bob,3,3),Color("#f1d7b5"))
+ if transformed:
+  draw_rect(Rect2(p.x-16,p.y-22+bob,32,3),Color("#ffb34f"))
+  draw_rect(Rect2(p.x-20,p.y-18+bob,40,2),Color("#ffdc82"))
+  draw_circle(p,27,Color(1.0,0.65,0.2,0.16))
