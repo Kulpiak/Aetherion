@@ -710,7 +710,7 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var frame := 1 if chasing and int(Time.get_ticks_msec()/180)%2 == 0 else 0
  var bob := sin(float(Time.get_ticks_msec())/190.0+float(kind))*2.0
  draw_ellipse_shadow(p+Vector2(0,13),22,8)
- draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-22,p.y-23+bob,44,44),Rect2((5+kind)*32,frame*32,32,32),Color.WHITE,false)
+ draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-30,p.y-32+bob,60,60),Rect2((5+kind)*64,frame*64,64,64),Color.WHITE,false)
  draw_rect(Rect2(p.x-19,p.y-31,38,5),Color("#251f28"))
  draw_rect(Rect2(p.x-18,p.y-30,36.0*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),3),Color("#d94d52"))
  draw_string(ThemeDB.fallback_font,p+Vector2(-38,-36),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("#f4ead2"))
@@ -756,7 +756,7 @@ func _draw_player() -> void:
  var race_index := maxi(0,RACES.keys().find(race))
  draw_ellipse_shadow(p+Vector2(0,15),25,9)
  var frame := 1 if moving and int(Time.get_ticks_msec()/145)%2 == 0 else 0
- draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-24,p.y-27+bob,48,48),Rect2(race_index*32,frame*32,32,32),Color.WHITE,false)
+ draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-32,p.y-38+bob,64,64),Rect2(race_index*64,frame*64,64,64),Color.WHITE,false)
  if transformed:
   draw_rect(Rect2(p.x-19,p.y-31+bob,38,3),Color("#ffb34f"))
   draw_rect(Rect2(p.x-23,p.y-27+bob,46,2),Color("#ffdc82"))
