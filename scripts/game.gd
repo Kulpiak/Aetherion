@@ -1001,9 +1001,19 @@ func _draw_combat_effects() -> void:
    draw_circle(point,18.0-float(trail)*2.5,Color(0.35,0.85,1.0,alpha*0.22))
   draw_line(dash_from,dash_to,Color(0.55,0.95,1.0,alpha*0.65),7.0,true)
  if bolt_anim > 0.0:
-  var beam_start := player_pos + Vector2(0,-8)
-  draw_line(beam_start,attack_target,Color(0.35,0.95,1.0,0.9),9.0,true)
-  draw_line(beam_start,attack_target,Color(0.9,1.0,1.0,0.95),3.0,true)
+  var beam_start := player_pos + player_facing * 26.0
+  var progress := 1.0 - bolt_anim / 0.38
+  var beam_width := 12.0 + sin(progress * PI) * 9.0
+  var beam_color := Color(0.25,0.78,1.0,0.35 + (1.0-progress)*0.55)
+  draw_line(beam_start,attack_target,beam_color,beam_width,true)
+  draw_line(beam_start,attack_target,Color(0.88,1.0,1.0,0.96),maxf(2.0,beam_width*0.28),true)
+  for spark_index in range(7):
+   var spark_t := fposmod(progress * 1.8 + float(spark_index) / 7.0,1.0)
+   var spark_pos := beam_start.lerp(attack_target,spark_t)
+   var spark_angle := now * 13.0 + float(spark_index) * 2.1
+   var spark_size := 4.0 + sin(now*19.0+float(spark_index))*2.0
+   draw_line(spark_pos-Vector2.RIGHT.rotated(spark_angle)*spark_size,spark_pos+Vector2.RIGHT.rotated(spark_angle)*spark_size,Color(0.75,0.98,1.0,0.9),2.0,true)
+  draw_circle(attack_target,18.0*(1.0-progress)+4.0,Color(0.4,0.88,1.0,0.35))
  if attack_anim > 0.0:
   var progress := 1.0 - attack_anim / 0.24
   var sweep := progress * 1.25
@@ -1039,6 +1049,16 @@ func _draw_player() -> void:
  var hero_tint := Color(1.0,0.55,0.48,1.0) if player_hit_flash > 0.0 else Color.WHITE
  draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-44,p.y-52+bob,88,88),Rect2(race_index*128,frame*128,128,128),hero_tint,false)
  if transformed:
-  draw_rect(Rect2(p.x-19,p.y-31+bob,38,3),Color("#ffb34f"))
-  draw_rect(Rect2(p.x-23,p.y-27+bob,46,2),Color("#ffdc82"))
-  draw_circle(p,29,Color(1.0,0.65,0.2,0.16))
+  var aura_time := float(Time.get_ticks_msec()) / 1000.0
+  var aura_pulse := 0.78 + sin(aura_time*10.0)*0.18
+  draw_arc(p+Vector2(0,3),43.0+sin(aura_time*7.0)*4.0,0.0,TAU,40,Color(1.0,0.55,0.12,0.72),3.0,true)
+  draw_arc(p+Vector2(0,3),34.0, aura_time*1.8, aura_time*1.8+PI*1.45,32,Color(1.0,0.83,0.35,0.8),2.0,true)
+  for aura_index in range(6):
+   var aura_angle := aura_time*2.4 + TAU*float(aura_index)/6.0
+   var aura_radius := 37.0 + sin(aura_time*8.0+float(aura_index))*5.0
+   var aura_point := p + Vector2.RIGHT.rotated(aura_angle)*aura_radius
+   draw_circle(aura_point,3.0*aura_pulse,Color(1.0,0.78,0.32,0.9))
+   draw_circle(aura_point,6.0,Color(1.0,0.52,0.12,0.22))
+  draw_rect(Rect2(p.x-22,p.y-35+bob,44,4),Color("#ffb34f"))
+  draw_rect(Rect2(p.x-18,p.y-34+bob,36,2),Color("#fff0a6"))
+  draw_circle(p,29,Color(1.0,0.65,0.2,0.13))
