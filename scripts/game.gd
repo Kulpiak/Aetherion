@@ -1017,6 +1017,13 @@ func _draw_enemy(enemy: Dictionary) -> void:
   draw_arc(p,37.0 if not is_boss else 66.0,0.0,TAU,28,Color(1.0,0.28,0.22,0.72),3.0,true)
  var sprite_rect := Rect2(p.x-sprite_size*0.5+lunge.x,p.y-sprite_size*0.55+bob+lunge.y,sprite_size,sprite_size)
  draw_texture_rect_region(SPRITE_ATLAS,sprite_rect,Rect2((5+kind)*128,frame*128,128,128),body_color,false)
+ if float(enemy.get("hit_flash",0.0)) > 0.0:
+  var hit_phase := float(enemy.get("hit_flash",0.0)) / 0.22
+  for spark_index in range(6):
+   var spark_angle := TAU*float(spark_index)/6.0 + float(kind)*0.4
+   var spark_origin := p + Vector2.RIGHT.rotated(spark_angle)*(sprite_size*0.27)
+   var spark_tip := spark_origin + Vector2.RIGHT.rotated(spark_angle)*(10.0+hit_phase*9.0)
+   draw_line(spark_origin,spark_tip,Color(1.0,0.88,0.55,hit_phase),2.5,true)
  var bar_width := 100.0 if is_boss else 38.0
  var bar_y := p.y-sprite_size*0.53-10.0
  draw_rect(Rect2(p.x-bar_width*0.5,bar_y,bar_width,6 if is_boss else 5),Color("#251f28"))
