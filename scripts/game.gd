@@ -32,7 +32,11 @@ var transformed := false
 var transform_left := 0.0
 var transform_cd := 0.0
 var attack_cd := 0.0
+var attack_anim := 0.0
+var attack_angle := 0.0
+var attack_target := Vector2.ZERO
 var skill_cd := 0.0
+var skill_anim := 0.0
 var quest := 0
 var kills := 0
 var inventory := {"Mikstura HP":3,"Odłamek Eterium":0,"Skóra bestii":0}
@@ -167,7 +171,9 @@ func _start_game(selected_race: String) -> void:
 func _process(delta: float) -> void:
  if not started: return
  attack_cd = maxf(0.0,attack_cd-delta)
+ attack_anim = maxf(0.0,attack_anim-delta)
  skill_cd = maxf(0.0,skill_cd-delta)
+ skill_anim = maxf(0.0,skill_anim-delta)
  transform_cd = maxf(0.0,transform_cd-delta)
  if transformed:
   transform_left -= delta
@@ -226,6 +232,10 @@ func _attack() -> void:
   _say("Brak celu w zasięgu.")
   return
  var enemy := enemies[index]
+ player_facing = (enemy["pos"]-player_pos).normalized()
+ attack_angle = player_facing.angle()
+ attack_target = enemy["pos"]
+ attack_anim = 0.24
  enemy["hp"] -= atk + (8 if transformed else 0)
  if enemy["hp"] <= 0.0: _kill_enemy(index)
  else: enemies[index] = enemy
@@ -237,6 +247,7 @@ func _skill() -> void:
   return
  ether -= 20.0
  skill_cd = 4.0
+ skill_anim = 0.72
  for i in range(enemies.size()):
   var enemy := enemies[i]
   if enemy["alive"] and player_pos.distance_to(enemy["pos"]) < 170.0:
@@ -422,6 +433,7 @@ func _draw() -> void:
   if enemy["alive"]:
    _draw_enemy(enemy)
  if started:
+  _draw_combat_effects()
   _draw_player()
 
 func _draw_world() -> void:
@@ -495,6 +507,33 @@ func _draw_enemy(enemy: Dictionary) -> void:
 
 func draw_ellipse_shadow(center: Vector2, width: float, height: float) -> void:
  draw_rect(Rect2(center.x-width/2.0,center.y-height/2.0,width,height),Color(0,0,0,0.28))
+
+func _draw_combat_effects() -> void:
+ var now := float(Time.get_ticks_msec()) / 1000.0
+ if attack_anim > 0.0:
+  var progress := 1.0 - attack_anim / 0.24
+  var sweep := progress * 1.25
+  var center := player_pos + Vector2(0,-5)
+  var radius := 43.0 + sin(progress * PI) * 9.0
+  draw_arc(center,radius,attack_angle-1.05+sweep,attack_angle+1.05+sweep,18,Color(0.95,0.96,1.0,0.95),5.0,true)
+  var tip := center + Vector2.RIGHT.rotated(attack_angle+sweep) * radius
+  draw_line(center + Vector2.RIGHT.rotated(attack_angle-0.72+sweep)*19.0,tip,Color("#8ce9e4"),3.0,true)
+  var spark := attack_target + Vector2(0,-12)
+  draw_line(spark+Vector2(-9,-8),spark+Vector2(9,8),Color("#fff0bd"),3.0,true)
+  draw_line(spark+Vector2(-9,8),spark+Vector2(9,-8),Color("#8ce9e4"),3.0,true)
+ if skill_anim > 0.0:
+  var progress := 1.0 - skill_anim / 0.72
+  var radius := 35.0 + progress * 145.0
+  var alpha := 1.0 - progress
+  var pulse := 1.0 + sin(now*24.0)*0.08
+  draw_arc(player_pos,radius*pulse,0.0,TAU,48,Color(0.35,0.9,1.0,alpha),5.0,true)
+  draw_arc(player_pos,radius*0.78,0.0,TAU,48,Color(0.75,0.98,1.0,alpha*0.65),2.0,true)
+  for i in range(8):
+   var angle := TAU*float(i)/8.0 + now*1.8
+   var inner := player_pos + Vector2.RIGHT.rotated(angle)*(radius*0.72)
+   var outer := player_pos + Vector2.RIGHT.rotated(angle)*(radius*1.08)
+   draw_line(inner,outer,Color(0.55,0.95,1.0,alpha*0.8),3.0,true)
+  draw_circle(player_pos,12.0+progress*9.0,Color(0.5,0.95,1.0,alpha*0.35))
 
 func _draw_player() -> void:
  var moving := held["left"] or held["right"] or held["up"] or held["down"] or Input.is_action_pressed("ui_left") or Input.is_action_pressed("ui_right") or Input.is_action_pressed("ui_up") or Input.is_action_pressed("ui_down")
