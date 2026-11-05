@@ -39,6 +39,7 @@ class VirtualStick extends Control:
 
 const SAVE_PATH := "user://aetherion_save.json"
 const SPRITE_ATLAS: Texture2D = preload("res://assets/aetherion_sprites.svg")
+const WORLD_TEXTURE: Texture2D = preload("res://assets/aetherion_world.svg")
 const WORLD_SIZE := Vector2(1920, 1440)
 const START_POS := Vector2(480, 380)
 const RUINS_POS := Vector2(1600, 720)
@@ -686,80 +687,12 @@ func _draw() -> void:
   _draw_player()
 
 func _draw_world() -> void:
- var tile_colors := [Color("#284b38"),Color("#2d543d"),Color("#315941"),Color("#355d43"),Color("#294d3b"),Color("#385d43")]
- for x in range(0,int(WORLD_SIZE.x),32):
-  for y in range(0,int(WORLD_SIZE.y),32):
-   var seed_value := int((x / 32 * 17 + y / 32 * 29 + x * y / 97) % tile_colors.size())
-   var tile_color: Color = tile_colors[seed_value]
-   draw_rect(Rect2(x,y,32,32),tile_color)
-   if seed_value == 0 or seed_value == 3:
-    draw_rect(Rect2(x+7+(seed_value%3)*5,y+8,2,2),Color("#52764a"))
-    draw_rect(Rect2(x+20,y+22-(seed_value%2)*5,2,2),Color("#1d3c30"))
-   if seed_value == 2:
-    draw_rect(Rect2(x+13,y+13,3,2),Color("#426849"))
- draw_rect(Rect2(430,0,100,WORLD_SIZE.y),Color("#625d4b"))
- draw_rect(Rect2(446,0,68,WORLD_SIZE.y),Color("#786e56"))
- for y in range(0,int(WORLD_SIZE.y),48):
-  draw_rect(Rect2(477,y,5,22),Color("#8c8064"))
+ draw_texture_rect(WORLD_TEXTURE,Rect2(Vector2.ZERO,WORLD_SIZE),false)
 
 func _draw_landmarks() -> void:
- # Kamienny Krąg — centralna strefa startowa
- draw_circle(START_POS,112,Color("#1b332d"))
- draw_circle(START_POS,102,Color("#777b78"))
- draw_circle(START_POS,82,Color("#414c4a"))
- draw_circle(START_POS,68,Color("#69716c"))
- draw_circle(START_POS,52,Color("#35413e"))
- for k in range(8):
-  var angle := TAU*float(k)/8.0
-  var stone_pos := START_POS+Vector2(cos(angle),sin(angle))*91
-  draw_rect(Rect2(stone_pos.x-9,stone_pos.y-7,18,14),Color("#a4aaa1"))
-  draw_rect(Rect2(stone_pos.x-6,stone_pos.y-9,12,3),Color("#c2c7b9"))
- draw_circle(START_POS,12,Color("#67c6d0"))
- draw_circle(START_POS,6,Color("#b7f2e9"))
- draw_string(ThemeDB.fallback_font,START_POS+Vector2(-72,-130),"KAMIENNY KRĄG",HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color("#fff0c4"))
- # Kryształowe Miasto — kamienne place, domy kupieckie i eteryczne latarnie.
- for i in range(6):
-  var bx := 270.0 + float(i % 3) * 112.0
-  var by := 205.0 + float(i / 3) * 126.0
-  draw_rect(Rect2(bx-28,by-23,56,48),Color("#514b49"))
-  draw_rect(Rect2(bx-24,by-19,48,40),Color("#9a8061"))
-  draw_rect(Rect2(bx-20,by-15,40,32),Color("#66594f"))
-  draw_colored_polygon(PackedVector2Array([Vector2(bx-34,by-23),Vector2(bx,by-49),Vector2(bx+34,by-23)]),Color("#3e5861"))
-  draw_rect(Rect2(bx-5,by-5,10,22),Color("#342f34"))
-  draw_rect(Rect2(bx-17,by-10,8,9),Color("#8bd5d5"))
-  draw_rect(Rect2(bx+9,by-10,8,9),Color("#8bd5d5"))
- for i in range(4):
-  var lx := 300.0 + float(i) * 82.0
-  draw_rect(Rect2(lx-3,START_POS.y+130,6,26),Color("#5d5145"))
-  draw_circle(Vector2(lx,START_POS.y+127),10,Color("#67cbd1"))
-  draw_circle(Vector2(lx,START_POS.y+127),4,Color("#e0ffff"))
- draw_rect(Rect2(410,START_POS.y+160,140,18),Color("#756d5e"))
- draw_rect(Rect2(418,START_POS.y+164,124,10),Color("#b4a48a"))
- draw_string(ThemeDB.fallback_font,Vector2(270,145),"KRYPTAŁOWE MIASTO",HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("#e6f5dc"))
- # Wschodnie ruiny — cel pierwszego rozdziału
- draw_rect(Rect2(RUINS_POS.x-100,RUINS_POS.y-70,200,140),Color("#263b37"))
- draw_rect(Rect2(RUINS_POS.x-88,RUINS_POS.y-58,176,116),Color("#756d58"))
- draw_rect(Rect2(RUINS_POS.x-72,RUINS_POS.y-42,144,84),Color("#394b45"))
- for offset in [Vector2(-68,-38),Vector2(52,-38),Vector2(-68,28),Vector2(52,28)]:
-  draw_rect(Rect2(RUINS_POS+offset,Vector2(16,16)),Color("#b2a88c"))
-  draw_rect(Rect2(RUINS_POS+offset+Vector2(3,3),Vector2(10,10)),Color("#777967"))
- draw_rect(Rect2(RUINS_POS.x-14,RUINS_POS.y-28,28,56),Color("#202f2c"))
- draw_circle(RUINS_POS,15,Color("#58c4d0"))
- draw_circle(RUINS_POS,7,Color("#b3f5e9"))
- draw_string(ThemeDB.fallback_font,RUINS_POS+Vector2(-63,-92),"WSCHODNIE RUINY",HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color("#f3dfad"))
- # Rozrzucone głazy i drzewa jako czytelne punkty orientacyjne
- for i in range(24):
-  var px := float((i*173+91)%int(WORLD_SIZE.x))
-  var py := float((i*257+143)%int(WORLD_SIZE.y))
-  if Vector2(px,py).distance_to(START_POS) < 150 or Vector2(px,py).distance_to(RUINS_POS) < 150:
-   continue
-  if i%3 == 0:
-   draw_rect(Rect2(px-8,py-3,16,12),Color("#594f42"))
-   draw_rect(Rect2(px-5,py-7,10,7),Color("#786b55"))
-  else:
-   draw_rect(Rect2(px-4,py-5,8,16),Color("#493d31"))
-   draw_rect(Rect2(px-13,py-15,26,17),Color("#1b3e2d"))
-   draw_rect(Rect2(px-9,py-22,18,12),Color("#285438"))
+ var pulse := 0.7 + sin(float(Time.get_ticks_msec()) / 420.0) * 0.2
+ draw_circle(START_POS,116.0,Color(0.35,0.95,0.9,0.07 * pulse))
+ draw_circle(RUINS_POS,150.0,Color(0.55,0.85,1.0,0.045 * pulse))
 
 func _draw_loot(drop: Dictionary) -> void:
  var p: Vector2 = drop["pos"]
