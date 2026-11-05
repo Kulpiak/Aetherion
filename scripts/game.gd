@@ -266,9 +266,10 @@ func _show_race_select() -> void:
   content.add_theme_constant_override("separation", 5)
   card.add_child(content)
   var portrait := TextureRect.new()
-  portrait.texture = SPRITE_ATLAS
-  portrait.region_enabled = true
-  portrait.region_rect = Rect2(index * 128, 0, 128, 128)
+  var portrait_atlas := AtlasTexture.new()
+  portrait_atlas.atlas = SPRITE_ATLAS
+  portrait_atlas.region = Rect2(index * 128, 0, 128, 128)
+  portrait.texture = portrait_atlas
   portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
   portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
   portrait.custom_minimum_size = Vector2(145, 145)
