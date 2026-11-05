@@ -227,16 +227,70 @@ func _clear_panel() -> void:
   child.queue_free()
 
 func _show_race_select() -> void:
+ panel.custom_minimum_size = Vector2(900, 450)
+ panel.position = Vector2(-450, -225)
  panel.show()
  var box := VBoxContainer.new()
+ box.add_theme_constant_override("separation", 12)
  panel.add_child(box)
  var title := Label.new()
- title.text = "AETHERION — WYBIERZ RASĘ"
+ title.text = "AETHERION  /  WYBIERZ SWOJE PRZEZNACZENIE"
  title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
- title.add_theme_font_size_override("font_size",20)
+ title.add_theme_font_size_override("font_size",24)
+ title.add_theme_color_override("font_color",Color("#f4dfb0"))
  box.add_child(title)
- for race_name in RACES.keys():
-  _button(box,race_name,func(): _start_game(race_name),380,36)
+ var subtitle := Label.new()
+ subtitle.text = "Pięć ras. Pięć ścieżek mocy. Jedna wyprawa."
+ subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+ subtitle.add_theme_font_size_override("font_size",14)
+ subtitle.add_theme_color_override("font_color",Color("#a9cbd7"))
+ box.add_child(subtitle)
+ var cards := HBoxContainer.new()
+ cards.add_theme_constant_override("separation", 10)
+ cards.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+ box.add_child(cards)
+ var descriptions := ["Wszechstronni wojownicy","Nieustępliwi berserkerzy","Mistrzowie energii","Zwinni strażnicy natury","Władcy mocy cienia"]
+ for index in range(RACES.size()):
+  var race_name := str(RACES.keys()[index])
+  var stats: Dictionary = RACES[race_name]
+  var card := PanelContainer.new()
+  card.custom_minimum_size = Vector2(166, 310)
+  var style := StyleBoxFlat.new()
+  style.bg_color = Color("#101e30")
+  style.border_color = Color("#41677d")
+  style.set_border_width_all(1)
+  style.set_corner_radius_all(12)
+  card.add_theme_stylebox_override("panel", style)
+  cards.add_child(card)
+  var content := VBoxContainer.new()
+  content.add_theme_constant_override("separation", 5)
+  card.add_child(content)
+  var portrait := TextureRect.new()
+  portrait.texture = SPRITE_ATLAS
+  portrait.region_enabled = true
+  portrait.region_rect = Rect2(index * 128, 0, 128, 128)
+  portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+  portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+  portrait.custom_minimum_size = Vector2(145, 145)
+  content.add_child(portrait)
+  var name_label := Label.new()
+  name_label.text = race_name.to_upper()
+  name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+  name_label.add_theme_font_size_override("font_size",17)
+  name_label.add_theme_color_override("font_color",Color("#f2dfb5"))
+  content.add_child(name_label)
+  var desc := Label.new()
+  desc.text = descriptions[index]
+  desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+  desc.add_theme_font_size_override("font_size",11)
+  desc.add_theme_color_override("font_color",Color("#9bb7c9"))
+  content.add_child(desc)
+  var stats_label := Label.new()
+  stats_label.text = "HP %d   ET %d\\nATAK %d   OBR %d" % [stats["hp"],stats["ep"],stats["atk"],stats["def"]]
+  stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+  stats_label.add_theme_font_size_override("font_size",12)
+  content.add_child(stats_label)
+  _button(content,"WYBIERZ",func(): _start_game(race_name),142,36)
 
 func _start_game(selected_race: String) -> void:
  race = selected_race
@@ -549,6 +603,8 @@ func _draw_npc() -> void:
 
 func _show_panel(panel_name: String) -> void:
  if not started: return
+ panel.custom_minimum_size = Vector2(410, 290)
+ panel.position = Vector2(-205, -145)
  _clear_panel()
  panel.show()
  var box := VBoxContainer.new()
@@ -765,7 +821,7 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var frame := 1 if chasing and int(Time.get_ticks_msec()/180)%2 == 0 else 0
  var bob := sin(float(Time.get_ticks_msec())/190.0+float(kind))*2.0
  draw_ellipse_shadow(p+Vector2(0,13),22,8)
- draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-30,p.y-32+bob,60,60),Rect2((5+kind)*64,frame*64,64,64),Color.WHITE,false)
+ draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-40,p.y-44+bob,80,80),Rect2((5+kind)*128,frame*128,128,128),Color.WHITE,false)
  draw_rect(Rect2(p.x-19,p.y-31,38,5),Color("#251f28"))
  draw_rect(Rect2(p.x-18,p.y-30,36.0*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),3),Color("#d94d52"))
  draw_string(ThemeDB.fallback_font,p+Vector2(-38,-36),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("#f4ead2"))
@@ -818,7 +874,7 @@ func _draw_player() -> void:
  var race_index := maxi(0,RACES.keys().find(race))
  draw_ellipse_shadow(p+Vector2(0,15),25,9)
  var frame := 1 if moving and int(Time.get_ticks_msec()/145)%2 == 0 else 0
- draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-32,p.y-38+bob,64,64),Rect2(race_index*64,frame*64,64,64),Color.WHITE,false)
+ draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-44,p.y-52+bob,88,88),Rect2(race_index*128,frame*128,128,128),Color.WHITE,false)
  if transformed:
   draw_rect(Rect2(p.x-19,p.y-31+bob,38,3),Color("#ffb34f"))
   draw_rect(Rect2(p.x-23,p.y-27+bob,46,2),Color("#ffdc82"))
