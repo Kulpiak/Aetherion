@@ -1,6 +1,7 @@
 extends Node2D
 
 const SAVE_PATH := "user://aetherion_save.json"
+const SPRITE_ATLAS: Texture2D = preload("res://assets/aetherion_sprites.svg")
 const WORLD_SIZE := Vector2(1920, 1440)
 const START_POS := Vector2(480, 380)
 const RUINS_POS := Vector2(1600, 720)
@@ -484,82 +485,23 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var p: Vector2 = enemy["pos"]
  var kind := int(enemy["type"])
  var bob := sin(float(Time.get_ticks_msec())/190.0+float(kind))*2.0
- var colors := [Color("#a96b48"),Color("#8c9b9e"),Color("#684f87"),Color("#777b83")]
- var main_color: Color = colors[kind]
- draw_ellipse_shadow(p+Vector2(0,12),18,7)
- if kind == 0:
-  # Dzik Eterowy — masywny korpus, pysk i kły
-  draw_rect(Rect2(p.x-14,p.y-9+bob,28,19),main_color)
-  draw_rect(Rect2(p.x-10,p.y-15+bob,17,10),main_color.lightened(0.12))
-  draw_rect(Rect2(p.x+7,p.y-5+bob,11,9),Color("#d39b70"))
-  draw_rect(Rect2(p.x+12,p.y-2+bob,4,5),Color("#f4e2bd"))
-  draw_rect(Rect2(p.x-9,p.y+8+bob,5,7),Color("#513d36"))
-  draw_rect(Rect2(p.x+6,p.y+8+bob,5,7),Color("#513d36"))
-  draw_rect(Rect2(p.x-6,p.y-10+bob,3,3),Color("#fff0bd"))
- elif kind == 1:
-  # Strażnik Ruin — kamienny konstrukt
-  draw_rect(Rect2(p.x-12,p.y-15+bob,24,27),main_color)
-  draw_rect(Rect2(p.x-16,p.y-8+bob,7,15),main_color.darkened(0.2))
-  draw_rect(Rect2(p.x+9,p.y-8+bob,7,15),main_color.darkened(0.2))
-  draw_rect(Rect2(p.x-8,p.y-20+bob,16,8),main_color.lightened(0.18))
-  draw_rect(Rect2(p.x-6,p.y-12+bob,4,3),Color("#73d8df"))
-  draw_rect(Rect2(p.x+3,p.y-12+bob,4,3),Color("#73d8df"))
- else:
-  # Łowca i golem — sylwetki z pikselowych płyt
-  draw_rect(Rect2(p.x-11,p.y-13+bob,22,25),main_color)
-  draw_rect(Rect2(p.x-7,p.y-19+bob,14,9),main_color.lightened(0.16))
-  draw_rect(Rect2(p.x-14,p.y-5+bob,6,15),main_color.darkened(0.15))
-  draw_rect(Rect2(p.x+8,p.y-5+bob,6,15),main_color.darkened(0.15))
-  draw_rect(Rect2(p.x-6,p.y-10+bob,3,3),Color("#ffe7a8"))
-  draw_rect(Rect2(p.x+3,p.y-10+bob,3,3),Color("#ffe7a8"))
- draw_rect(Rect2(p.x-19,p.y-29,38,5),Color("#251f28"))
- draw_rect(Rect2(p.x-18,p.y-28,36.0*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),3),Color("#d94d52"))
- draw_string(ThemeDB.fallback_font,p+Vector2(-38,-34),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("#f4ead2"))
+ draw_ellipse_shadow(p+Vector2(0,13),22,8)
+ draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-22,p.y-23+bob,44,44),Rect2((5+kind)*32,0,32,32),Color.WHITE,false)
+ draw_rect(Rect2(p.x-19,p.y-31,38,5),Color("#251f28"))
+ draw_rect(Rect2(p.x-18,p.y-30,36.0*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),3),Color("#d94d52"))
+ draw_string(ThemeDB.fallback_font,p+Vector2(-38,-36),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("#f4ead2"))
 
 func draw_ellipse_shadow(center: Vector2, width: float, height: float) -> void:
  draw_rect(Rect2(center.x-width/2.0,center.y-height/2.0,width,height),Color(0,0,0,0.28))
 
 func _draw_player() -> void:
- var bob := sin(walk_phase)*2.0 if (held["left"] or held["right"] or held["up"] or held["down"]) else 0.0
+ var moving := held["left"] or held["right"] or held["up"] or held["down"] or Input.is_action_pressed("ui_left") or Input.is_action_pressed("ui_right") or Input.is_action_pressed("ui_up") or Input.is_action_pressed("ui_down")
+ var bob := sin(walk_phase)*2.0 if moving else 0.0
  var p := player_pos
- var race_index := RACES.keys().find(race)
- var skin := Color("#e0bd91")
- var armor := Color("#34485a")
- var accent := Color("#c84b55")
- if race_index == 1:
-  skin = Color("#a9b6c6")
-  armor = Color("#39465c")
-  accent = Color("#e3a44d")
- elif race_index == 2:
-  skin = Color("#76c9d5")
-  armor = Color("#315b70")
-  accent = Color("#8ce9e4")
- elif race_index == 3:
-  skin = Color("#83bd83")
-  armor = Color("#365b42")
-  accent = Color("#d4d17a")
- elif race_index == 4:
-  skin = Color("#8271a8")
-  armor = Color("#38334e")
-  accent = Color("#b58be8")
- draw_ellipse_shadow(p+Vector2(0,14),22,8)
- # Płaszcz, tors i pas — pixel-art bez gładkich kół
- draw_rect(Rect2(p.x-9,p.y-1+bob,18,17),armor)
- draw_rect(Rect2(p.x-12,p.y+4+bob,5,12),armor.darkened(0.18))
- draw_rect(Rect2(p.x+7,p.y+4+bob,5,12),armor.darkened(0.18))
- draw_rect(Rect2(p.x-8,p.y+15+bob,6,7),Color("#292f3a"))
- draw_rect(Rect2(p.x+2,p.y+15+bob,6,7),Color("#292f3a"))
- draw_rect(Rect2(p.x-9,p.y+8+bob,18,3),accent)
- draw_rect(Rect2(p.x-6,p.y-12+bob,12,12),skin)
- draw_rect(Rect2(p.x-8,p.y-15+bob,16,5),skin.darkened(0.1))
- draw_rect(Rect2(p.x-6,p.y-7+bob,3,2),Color("#20242c"))
- draw_rect(Rect2(p.x+3,p.y-7+bob,3,2),Color("#20242c"))
- # Kierunkowe detale twarzy
- if player_facing.x < -0.2:
-  draw_rect(Rect2(p.x-10,p.y-7+bob,3,3),Color("#f1d7b5"))
- elif player_facing.x > 0.2:
-  draw_rect(Rect2(p.x+7,p.y-7+bob,3,3),Color("#f1d7b5"))
+ var race_index := maxi(0,RACES.keys().find(race))
+ draw_ellipse_shadow(p+Vector2(0,15),25,9)
+ draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-24,p.y-27+bob,48,48),Rect2(race_index*32,0,32,32),Color.WHITE,false)
  if transformed:
-  draw_rect(Rect2(p.x-16,p.y-22+bob,32,3),Color("#ffb34f"))
-  draw_rect(Rect2(p.x-20,p.y-18+bob,40,2),Color("#ffdc82"))
-  draw_circle(p,27,Color(1.0,0.65,0.2,0.16))
+  draw_rect(Rect2(p.x-19,p.y-31+bob,38,3),Color("#ffb34f"))
+  draw_rect(Rect2(p.x-23,p.y-27+bob,46,2),Color("#ffdc82"))
+  draw_circle(p,29,Color(1.0,0.65,0.2,0.16))
