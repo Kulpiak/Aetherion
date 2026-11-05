@@ -69,7 +69,7 @@ func _ready() -> void:
 func _spawn_enemies() -> void:
  for i in range(18):
   var enemy_hp := 42.0 + float(i % 4) * 13.0
-  enemies.append({"name":ENEMY_NAMES[i%4],"pos":Vector2(rng.randf_range(90,1830),rng.randf_range(90,1350)),"hp":enemy_hp,"max_hp":enemy_hp,"damage":7.0+float(i%4)*2.0,"speed":42.0+float(i%4)*8.0,"alive":true,"type":i%4,"timer":0.0})
+  enemies.append({"name":ENEMY_NAMES[i%4],"pos":Vector2(rng.randf_range(90,1830),rng.randf_range(90,1350)),"hp":enemy_hp,"max_hp":enemy_hp,"damage":7.0+float(i%4)*2.0,"speed":42.0+float(i%4)*8.0,"alive":true,"type":i%4,"timer":0.0,"respawn":0.0})
 
 func _build_ui() -> void:
  ui = CanvasLayer.new()
@@ -196,7 +196,16 @@ func _process(delta: float) -> void:
  camera.position = player_pos
  for i in range(enemies.size()):
   var enemy := enemies[i]
-  if not enemy["alive"]: continue
+  if not enemy["alive"]:
+   enemy["respawn"] += delta
+   if enemy["respawn"] >= 18.0:
+    enemy["alive"] = true
+    enemy["hp"] = enemy["max_hp"]
+    enemy["pos"] = Vector2(rng.randf_range(90,1830),rng.randf_range(90,1350))
+    enemy["timer"] = 0.0
+    enemy["respawn"] = 0.0
+   enemies[i] = enemy
+   continue
   var difference: Vector2 = player_pos - enemy["pos"]
   if difference.length() < 300.0 and difference.length() > 36.0:
    enemy["pos"] += difference.normalized() * enemy["speed"] * delta
