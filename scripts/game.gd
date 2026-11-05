@@ -189,6 +189,18 @@ func _build_ui() -> void:
  panel.set_anchors_preset(Control.PRESET_CENTER)
  panel.position = Vector2(-205,-145)
  panel.custom_minimum_size = Vector2(410,290)
+ var panel_style := StyleBoxFlat.new()
+ panel_style.bg_color = Color(0.035,0.065,0.105,0.96)
+ panel_style.border_color = Color("#75c6cf")
+ panel_style.set_border_width_all(2)
+ panel_style.set_corner_radius_all(18)
+ panel_style.shadow_color = Color(0,0,0,0.62)
+ panel_style.shadow_size = 14
+ panel_style.content_margin_left = 16
+ panel_style.content_margin_right = 16
+ panel_style.content_margin_top = 14
+ panel_style.content_margin_bottom = 14
+ panel.add_theme_stylebox_override("panel",panel_style)
  root.add_child(panel)
  panel.hide()
 
