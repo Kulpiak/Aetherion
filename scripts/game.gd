@@ -91,6 +91,7 @@ var boss_defeated := false
 var autosave_timer := 0.0
 var enemies: Array[Dictionary] = []
 var loot_drops: Array[Dictionary] = []
+var damage_numbers: Array[Dictionary] = []
 var started := false
 var rng := RandomNumberGenerator.new()
 var camera: Camera2D
@@ -383,6 +384,14 @@ func _process(delta: float) -> void:
      gold = maxi(0,gold-8)
      _say("Odrodzenie przy kręgu. Utracono 8 złota.")
   enemies[i] = enemy
+ for i in range(damage_numbers.size()-1,-1,-1):
+  var number: Dictionary = damage_numbers[i]
+  number["life"] = float(number["life"]) - delta
+  number["pos"] = Vector2(number["pos"]) + Vector2(0,-34.0*delta)
+  if float(number["life"]) <= 0.0:
+   damage_numbers.remove_at(i)
+  else:
+   damage_numbers[i] = number
  for i in range(loot_drops.size()-1,-1,-1):
   var drop: Dictionary = loot_drops[i]
   drop["life"] = float(drop.get("life",60.0)) - delta
@@ -428,7 +437,9 @@ func _attack() -> void:
  attack_anim = 0.24
  enemy["hit_flash"] = 0.18
  enemy["pos"] += player_facing * 9.0
- enemy["hp"] -= atk + (8 if transformed else 0)
+ var damage := atk + (8 if transformed else 0)
+ _spawn_damage_number(enemy["pos"],damage,transformed)
+ enemy["hp"] -= damage
  if enemy["hp"] <= 0.0: _kill_enemy(index)
  else: enemies[index] = enemy
 
@@ -445,6 +456,7 @@ func _skill() -> void:
   if enemy["alive"] and player_pos.distance_to(enemy["pos"]) < 170.0:
    enemy["hit_flash"] = 0.18
    enemy["pos"] += (enemy["pos"]-player_pos).normalized() * 7.0
+   _spawn_damage_number(enemy["pos"],atk*2,false)
    enemy["hp"] -= atk * 2
    if enemy["hp"] <= 0.0: _kill_enemy(i)
    else: enemies[i] = enemy
@@ -468,7 +480,9 @@ func _skill_bolt() -> void:
  attack_target = enemy["pos"]
  enemy["hit_flash"] = 0.2
  enemy["pos"] += (enemy["pos"]-player_pos).normalized() * 12.0
- enemy["hp"] -= atk * 3 + (18 if transformed else 0)
+ var damage := atk * 3 + (18 if transformed else 0)
+ _spawn_damage_number(enemy["pos"],damage,true)
+ enemy["hp"] -= damage
  if enemy["hp"] <= 0.0:
   _kill_enemy(index)
  else:
@@ -495,7 +509,9 @@ func _skill_dash() -> void:
  ether -= 16.0
  enemy["hit_flash"] = 0.22
  enemy["pos"] += direction * 14.0
- enemy["hp"] -= atk * 2.4 + (12 if transformed else 0)
+ var damage := int(atk * 2.4 + (12 if transformed else 0))
+ _spawn_damage_number(enemy["pos"],damage,true)
+ enemy["hp"] -= damage
  if enemy["hp"] <= 0.0:
   _kill_enemy(index)
  else:
@@ -524,6 +540,9 @@ func _potion() -> void:
  inventory["Mikstura HP"] -= 1
  hp = minf(max_hp,hp+60.0)
  _say("Użyto mikstury.")
+
+func _spawn_damage_number(position: Vector2, amount: int, empowered: bool) -> void:
+ damage_numbers.append({"pos":position+Vector2(rng.randf_range(-8.0,8.0),-26.0),"amount":amount,"life":0.82,"empowered":empowered})
 
 func _kill_enemy(index: int) -> void:
  var enemy := enemies[index]
@@ -877,6 +896,8 @@ func _draw() -> void:
    _draw_enemy(enemy)
  for drop in loot_drops:
   _draw_loot(drop)
+ for number in damage_numbers:
+  _draw_damage_number(number)
  if started:
   _draw_combat_effects()
   _draw_player()
@@ -888,6 +909,15 @@ func _draw_landmarks() -> void:
  var pulse := 0.7 + sin(float(Time.get_ticks_msec()) / 420.0) * 0.2
  draw_circle(START_POS,116.0,Color(0.35,0.95,0.9,0.07 * pulse))
  draw_circle(RUINS_POS,150.0,Color(0.55,0.85,1.0,0.045 * pulse))
+
+func _draw_damage_number(number: Dictionary) -> void:
+ var life := float(number["life"])
+ var alpha := clampf(life/0.3,0.0,1.0)
+ var amount := str(number["amount"])
+ var empowered := bool(number.get("empowered",false))
+ var color := Color(1.0,0.78,0.34,alpha) if empowered else Color(1.0,0.96,0.82,alpha)
+ var p: Vector2 = number["pos"]
+ draw_string(ThemeDB.fallback_font,p+Vector2(-14,0),amount,HORIZONTAL_ALIGNMENT_CENTER,-1,17 if empowered else 14,color)
 
 func _draw_loot(drop: Dictionary) -> void:
  var p: Vector2 = drop["pos"]
