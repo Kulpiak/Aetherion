@@ -41,6 +41,7 @@ var quest := 0
 var kills := 0
 var inventory := {"Mikstura HP":3,"Odłamek Eterium":0,"Skóra bestii":0}
 var enemies: Array[Dictionary] = []
+var loot_drops: Array[Dictionary] = []
 var started := false
 var rng := RandomNumberGenerator.new()
 var camera: Camera2D
@@ -501,6 +502,15 @@ func _draw_landmarks() -> void:
    draw_rect(Rect2(px-4,py-5,8,16),Color("#493d31"))
    draw_rect(Rect2(px-13,py-15,26,17),Color("#1b3e2d"))
    draw_rect(Rect2(px-9,py-22,18,12),Color("#285438"))
+
+func _draw_loot(drop: Dictionary) -> void:
+ var p: Vector2 = drop["pos"]
+ var shard := drop["item"] == "Odłamek Eterium"
+ var glow := 0.72 + sin(float(Time.get_ticks_msec())/170.0)*0.18
+ draw_circle(p,10.0,Color(0.1,0.08,0.06,0.45))
+ draw_circle(p+Vector2(0,-3),6.0,Color(0.35,0.9,1.0,glow) if shard else Color(0.72,0.9,0.48,glow))
+ draw_circle(p+Vector2(-2,-5),2.0,Color("#f3fff2"))
+ draw_string(ThemeDB.fallback_font,p+Vector2(-28,-15),"ETER" if shard else "SKÓRA",HORIZONTAL_ALIGNMENT_LEFT,-1,9,Color("#baf5f2") if shard else Color("#d9efad"))
 
 func _draw_enemy(enemy: Dictionary) -> void:
  var p: Vector2 = enemy["pos"]
