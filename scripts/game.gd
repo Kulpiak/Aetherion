@@ -29,22 +29,7 @@ class VirtualStick extends Control:
  func _axis_from(point: Vector2) -> Vector2:
   var value := (point - size * 0.5) / 54.0
   return value.limit_length(1.0)
- func _refresh_action_buttons() -> void:
- if action_buttons.size() < 6:
-  return
- action_buttons[0].disabled = attack_cd > 0.0
- action_buttons[1].disabled = skill_cd > 0.0 or ether < 20.0
- action_buttons[1].text = "✦\\nFALA" if skill_cd <= 0.0 else "✦\\n%.1fs" % skill_cd
- action_buttons[2].disabled = bolt_cd > 0.0 or ether < 28.0
- action_buttons[2].text = "◎\\nPROMIEŃ" if bolt_cd <= 0.0 else "◎\\n%.1fs" % bolt_cd
- action_buttons[3].disabled = dash_cd > 0.0 or ether < 16.0
- action_buttons[3].text = "➤\\nSZARŻA" if dash_cd <= 0.0 else "➤\\n%.1fs" % dash_cd
- action_buttons[4].disabled = not transformed and (transform_cd > 0.0 or ether < 28.0)
- action_buttons[4].text = "✧\\n%.0fs" % transform_left if transformed else ("✧\\nFORMA" if transform_cd <= 0.0 else "✧\\n%.0fs" % transform_cd)
- action_buttons[5].disabled = int(inventory.get("Mikstura HP",0)) <= 0 or hp >= max_hp
- action_buttons[5].tooltip_text = "Mikstury HP: %d" % int(inventory.get("Mikstura HP",0))
-
-func _draw() -> void:
+ func _draw() -> void:
   var center := size * 0.5
   draw_circle(center,67,Color(0.025,0.055,0.075,0.72))
   draw_arc(center,67,0.0,TAU,48,Color(0.45,0.83,0.9,0.8),3.0,true)
@@ -968,6 +953,21 @@ func _update_hud() -> void:
  var objectives := ["ZADANIE: porozmawiaj z Kronikarzem.","ZADANIE: pokonaj 5 stworzeń (%d/5)." % mini(kills,5),"ZADANIE: wróć do Kronikarza po nagrodę.","ZADANIE: dotrzyj do wschodnich ruin i zbadaj ich centrum.","ROZDZIAŁ I: zbadaj tajemnicę Strażnika Rdzenia.","ZADANIE: pokonaj Strażnika Rdzenia.","ROZDZIAŁ I UKOŃCZONY — Aetherion jest bezpieczne."]
  quest_label.text = objectives[clampi(quest,0,6)]
  _refresh_action_buttons()
+
+func _refresh_action_buttons() -> void:
+ if action_buttons.size() < 6:
+  return
+ action_buttons[0].disabled = attack_cd > 0.0
+ action_buttons[1].disabled = skill_cd > 0.0 or ether < 20.0
+ action_buttons[1].text = "✦\\nFALA" if skill_cd <= 0.0 else "✦\\n%.1fs" % skill_cd
+ action_buttons[2].disabled = bolt_cd > 0.0 or ether < 28.0
+ action_buttons[2].text = "◎\\nPROMIEŃ" if bolt_cd <= 0.0 else "◎\\n%.1fs" % bolt_cd
+ action_buttons[3].disabled = dash_cd > 0.0 or ether < 16.0
+ action_buttons[3].text = "➤\\nSZARŻA" if dash_cd <= 0.0 else "➤\\n%.1fs" % dash_cd
+ action_buttons[4].disabled = not transformed and (transform_cd > 0.0 or ether < 28.0)
+ action_buttons[4].text = "✧\\n%.0fs" % transform_left if transformed else ("✧\\nFORMA" if transform_cd <= 0.0 else "✧\\n%.0fs" % transform_cd)
+ action_buttons[5].disabled = int(inventory.get("Mikstura HP",0)) <= 0 or hp >= max_hp
+ action_buttons[5].tooltip_text = "Mikstury HP: %d" % int(inventory.get("Mikstura HP",0))
 
 func _draw() -> void:
  _draw_world()
