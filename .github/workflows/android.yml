@@ -71,8 +71,20 @@ jobs:
           java -version
           sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --list_installed
 
-      - name: Validate project scripts
-        run: godot --headless --path . --editor --quit
+      - name: Validate project scripts and startup
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --editor --quit 2>&1 | tee /tmp/godot-editor.log
+          if grep -E "SCRIPT ERROR:|Parse Error:|Failed to load script" /tmp/godot-editor.log; then
+            echo "Godot script validation failed"
+            exit 1
+          fi
+          godot --headless --path . --quit-after 3 2>&1 | tee /tmp/godot-runtime.log
+          if grep -E "SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:" /tmp/godot-runtime.log; then
+            echo "Godot runtime startup validation failed"
+            exit 1
+          fi
 
       - name: Export Android debug APK
         run: |
