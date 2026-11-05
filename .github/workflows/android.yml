@@ -22,7 +22,7 @@ jobs:
       ANDROID_HOME: /usr/lib/android-sdk
       ANDROID_SDK_ROOT: /usr/lib/android-sdk
       JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
-      ANDROID_NDK_HOME: /usr/lib/android-sdk/ndk/25.2.9519653
+      ANDROID_NDK_HOME: /usr/lib/android-sdk/ndk/23.2.8568313
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,12 +39,13 @@ jobs:
       - name: Install Android SDK components
         run: |
           yes | sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null || true
-          sdkmanager --sdk_root="$ANDROID_SDK_ROOT" "platform-tools" "platforms;android-33" "build-tools;33.0.2" "ndk;25.2.9519653" "cmdline-tools;latest"
+          sdkmanager --sdk_root="$ANDROID_SDK_ROOT" "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;23.2.8568313" "cmdline-tools;latest" "cmake;3.10.2.4988404"
           test -x "$ANDROID_SDK_ROOT/platform-tools/adb"
-          test -d "$ANDROID_SDK_ROOT/platforms/android-33"
-          test -d "$ANDROID_SDK_ROOT/build-tools/33.0.2"
+          test -d "$ANDROID_SDK_ROOT/platforms/android-34"
+          test -d "$ANDROID_SDK_ROOT/build-tools/34.0.0"
           test -d "$ANDROID_NDK_HOME"
-          ls -la "$ANDROID_SDK_ROOT/build-tools/33.0.2"
+          test -d "$ANDROID_SDK_ROOT/cmake/3.10.2.4988404"
+          ls -la "$ANDROID_SDK_ROOT/build-tools/34.0.0"
 
       - name: Configure Android signing
         run: |
@@ -62,7 +63,6 @@ jobs:
           [resource]
           export/android/android_sdk_path = "/usr/lib/android-sdk"
           export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
-          export/android/ndk_path = "/usr/lib/android-sdk/ndk/25.2.9519653"
           EOF
           test -d "$ANDROID_HOME/platform-tools"
           test -d "$JAVA_HOME"
