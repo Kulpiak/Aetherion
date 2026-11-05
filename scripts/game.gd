@@ -539,7 +539,11 @@ func _load_game() -> void:
  kills = int(data.get("kills",0))
  inventory = data.get("inventory",inventory)
  equipment = data.get("equipment",equipment)
- owned_gear = data.get("owned_gear",owned_gear)
+ owned_gear.clear()
+ for saved_gear in data.get("owned_gear",[]):
+  var gear_name := str(saved_gear)
+  if GEAR_STATS.has(gear_name) and not owned_gear.has(gear_name):
+   owned_gear.append(gear_name)
  boss_spawned = bool(data.get("boss_spawned",false))
  boss_defeated = bool(data.get("boss_defeated",false))
  loot_drops.clear()
