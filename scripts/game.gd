@@ -167,6 +167,7 @@ func _build_ui() -> void:
  _button(right,"SKILLE",func(): _show_panel("Umiejętności"))
  _button(right,"RZEMIOSŁO",func(): _show_panel("Rzemiosło"))
  _button(right,"MAPA",func(): _show_panel("Mapa"))
+ _button(right,"KODEKS",func(): _show_panel("Kodeks"))
  _button(right,"ZADANIE",_quest_interact)
  _button(right,"ZAPISZ",_save_game)
  _button(right,"WCZYTAJ",_load_game)
@@ -746,8 +747,8 @@ func _draw_npc() -> void:
 
 func _show_panel(panel_name: String) -> void:
  if not started: return
- panel.custom_minimum_size = Vector2(520, 380) if panel_name == "Ekwipunek" else (Vector2(660, 520) if panel_name == "Mapa" else Vector2(440, 320))
- panel.position = Vector2(-260, -190) if panel_name == "Ekwipunek" else (Vector2(-330, -260) if panel_name == "Mapa" else Vector2(-220, -160))
+ panel.custom_minimum_size = Vector2(520, 380) if panel_name == "Ekwipunek" else (Vector2(660, 520) if panel_name == "Mapa" else (Vector2(620, 470) if panel_name == "Kodeks" else Vector2(440, 320)))
+ panel.position = Vector2(-260, -190) if panel_name == "Ekwipunek" else (Vector2(-330, -260) if panel_name == "Mapa" else (Vector2(-310, -235) if panel_name == "Kodeks" else Vector2(-220, -160)))
  _clear_panel()
  panel.show()
  var box := VBoxContainer.new()
@@ -821,6 +822,8 @@ func _show_panel(panel_name: String) -> void:
  elif panel_name == "Mapa":
   var objective_text := "CEL: Wschodnie Ruiny" if quest >= 3 and quest <= 5 else ("CEL: wróć do Kronikarza" if quest == 2 else "CEL: Kamienny Krąg i pierwsze polowanie")
   body.text = "%s\\nPozycja: %d, %d\\n\\nKamienny Krąg • Zielone Ostępy • Korona Gór\\nKrypta Kryształów • Złote Pustkowia\\nWschodnie Ruiny • Popielne Ziemie" % [objective_text,int(player_pos.x),int(player_pos.y)]
+ elif panel_name == "Kodeks":
+  body.text = "AETHERION — KRONIKI ETERIUM\\n\\nPIĘĆ RODÓW\\nTerranie — wszechstronni i wytrwali.\\nVarkari — silni wojownicy o niezłomnej woli.\\nElarianie — urodzeni przewodnicy energii.\\nSylvari — strażnicy dzikiej równowagi.\\nNoctari — badacze mocy ukrytej w cieniu.\\n\\nKRAINA\\nKamienny Krąg jest bezpiecznym schronieniem wędrowców. Zielone Ostępy skrywają pradawne ścieżki, Korona Gór strzeże źródeł Eterium, a Kryształowa Krypta pulsuje nieznaną energią. Złote Pustkowia i Popielne Ziemie kryją ślady dawnych katastrof. Wschodnie Ruiny pozostają zamknięte dla tych, którzy nie poznali ich sekretu.\\n\\nETERIUM\\nEterium jest pierwotną siłą przenikającą świat. Wzmacnia techniki, pozwala przekraczać granice ciała i budzi Przebudzenie Rdzenia — lecz jego moc wymaga dyscypliny."
  else:
   body.text = "Technika Eterium: koszt 20, fala obszarowa, cooldown 4 s.\\nPromień Eterium: koszt 28, zasięg 285, potrójne obrażenia, cooldown 6 s.\\nSzarża: koszt 16, zasięg 310, cooldown 5 s.\\nPrzebudzenie Rdzenia: 16 s."
  box.add_child(body)
