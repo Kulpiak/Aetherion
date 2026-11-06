@@ -28,5 +28,10 @@
 - **ZADANIE** służy do rozmowy z Kronikarzem i badania ruin.
 - **ZAPISZ / WCZYTAJ** obsługują lokalny zapis.
 
+## Ostatnia iteracja
+- Dodano subtelne, animowane drobiny Eterium dopasowane kolorystycznie do biomów świata.
+- Dodano Kodeks w grze: opis pięciu rodów, regionów i natury Eterium.
+- To nadal etap rozbudowy prototypu; oprawa postaci i świata wymaga pełnego, docelowego przebudowania.
+
 ## Status projektu
 To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między graczami i synchronizacja online nie są jeszcze zaimplementowane. Każdy build traktujemy jako potwierdzony dopiero po poprawnym przejściu walidacji Godot i eksporcie APK w GitHub Actions; zachowanie w grze wymaga jeszcze testu na urządzeniu.
