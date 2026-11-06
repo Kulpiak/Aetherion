@@ -111,9 +111,12 @@ var dash_anim := 0.0
 var dash_from := Vector2.ZERO
 var dash_to := Vector2.ZERO
 var player_hit_flash := 0.0
+var ambient_particles: Array[Dictionary] = []
+var ambient_time := 0.0
 
 func _ready() -> void:
  rng.randomize()
+ _init_ambient_particles()
  _spawn_enemies()
  _build_ui()
  _show_race_select()
@@ -379,6 +382,8 @@ func _process(delta: float) -> void:
  if held["up"] or Input.is_action_pressed("ui_up"): direction.y -= 1.0
  if held["down"] or Input.is_action_pressed("ui_down"): direction.y += 1.0
  if direction.length() > 1.0: direction = direction.normalized()
+ ambient_time += delta
+ _update_ambient_particles(delta)
  if direction != Vector2.ZERO:
   player_facing = direction
   walk_phase += delta * 11.0
@@ -444,6 +449,55 @@ func _process(delta: float) -> void:
    loot_drops[i] = drop
  _update_hud()
  queue_redraw()
+
+func _init_ambient_particles() -> void:
+ ambient_particles.clear()
+ for i in range(118):
+  var x := rng.randf_range(24.0,WORLD_SIZE.x-24.0)
+  var y := rng.randf_range(24.0,WORLD_SIZE.y-24.0)
+  var tint := Color("#9df4df")
+  if y < 470.0 and x > 1180.0:
+   tint = Color("#c8eaff")
+  elif y > 900.0 and x < 820.0:
+   tint = Color("#ffe0a0")
+  elif y > 850.0 and x > 1260.0:
+   tint = Color("#ffad82")
+  elif x > 930.0 and x < 1320.0:
+   tint = Color("#8deeff")
+  ambient_particles.append({
+   "pos":Vector2(x,y),
+   "velocity":Vector2(rng.randf_range(-5.0,5.0),rng.randf_range(-13.0,-3.0)),
+   "size":rng.randf_range(1.0,2.8),
+   "phase":rng.randf_range(0.0,TAU),
+   "tint":tint
+  })
+
+func _update_ambient_particles(delta: float) -> void:
+ for i in range(ambient_particles.size()):
+  var mote: Dictionary = ambient_particles[i]
+  var position: Vector2 = mote["pos"]
+  var velocity: Vector2 = mote["velocity"]
+  position += velocity * delta
+  position.x += sin(ambient_time*0.7+float(mote["phase"]))*3.0*delta
+  if position.y < 12.0:
+   position.y = WORLD_SIZE.y-12.0
+   position.x = rng.randf_range(24.0,WORLD_SIZE.x-24.0)
+  if position.x < 12.0:
+   position.x = WORLD_SIZE.x-12.0
+  elif position.x > WORLD_SIZE.x-12.0:
+   position.x = 12.0
+  mote["pos"] = position
+  ambient_particles[i] = mote
+
+func _draw_ambient_particles() -> void:
+ for mote in ambient_particles:
+  var phase := float(mote["phase"])
+  var pulse := 0.35+0.3*(0.5+0.5*sin(ambient_time*2.1+phase))
+  var position: Vector2 = mote["pos"]
+  var size := float(mote["size"])
+  var tint: Color = mote["tint"]
+  draw_circle(position,size*4.0,Color(tint.r,tint.g,tint.b,pulse*0.10))
+  draw_circle(position,size,Color(tint.r,tint.g,tint.b,pulse*0.72))
 
 func _on_virtual_stick(value: Vector2) -> void:
  held["left"] = value.x < -0.18
@@ -971,6 +1025,7 @@ func _refresh_action_buttons() -> void:
 
 func _draw() -> void:
  _draw_world()
+ _draw_ambient_particles()
  _draw_landmarks()
  if started:
   _draw_npc()
