@@ -637,25 +637,10 @@ func _potion() -> void:
 func _spawn_damage_number(position: Vector2, amount: int, empowered: bool) -> void:
  damage_numbers.append({"pos":position+Vector2(rng.randf_range(-8.0,8.0),-26.0),"amount":amount,"life":0.82,"empowered":empowered})
 
-func _kill_enemy(index: int) -> void:
- var enemy := enemies[index]
- enemy["alive"] = false
- enemies[index] = enemy
- xp += 20
- gold += 5
- kills += 1
- if rng.randf() < 0.35:
-  loot_drops.append({"item":"Skóra bestii","pos":enemy["pos"]+Vector2(rng.randf_range(-16,16),rng.randf_range(-16,16)),"life":60.0})
- if rng.randf() < 0.2:
-  loot_drops.append({"item":"Odłamek Eterium","pos":enemy["pos"]+Vector2(rng.randf_range(-16,16),rng.randf_range(-16,16)),"life":60.0})
- if bool(enemy.get("is_boss",false)):
-  boss_defeated = true
-  quest = 6
-  gold += 250
-  xp += 300
-  _say("STRAŻNIK RDZENIA POKONANY! +250 złota, +300 XP.")
- else:
-  _say("Pokonano %s! +20 XP, +5 złota." % enemy["name"])
+func _grant_xp(amount: int) -> void:
+ if amount <= 0:
+  return
+ xp += amount
  while xp >= level * 100:
   xp -= level * 100
   level += 1
@@ -666,12 +651,32 @@ func _kill_enemy(index: int) -> void:
   hp = max_hp
   ether = max_ether
   _say("AWANS! Poziom %d" % level)
+
+func _kill_enemy(index: int) -> void:
+ var enemy := enemies[index]
+ enemy["alive"] = false
+ enemies[index] = enemy
+ _grant_xp(20)
+ gold += 5
+ kills += 1
+ if rng.randf() < 0.35:
+  loot_drops.append({"item":"Skóra bestii","pos":enemy["pos"]+Vector2(rng.randf_range(-16,16),rng.randf_range(-16,16)),"life":60.0})
+ if rng.randf() < 0.2:
+  loot_drops.append({"item":"Odłamek Eterium","pos":enemy["pos"]+Vector2(rng.randf_range(-16,16),rng.randf_range(-16,16)),"life":60.0})
+ if bool(enemy.get("is_boss",false)):
+  boss_defeated = true
+  quest = 6
+  gold += 250
+  _grant_xp(300)
+  _say("STRAŻNIK RDZENIA POKONANY! +250 złota, +300 XP.")
+ else:
+  _say("Pokonano %s! +20 XP, +5 złota." % enemy["name"])
  if quest == 5 and bool(enemy.get("is_boss",false)):
   quest = 6
  if quest == 1 and kills >= 5:
   quest = 2
   gold += 35
-  xp += 50
+  _grant_xp(50)
   _say("Zadanie wykonane. Wróć do Kronikarza.")
 
 func _quest_interact() -> void:
@@ -683,17 +688,8 @@ func _quest_interact() -> void:
    return
   quest = 4
   gold += 75
-  xp += 100
+  _grant_xp(100)
   _say("Ruiny zbadane! +75 złota, +100 XP. Rozdział I ukończony!")
-  while xp >= level * 100:
-   xp -= level * 100
-   level += 1
-   max_hp += 10
-   max_ether += 7
-   atk += 2
-   defense += 1
-   hp = max_hp
-   ether = max_ether
   _update_hud()
   return
  if player_pos.distance_to(START_POS) > 145.0:
