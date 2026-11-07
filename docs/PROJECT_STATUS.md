@@ -16,6 +16,11 @@
 - Panel mapy z ilustracją świata, nazwami regionów i znacznikiem celu zadania.
 - Paski HP/Eterium, przebudowane przyciski walki oraz stylizowane okna UI.
 
+## Ostatnia iteracja — spójna progresja doświadczenia
+- Dodano wspólną funkcję `_grant_xp(amount)` dla nagród z walki, bossów i zadań.
+- Każde źródło XP korzysta teraz z tego samego progu awansu i identycznego wzrostu HP, Eterium, ataku oraz obrony.
+- Usunięto rozbieżność, w której nagrody z zadań mogły zwiększać XP bez natychmiastowego awansu i aktualizacji statystyk.
+
 ## W trakcie przebudowy i walidacji
 - Kolejne iteracje wyglądu oraz czytelności interfejsu na rzeczywistych ekranach Androida.
 - Lepsze, pełne animacje kierunkowe postaci i przeciwników.
