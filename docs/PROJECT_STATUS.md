@@ -21,6 +21,12 @@
 - Każde źródło XP korzysta teraz z tego samego progu awansu i identycznego wzrostu HP, Eterium, ataku oraz obrony.
 - Usunięto rozbieżność, w której nagrody z zadań mogły zwiększać XP bez natychmiastowego awansu i aktualizacji statystyk.
 
+## Ostatnia iteracja — czytelne telegraphowanie ataków przeciwników
+- Przeciwnicy zatrzymują się przed atakiem i sygnalizują go przez 0,52 s; Strażnik Rdzenia ma dłuższe przygotowanie 0,82 s i większy obszar ostrzegawczy.
+- Zwykłe ciosy pokazują kierunek zagrożenia, a atak bossa zaznacza obszar na ziemi.
+- Obrażenia są rozstrzygane dopiero po zakończeniu przygotowania, więc odejście poza zasięg pozwala uniknąć ciosu.
+- Aktywna Szarża zapewnia unik podczas animacji doskoku; przeciwnik nadal wykonuje widoczny atak, ale nie zadaje wtedy obrażeń.
+
 ## W trakcie przebudowy i walidacji
 - Kolejne iteracje wyglądu oraz czytelności interfejsu na rzeczywistych ekranach Androida.
 - Lepsze, pełne animacje kierunkowe postaci i przeciwników.
