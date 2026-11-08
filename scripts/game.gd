@@ -993,7 +993,7 @@ func _load_game() -> void:
    if bool(enemies[i].get("is_boss",false)):
     existing_boss = i
     enemies.remove_at(i)
-  enemies.append({"name":"Strażnik Rdzenia","pos":boss_pos,"hp":boss_hp,"max_hp":boss_max_hp,"damage":22.0,"speed":58.0,"alive":true,"type":3,"timer":0.0,"respawn":0.0,"is_boss":true})
+  enemies.append({"name":"Strażnik Rdzenia","pos":boss_pos,"hp":boss_hp,"max_hp":boss_max_hp,"damage":22.0,"speed":58.0,"alive":true,"type":3,"timer":0.0,"respawn":0.0,"windup":0.0,"windup_total":0.82,"is_boss":true})
  max_ether = float(RACES[race]["ep"])+(level-1)*7
  hp = clampf(hp,1.0,max_hp)
  ether = clampf(ether,0.0,max_ether)
