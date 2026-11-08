@@ -422,7 +422,9 @@ func _process(delta: float) -> void:
    enemy["windup"] = windup
    if windup <= 0.0 and player_pos.distance_to(enemy["pos"]) <= attack_range:
     enemy["attack_anim"] = 0.34
-    if dash_anim <= 0.0 and player_invuln <= 0.0:
+    if dash_anim > 0.0:
+     _say("Uniknięto ataku dzięki Szarży!")
+    elif player_invuln <= 0.0:
      player_hit_flash = 0.18
      player_invuln = 0.62
      hp -= maxf(2.0,enemy["damage"]-float(defense))
@@ -431,8 +433,6 @@ func _process(delta: float) -> void:
       player_pos = START_POS
       gold = maxi(0,gold-8)
       _say("Odrodzenie przy kręgu. Utracono 8 złota.")
-    else:
-     _say("Uniknięto ataku dzięki Szarży!")
   elif difference.length() < 300.0 and difference.length() > attack_range:
    enemy["facing"] = difference.normalized()
    enemy["walk_phase"] = float(enemy.get("walk_phase",0.0)) + delta * 9.0
