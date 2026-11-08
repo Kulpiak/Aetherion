@@ -410,22 +410,37 @@ func _process(delta: float) -> void:
   enemy["attack_anim"] = maxf(0.0,float(enemy.get("attack_anim",0.0))-delta)
   enemy["hit_flash"] = maxf(0.0,float(enemy.get("hit_flash",0.0))-delta)
   var difference: Vector2 = player_pos - enemy["pos"]
-  if difference.length() < 300.0 and difference.length() > 36.0:
+  var is_boss := bool(enemy.get("is_boss",false))
+  var attack_range := 112.0 if is_boss else 48.0
+  var windup := float(enemy.get("windup",0.0))
+  if windup > 0.0:
+   windup = maxf(0.0,windup-delta)
+   enemy["windup"] = windup
+   if windup <= 0.0 and player_pos.distance_to(enemy["pos"]) <= attack_range:
+    enemy["attack_anim"] = 0.34
+    if dash_anim <= 0.0:
+     player_hit_flash = 0.18
+     hp -= maxf(2.0,enemy["damage"]-float(defense))
+     if hp <= 0.0:
+      hp = max_hp
+      player_pos = START_POS
+      gold = maxi(0,gold-8)
+      _say("Odrodzenie przy kręgu. Utracono 8 złota.")
+    else:
+     _say("Uniknięto ataku dzięki Szarży!")
+  elif difference.length() < 300.0 and difference.length() > attack_range:
    enemy["facing"] = difference.normalized()
    enemy["walk_phase"] = float(enemy.get("walk_phase",0.0)) + delta * 9.0
    enemy["pos"] += difference.normalized() * enemy["speed"] * delta
-  elif difference.length() <= 36.0:
+  elif difference.length() <= attack_range and windup <= 0.0:
+   enemy["facing"] = difference.normalized()
    enemy["timer"] += delta
    if enemy["timer"] > 1.3:
     enemy["timer"] = 0.0
-    enemy["attack_anim"] = 0.34
-    player_hit_flash = 0.18
-    hp -= maxf(2.0,enemy["damage"]-float(defense))
-    if hp <= 0.0:
-     hp = max_hp
-     player_pos = START_POS
-     gold = maxi(0,gold-8)
-     _say("Odrodzenie przy kręgu. Utracono 8 złota.")
+    enemy["windup"] = 0.82 if is_boss else 0.52
+    enemy["windup_total"] = enemy["windup"]
+  else:
+   enemy["timer"] = maxf(0.0,float(enemy.get("timer",0.0))-delta*0.5)
   enemies[i] = enemy
  for i in range(damage_numbers.size()-1,-1,-1):
   var number: Dictionary = damage_numbers[i]
@@ -1092,9 +1107,21 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var phase := float(enemy.get("walk_phase",0.0))
  var bob := sin(phase)*3.0 if chasing else sin(float(Time.get_ticks_msec())/260.0+float(kind))*1.5
  var enemy_facing: Vector2 = enemy.get("facing",Vector2.DOWN)
+ var windup_left := float(enemy.get("windup",0.0))
  var lunge := enemy_facing * (7.0 if attacking else 0.0)
  var body_color := Color(1.0,0.55,0.48,1.0) if float(enemy.get("hit_flash",0.0)) > 0.0 else Color.WHITE
  draw_ellipse_shadow(p+Vector2(0,13),sprite_size*0.48,14.0 if is_boss else 8.0)
+ if windup_left > 0.0:
+  var windup_total := maxf(0.01,float(enemy.get("windup_total",0.52)))
+  var warning_progress := clampf(1.0-windup_left/windup_total,0.0,1.0)
+  var warning_alpha := 0.42+warning_progress*0.48
+  if is_boss:
+   draw_circle(p,112.0,Color(1.0,0.18,0.15,0.035+warning_progress*0.045))
+   draw_arc(p,112.0,0.0,TAU,56,Color(1.0,0.28,0.2,warning_alpha),4.5,true)
+  else:
+   var warning_angle := enemy_facing.angle()
+   draw_arc(p,43.0,warning_angle-0.82,warning_angle+0.82,24,Color(1.0,0.32,0.2,warning_alpha),4.0,true)
+   draw_line(p,p+enemy_facing*48.0,Color(1.0,0.4,0.25,warning_alpha),3.0,true)
  if is_boss:
   var boss_pulse := 0.72 + sin(float(Time.get_ticks_msec())/190.0)*0.16
   draw_circle(p,76.0,Color(0.55,0.16,0.25,0.09*boss_pulse))
