@@ -111,6 +111,7 @@ var dash_anim := 0.0
 var dash_from := Vector2.ZERO
 var dash_to := Vector2.ZERO
 var player_hit_flash := 0.0
+var player_invuln := 0.0
 var ambient_particles: Array[Dictionary] = []
 var ambient_time := 0.0
 
@@ -367,6 +368,7 @@ func _process(delta: float) -> void:
  bolt_anim = maxf(0.0,bolt_anim-delta)
  dash_cd = maxf(0.0,dash_cd-delta)
  player_hit_flash = maxf(0.0,player_hit_flash-delta)
+ player_invuln = maxf(0.0,player_invuln-delta)
  dash_anim = maxf(0.0,dash_anim-delta)
  if dash_anim > 0.0:
   player_pos = dash_from.lerp(dash_to,1.0-dash_anim/0.32)
@@ -420,8 +422,9 @@ func _process(delta: float) -> void:
    enemy["windup"] = windup
    if windup <= 0.0 and player_pos.distance_to(enemy["pos"]) <= attack_range:
     enemy["attack_anim"] = 0.34
-    if dash_anim <= 0.0:
+    if dash_anim <= 0.0 and player_invuln <= 0.0:
      player_hit_flash = 0.18
+     player_invuln = 0.62
      hp -= maxf(2.0,enemy["damage"]-float(defense))
      if hp <= 0.0:
       hp = max_hp
@@ -1211,7 +1214,8 @@ func _draw_player() -> void:
  var race_index := maxi(0,RACES.keys().find(race))
  draw_ellipse_shadow(p+Vector2(0,15),25,9)
  var frame := 1 if moving and int(Time.get_ticks_msec()/145)%2 == 0 else 0
- var hero_tint := Color(1.0,0.55,0.48,1.0) if player_hit_flash > 0.0 else Color.WHITE
+ var invuln_flash := player_invuln > 0.0 and int(Time.get_ticks_msec()/90)%2 == 0
+ var hero_tint := Color(1.0,0.55,0.48,1.0) if player_hit_flash > 0.0 else (Color(0.55,0.9,1.0,0.58) if invuln_flash else Color.WHITE)
  draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-44,p.y-52+bob,88,88),Rect2(race_index*128,frame*128,128,128),hero_tint,false)
  if transformed:
   var aura_time := float(Time.get_ticks_msec()) / 1000.0
