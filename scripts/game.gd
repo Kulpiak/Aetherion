@@ -134,7 +134,7 @@ func _ready() -> void:
 func _spawn_enemies() -> void:
  for i in range(18):
   var enemy_hp := 42.0 + float(i % 4) * 13.0
-  enemies.append({"name":ENEMY_NAMES[i%4],"pos":Vector2(rng.randf_range(90,1830),rng.randf_range(90,1350)),"hp":enemy_hp,"max_hp":enemy_hp,"damage":7.0+float(i%4)*2.0,"speed":42.0+float(i%4)*8.0,"alive":true,"type":i%4,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN})
+  enemies.append({"name":ENEMY_NAMES[i%4],"pos":Vector2(rng.randf_range(90,1830),rng.randf_range(90,1350)),"hp":enemy_hp,"max_hp":enemy_hp,"damage":7.0+float(i%4)*2.0,"speed":42.0+float(i%4)*8.0,"alive":true,"type":i%4,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.52,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN})
 
 func _build_ui() -> void:
  ui = CanvasLayer.new()
@@ -404,6 +404,8 @@ func _process(delta: float) -> void:
     enemy["hp"] = enemy["max_hp"]
     enemy["pos"] = Vector2(rng.randf_range(90,1830),rng.randf_range(90,1350))
     enemy["timer"] = 0.0
+    enemy["windup"] = 0.0
+    enemy["windup_total"] = 0.52
     enemy["respawn"] = 0.0
    enemies[i] = enemy
    continue
@@ -721,7 +723,7 @@ func _quest_interact() -> void:
  elif quest == 4:
   quest = 5
   boss_spawned = true
-  enemies.append({"name":"Strażnik Rdzenia","pos":RUINS_POS+Vector2(0,105),"hp":620.0,"max_hp":620.0,"damage":22.0,"speed":58.0,"alive":true,"type":3,"timer":0.0,"respawn":0.0,"is_boss":true})
+  enemies.append({"name":"Strażnik Rdzenia","pos":RUINS_POS+Vector2(0,105),"hp":620.0,"max_hp":620.0,"damage":22.0,"speed":58.0,"alive":true,"type":3,"timer":0.0,"respawn":0.0,"windup":0.0,"windup_total":0.82,"is_boss":true})
   _say("NOWE ZADANIE: pokonaj Strażnika Rdzenia we Wschodnich Ruinach!")
  elif quest == 5:
   _say("Strażnik Rdzenia czeka we Wschodnich Ruinach.")
