@@ -11,6 +11,7 @@
 - Wybór jednej z pięciu ras i rozwój poziomu postaci.
 - Dotykowe poruszanie, kamera, podstawowy atak, technika obszarowa i forma.
 - Wrogowie z pościgiem, atakiem, HP i odradzaniem.
+- Przeciwnicy zapowiadają ataki czytelnym sygnałem; można zejść z linii ciosu lub uniknąć trafienia aktywną Szarżą. Strażnik Rdzenia ostrzega przed większym atakiem obszarowym.
 - Doświadczenie, złoto, mikstury i losowe łupy widoczne na ziemi.
 - Podnoszenie materiałów przez podejście do nich.
 - Ekwipunek, broń i pancerz z bonusami statystyk.
