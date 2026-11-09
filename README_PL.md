@@ -30,6 +30,7 @@
 - **ZAPISZ / WCZYTAJ** obsługują lokalny zapis.
 
 ## Ostatnia iteracja
+- Dodano pięć autorskich herbów ras w wektorowym atlasie SVG i zintegrowano je z ekranem wyboru postaci.
 - Dodano subtelne, animowane drobiny Eterium dopasowane kolorystycznie do biomów świata.
 - Dodano Kodeks w grze: opis pięciu rodów, regionów i natury Eterium.
 - To nadal etap rozbudowy prototypu; oprawa postaci i świata wymaga pełnego, docelowego przebudowania.
