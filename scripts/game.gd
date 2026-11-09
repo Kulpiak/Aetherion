@@ -39,6 +39,7 @@ class VirtualStick extends Control:
 
 const SAVE_PATH := "user://aetherion_save.json"
 const SPRITE_ATLAS: Texture2D = preload("res://assets/aetherion_sprites.svg")
+const RACE_CREST_ATLAS: Texture2D = preload("res://assets/aetherion_race_crests.svg")
 const WORLD_TEXTURE: Texture2D = preload("res://assets/aetherion_world.svg")
 const WORLD_SIZE := Vector2(1920, 1440)
 const START_POS := Vector2(480, 380)
@@ -320,12 +321,26 @@ func _show_race_select() -> void:
   portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
   portrait.custom_minimum_size = Vector2(145, 145)
   content.add_child(portrait)
+  var identity_row := HBoxContainer.new()
+  identity_row.alignment = BoxContainer.ALIGNMENT_CENTER
+  identity_row.add_theme_constant_override("separation", 7)
+  content.add_child(identity_row)
+  var crest := TextureRect.new()
+  var crest_region := AtlasTexture.new()
+  crest_region.atlas = RACE_CREST_ATLAS
+  crest_region.region = Rect2(index * 128, 0, 128, 128)
+  crest.texture = crest_region
+  crest.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+  crest.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+  crest.custom_minimum_size = Vector2(38, 38)
+  identity_row.add_child(crest)
   var name_label := Label.new()
   name_label.text = race_name.to_upper()
+  name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
   name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   name_label.add_theme_font_size_override("font_size",17)
   name_label.add_theme_color_override("font_color",Color("#f2dfb5"))
-  content.add_child(name_label)
+  identity_row.add_child(name_label)
   var desc := Label.new()
   desc.text = descriptions[index]
   desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
