@@ -929,7 +929,7 @@ func _save_game(silent: bool=false) -> void:
   if bool(enemy.get("is_boss",false)):
    boss_state = {"name":str(enemy["name"]),"pos":[enemy["pos"].x,enemy["pos"].y],"hp":float(enemy["hp"]),"max_hp":float(enemy["max_hp"]),"damage":float(enemy["damage"]),"speed":float(enemy["speed"])}
    break
- var data := {"race":race,"pos":[player_pos.x,player_pos.y],"hp":hp,"ether":ether,"level":level,"xp":xp,"gold":gold,"atk":atk,"defense":defense,"quest":quest,"kills":kills,"inventory":inventory,"equipment":equipment,"owned_gear":owned_gear,"boss_spawned":boss_spawned,"boss_defeated":boss_defeated,"loot_drops":saved_loot,"boss_state":boss_state}
+ var data := {"save_version":2,"race":race,"pos":[player_pos.x,player_pos.y],"hp":hp,"ether":ether,"level":level,"xp":xp,"gold":gold,"atk":atk,"defense":defense,"quest":quest,"kills":kills,"inventory":inventory,"equipment":equipment,"owned_gear":owned_gear,"boss_spawned":boss_spawned,"boss_defeated":boss_defeated,"loot_drops":saved_loot,"boss_state":boss_state}
  var file := FileAccess.open(SAVE_PATH,FileAccess.WRITE)
  if file:
   file.store_string(JSON.stringify(data))
@@ -943,63 +943,110 @@ func _load_game() -> void:
   _say("Brak zapisu.")
   return
  var file := FileAccess.open(SAVE_PATH,FileAccess.READ)
+ if file == null:
+  _say("Nie można otworzyć zapisu.")
+  return
  var data = JSON.parse_string(file.get_as_text())
  if typeof(data) != TYPE_DICTIONARY:
   _say("Uszkodzony zapis.")
   return
+ var save_version := int(data.get("save_version",1))
+ if save_version < 1 or save_version > 2:
+  _say("Zapis pochodzi z nieobsługiwanej wersji gry.")
+  return
  race = str(data.get("race","Varkari"))
  if not RACES.has(race):
   race = "Varkari"
- var p: Array = data.get("pos",[START_POS.x,START_POS.y])
- player_pos = Vector2(float(p[0]),float(p[1]))
- level = int(data.get("level",1))
- xp = int(data.get("xp",0))
- gold = int(data.get("gold",0))
- atk = int(RACES[race]["atk"])+(level-1)*2
- defense = int(RACES[race]["def"])+(level-1)
- hp = float(data.get("hp",140))
- ether = float(data.get("ether",100))
- quest = int(data.get("quest",0))
- kills = int(data.get("kills",0))
- inventory = data.get("inventory",inventory)
- equipment = data.get("equipment",equipment)
+ level = clampi(int(data.get("level",1)),1,999)
+ xp = clampi(int(data.get("xp",0)),0,level*100-1)
+ gold = clampi(int(data.get("gold",0)),0,999999999)
+ kills = clampi(int(data.get("kills",0)),0,999999999)
+ quest = clampi(int(data.get("quest",0)),0,6)
+ var saved_position = data.get("pos",[])
+ if typeof(saved_position) == TYPE_ARRAY and saved_position.size() >= 2:
+  player_pos = Vector2(
+   clampf(float(saved_position[0]),24.0,WORLD_SIZE.x-24.0),
+   clampf(float(saved_position[1]),24.0,WORLD_SIZE.y-24.0)
+  )
+ else:
+  player_pos = START_POS
+ inventory = {"Mikstura HP":3,"Odłamek Eterium":0,"Skóra bestii":0}
+ var saved_inventory = data.get("inventory",{})
+ if typeof(saved_inventory) == TYPE_DICTIONARY:
+  for item_name in inventory.keys():
+   if saved_inventory.has(item_name):
+    inventory[item_name] = clampi(int(saved_inventory[item_name]),0,999999)
+ equipment = {"Broń":"Ostrze Wędrowca","Pancerz":"Tunika Wędrowca"}
+ var saved_equipment = data.get("equipment",{})
+ if typeof(saved_equipment) == TYPE_DICTIONARY:
+  for slot_name in equipment.keys():
+   var candidate := str(saved_equipment.get(slot_name,equipment[slot_name]))
+   if GEAR_STATS.has(candidate) and str(GEAR_STATS[candidate].get("slot","")) == str(slot_name):
+    equipment[slot_name] = candidate
  owned_gear.clear()
- for saved_gear in data.get("owned_gear",[]):
-  var gear_name := str(saved_gear)
-  if GEAR_STATS.has(gear_name) and not owned_gear.has(gear_name):
-   owned_gear.append(gear_name)
- boss_spawned = bool(data.get("boss_spawned",false))
- boss_defeated = bool(data.get("boss_defeated",false))
- loot_drops.clear()
- for saved_drop in data.get("loot_drops",[]):
-  if typeof(saved_drop) == TYPE_DICTIONARY:
-   var drop_pos: Array = saved_drop.get("pos",[player_pos.x,player_pos.y])
-   loot_drops.append({"item":str(saved_drop.get("item","Skóra bestii")),"pos":Vector2(float(drop_pos[0]),float(drop_pos[1])),"life":float(saved_drop.get("life",60.0))})
- max_hp = float(RACES[race]["hp"])+(level-1)*10
+ owned_gear.append("Ostrze Wędrowca")
+ owned_gear.append("Tunika Wędrowca")
+ var saved_owned_gear = data.get("owned_gear",[])
+ if typeof(saved_owned_gear) == TYPE_ARRAY:
+  for saved_gear in saved_owned_gear:
+   var gear_name := str(saved_gear)
+   if GEAR_STATS.has(gear_name) and not owned_gear.has(gear_name):
+    owned_gear.append(gear_name)
+ for equipped_item in equipment.values():
+  var equipped_name := str(equipped_item)
+  if not owned_gear.has(equipped_name):
+   owned_gear.append(equipped_name)
+ var race_stats: Dictionary = RACES[race]
+ atk = int(race_stats["atk"])+(level-1)*2
+ defense = int(race_stats["def"])+(level-1)
+ max_hp = float(race_stats["hp"])+(level-1)*10
+ max_ether = float(race_stats["ep"])+(level-1)*7
  for item_name in equipment.values():
   var gear_stats: Dictionary = GEAR_STATS.get(str(item_name),{})
   max_hp += int(gear_stats.get("hp",0))
   atk += int(gear_stats.get("atk",0))
   defense += int(gear_stats.get("def",0))
+ hp = clampf(float(data.get("hp",max_hp)),1.0,max_hp)
+ ether = clampf(float(data.get("ether",max_ether)),0.0,max_ether)
+ boss_spawned = bool(data.get("boss_spawned",false))
+ boss_defeated = bool(data.get("boss_defeated",false))
+ if boss_defeated:
+  quest = 6
+ loot_drops.clear()
+ var saved_loot = data.get("loot_drops",[])
+ if typeof(saved_loot) == TYPE_ARRAY:
+  for saved_drop in saved_loot:
+   if typeof(saved_drop) == TYPE_DICTIONARY:
+    var item_name := str(saved_drop.get("item",""))
+    var drop_position = saved_drop.get("pos",[])
+    if inventory.has(item_name) and item_name != "Mikstura HP" and typeof(drop_position) == TYPE_ARRAY and drop_position.size() >= 2:
+     var drop_pos := Vector2(
+      clampf(float(drop_position[0]),24.0,WORLD_SIZE.x-24.0),
+      clampf(float(drop_position[1]),24.0,WORLD_SIZE.y-24.0)
+     )
+     loot_drops.append({"item":item_name,"pos":drop_pos,"life":clampf(float(saved_drop.get("life",60.0)),0.1,60.0)})
  if boss_spawned and not boss_defeated:
-  var saved_boss: Dictionary = data.get("boss_state",{})
+  var saved_boss = data.get("boss_state",{})
+  if typeof(saved_boss) != TYPE_DICTIONARY:
+   saved_boss = {}
   var boss_pos := RUINS_POS+Vector2(0,105)
-  var boss_hp := 620.0
-  var boss_max_hp := 620.0
-  if not saved_boss.is_empty():
-   var saved_boss_pos: Array = saved_boss.get("pos",[boss_pos.x,boss_pos.y])
-   boss_pos = Vector2(float(saved_boss_pos[0]),float(saved_boss_pos[1]))
-   boss_hp = float(saved_boss.get("hp",620.0))
-   boss_max_hp = float(saved_boss.get("max_hp",620.0))
-  var existing_boss := -1
+  var boss_position_data = saved_boss.get("pos",[])
+  if typeof(boss_position_data) == TYPE_ARRAY and boss_position_data.size() >= 2:
+   boss_pos = Vector2(
+    clampf(float(boss_position_data[0]),24.0,WORLD_SIZE.x-24.0),
+    clampf(float(boss_position_data[1]),24.0,WORLD_SIZE.y-24.0)
+   )
+  var boss_max_hp := maxf(1.0,float(saved_boss.get("max_hp",620.0)))
+  var boss_hp := clampf(float(saved_boss.get("hp",boss_max_hp)),1.0,boss_max_hp)
   for i in range(enemies.size()-1,-1,-1):
    if bool(enemies[i].get("is_boss",false)):
-    existing_boss = i
     enemies.remove_at(i)
-  enemies.append({"name":"Strażnik Rdzenia","pos":boss_pos,"hp":boss_hp,"max_hp":boss_max_hp,"damage":22.0,"speed":58.0,"alive":true,"type":3,"timer":0.0,"respawn":0.0,"windup":0.0,"windup_total":0.82,"is_boss":true})
- max_ether = float(RACES[race]["ep"])+(level-1)*7
- hp = clampf(hp,1.0,max_hp)
- ether = clampf(ether,0.0,max_ether)
+  enemies.append({"name":"Strażnik Rdzenia","pos":boss_pos,"hp":boss_hp,"max_hp":boss_max_hp,"damage":22.0,"speed":58.0,"alive":true,"type":3,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"hit_flash":0.0,"windup":0.0,"windup_total":0.82,"walk_phase":0.0,"facing":Vector2.DOWN,"is_boss":true})
+ transformed = false
+ transform_left = 0.0
+ player_invuln = 0.0
+ dash_anim = 0.0
+ damage_numbers.clear()
  started = true
  panel.hide()
  camera.position = player_pos
