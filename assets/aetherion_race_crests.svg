@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="128" viewBox="0 0 640 128">
+<defs>
+ <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff0bd"/><stop offset=".45" stop-color="#d9a957"/><stop offset="1" stop-color="#76502d"/></linearGradient>
+ <linearGradient id="ember" x2="0" y2="1"><stop stop-color="#ffe0a0"/><stop offset=".45" stop-color="#ed8051"/><stop offset="1" stop-color="#772e37"/></linearGradient>
+ <linearGradient id="ice" x2="0" y2="1"><stop stop-color="#f1ffff"/><stop offset=".5" stop-color="#80dce8"/><stop offset="1" stop-color="#326c91"/></linearGradient>
+ <linearGradient id="leaf" x2="0" y2="1"><stop stop-color="#e8f5b4"/><stop offset=".5" stop-color="#8ecb79"/><stop offset="1" stop-color="#32634e"/></linearGradient>
+ <linearGradient id="shade" x2="0" y2="1"><stop stop-color="#d9c7ff"/><stop offset=".5" stop-color="#8e78c3"/><stop offset="1" stop-color="#38365f"/></linearGradient>
+ <radialGradient id="core"><stop stop-color="#fff8dc"/><stop offset=".35" stop-color="#a7fff0"/><stop offset="1" stop-color="#3d9aab" stop-opacity=".12"/></radialGradient>
+</defs>
+<!-- Terranie: sun-forged compass -->
+<g transform="translate(64 64)">
+ <circle r="54" fill="#101d2b" stroke="url(#gold)" stroke-width="4"/>
+ <circle r="44" fill="none" stroke="#f5d58b" stroke-width="1.5" opacity=".7"/>
+ <path d="M0-47L8-13 0-19-8-13Z M47 0L13 8 19 0 13-8Z M0 47L-8 13 0 19 8 13Z M-47 0L-13-8-19 0-13 8Z" fill="url(#gold)"/>
+ <path d="M0-31L8-8 31 0 8 8 0 31-8 8-31 0-8-8Z" fill="#d5a75d" stroke="#fff0bd" stroke-width="2"/>
+ <circle r="10" fill="url(#core)" stroke="#fff1c8" stroke-width="2"/>
+ <path d="M-23-27L-16-20M23-27L16-20M-23 27L-16 20M23 27L16 20" stroke="#fff0bd" stroke-width="3" stroke-linecap="round"/>
+</g>
+<!-- Varkari: twin fangs and ember -->
+<g transform="translate(192 64)">
+ <path d="M0-53C-13-35-43-34-47-8C-51 19-29 43 0 53C29 43 51 19 47-8C43-34 13-35 0-53Z" fill="#201923" stroke="url(#ember)" stroke-width="4"/>
+ <path d="M-29-27Q-14-12-10 17L-25 3Q-34-9-29-27ZM29-27Q14-12 10 17L25 3Q34-9 29-27Z" fill="url(#ember)" stroke="#ffd7a1" stroke-width="2"/>
+ <path d="M0-29L10-4 0 25-10-4Z" fill="#f5a15f" stroke="#ffe0ae" stroke-width="2"/>
+ <path d="M-22 18Q0 38 22 18" fill="none" stroke="#ffbf7a" stroke-width="3" stroke-linecap="round"/>
+ <circle cy="2" r="7" fill="#fff0c5"/>
+</g>
+<!-- Elarianie: crystalline wings -->
+<g transform="translate(320 64)">
+ <circle r="52" fill="#102632" stroke="url(#ice)" stroke-width="4"/>
+ <path d="M0-43L13-14 36-26 24 0 42 17 12 15 0 43-12 15-42 17-24 0-36-26-13-14Z" fill="#4b9eb1" stroke="#d9ffff" stroke-width="2.5"/>
+ <path d="M0-34L8-3 0 8-8-3Z M-29-19L-6-5-12 5-32 4Z M29-19L6-5 12 5 32 4Z M0 34L8 8 0 2-8 8Z" fill="url(#ice)" stroke="#eaffff" stroke-width="1.2"/>
+ <circle r="9" fill="#f1ffff" stroke="#73d8e7" stroke-width="3"/>
+</g>
+<!-- Sylvari: living leaf sigil -->
+<g transform="translate(448 64)">
+ <circle r="52" fill="#14271f" stroke="url(#leaf)" stroke-width="4"/>
+ <path d="M0 39C-8 8-34 1-29-29C-4-27 2-12 0 1C5-24 24-36 35-25C38 1 19 16 0 18" fill="url(#leaf)" stroke="#e6f5b8" stroke-width="2.5"/>
+ <path d="M0 39V-19M0 6L-19-12M0 1L19-15M0 19L-17 7M0 13L18 1" fill="none" stroke="#f0ffd0" stroke-width="2.4" stroke-linecap="round"/>
+ <circle r="7" fill="#f2f8cb" stroke="#8ecb79" stroke-width="2"/>
+ <path d="M-34 34Q0 47 34 34" fill="none" stroke="#8ecb79" stroke-width="2"/>
+</g>
+<!-- Noctari: lunar veil and star -->
+<g transform="translate(576 64)">
+ <circle r="52" fill="#17182c" stroke="url(#shade)" stroke-width="4"/>
+ <path d="M16-36C-16-25-24 13-2 32C-34 22-43-13-23-35C-8-50 12-48 27-38Z" fill="url(#shade)" stroke="#e5d9ff" stroke-width="2"/>
+ <path d="M15-21L20-7 35-2 20 3 15 18 10 3-5-2 10-7Z" fill="#f0eaff" stroke="#9c8ad0" stroke-width="2"/>
+ <path d="M-22 22L-18 12-14 22-4 26-14 30-18 40-22 30-32 26Z" fill="#a89bd8"/>
+ <circle cx="29" cy="-28" r="3" fill="#f7efff"/><circle cx="-31" cy="-24" r="2.5" fill="#b7c9ff"/>
+</g>
+</svg>
