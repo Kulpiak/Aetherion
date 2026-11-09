@@ -41,3 +41,10 @@
 
 ## Zasada jakości
 Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie przejdą odpowiedniego builda i testów. Każdy etap musi mieć możliwy do sprawdzenia rezultat.
+
+
+## Iteracja grafiki — herby pięciu ras
+- Dodano nowy, oryginalny atlas wektorowych herbów pięciu ras: kompas słoneczny Terranów, płomienne kły Varkari, kryształowe skrzydła Elarian, żywy liść Sylvari oraz księżycowy znak Noctari.
+- Atlas SVG jest ładowany bezpośrednio przez Godot i wyświetlany w kartach wyboru postaci obok nazwy rasy; nie jest to osobna grafika poglądowa.
+- Zachowano dotychczasowy atlas sylwetek i statystyki ras. Zasoby są wektorowe, więc skalują się bez utraty ostrości na ekranach Androida.
+- To pierwszy z etapów wymiany oprawy; nie zastępuje jeszcze pełnych animowanych modeli i docelowych środowisk.
