@@ -48,3 +48,10 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Atlas SVG jest ładowany bezpośrednio przez Godot i wyświetlany w kartach wyboru postaci obok nazwy rasy; nie jest to osobna grafika poglądowa.
 - Zachowano dotychczasowy atlas sylwetek i statystyki ras. Zasoby są wektorowe, więc skalują się bez utraty ostrości na ekranach Androida.
 - To pierwszy z etapów wymiany oprawy; nie zastępuje jeszcze pełnych animowanych modeli i docelowych środowisk.
+
+
+## Iteracja oprawy walki — glify Eterium
+- Dodano autorski atlas SVG z czterema glifami: kręgiem runicznym, cięciem energii, rozbłyskiem uderzenia i znakiem Przebudzenia.
+- Glify są renderowane bezpośrednio w scenie: pojawiają się podczas przygotowania ataków przeciwników, przy ataku podstawowym i Promieniu, w fali obszarowej oraz w aurze i impulsie aktywacji Przebudzenia Rdzenia.
+- Zachowano wektorowe źródła i skalowanie bez utraty ostrości; efekty nie wymagają dodatkowych węzłów ani ciężkich shaderów, co ogranicza koszt na Androidzie.
+- To zintegrowane efekty walki, nie finalna wymiana sprite'ów bohaterów i pełnych animacji kierunkowych.
