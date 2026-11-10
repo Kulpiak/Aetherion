@@ -40,6 +40,7 @@ class VirtualStick extends Control:
 const SAVE_PATH := "user://aetherion_save.json"
 const SPRITE_ATLAS: Texture2D = preload("res://assets/aetherion_sprites.svg")
 const RACE_CREST_ATLAS: Texture2D = preload("res://assets/aetherion_race_crests.svg")
+const ETERIUM_GLYPH_ATLAS: Texture2D = preload("res://assets/aetherion_eterium_glyphs.svg")
 const WORLD_TEXTURE: Texture2D = preload("res://assets/aetherion_world.svg")
 const WORLD_SIZE := Vector2(1920, 1440)
 const START_POS := Vector2(480, 380)
@@ -69,6 +70,7 @@ var atk := 15
 var defense := 4
 var transformed := false
 var transform_left := 0.0
+var transform_burst := 0.0
 var transform_cd := 0.0
 var attack_cd := 0.0
 var attack_anim := 0.0
@@ -388,6 +390,7 @@ func _process(delta: float) -> void:
  if dash_anim > 0.0:
   player_pos = dash_from.lerp(dash_to,1.0-dash_anim/0.32)
  transform_cd = maxf(0.0,transform_cd-delta)
+ transform_burst = maxf(0.0,transform_burst-delta)
  if transformed:
   transform_left -= delta
   ether = maxf(0.0,ether-4.0*delta)
@@ -657,6 +660,7 @@ func _transform() -> void:
  ether -= 28.0
  transformed = true
  transform_left = 16.0
+ transform_burst = 1.0
  transform_cd = 32.0
  _say("PRZEBUDZENIE RDZENIA!")
 
@@ -1179,6 +1183,8 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var body_color := Color(1.0,0.55,0.48,1.0) if float(enemy.get("hit_flash",0.0)) > 0.0 else Color.WHITE
  draw_ellipse_shadow(p+Vector2(0,13),sprite_size*0.48,14.0 if is_boss else 8.0)
  if windup_left > 0.0:
+  var glyph_rotation := float(Time.get_ticks_msec()) / 1000.0 * 0.32
+  _draw_eterium_glyph(p,0,290.0 if is_boss else 118.0,glyph_rotation,Color(1.0,0.32,0.2,0.55))
   var windup_total := maxf(0.01,float(enemy.get("windup_total",0.52)))
   var warning_progress := clampf(1.0-windup_left/windup_total,0.0,1.0)
   var warning_alpha := 0.42+warning_progress*0.48
@@ -1233,6 +1239,7 @@ func _draw_combat_effects() -> void:
  if bolt_anim > 0.0:
   var beam_start := player_pos + player_facing * 26.0
   var progress := 1.0 - bolt_anim / 0.38
+  _draw_eterium_glyph(attack_target,2,82.0+progress*54.0,now*1.8,Color(0.48,0.9,1.0,1.0-progress*0.35))
   var beam_width := 12.0 + sin(progress * PI) * 9.0
   var beam_color := Color(0.25,0.78,1.0,0.35 + (1.0-progress)*0.55)
   draw_line(beam_start,attack_target,beam_color,beam_width,true)
@@ -1247,6 +1254,7 @@ func _draw_combat_effects() -> void:
  if attack_anim > 0.0:
   var progress := 1.0 - attack_anim / 0.24
   var sweep := progress * 1.25
+  _draw_eterium_glyph(attack_target,1,62.0+sin(progress*PI)*24.0,attack_angle+sweep,Color(0.72,0.97,1.0,1.0-progress*0.35))
   var center := player_pos + Vector2(0,-5)
   var radius := 43.0 + sin(progress * PI) * 9.0
   draw_arc(center,radius,attack_angle-1.05+sweep,attack_angle+1.05+sweep,18,Color(0.95,0.96,1.0,0.95),5.0,true)
@@ -1259,6 +1267,7 @@ func _draw_combat_effects() -> void:
   var progress := 1.0 - skill_anim / 0.72
   var radius := 35.0 + progress * 145.0
   var alpha := 1.0 - progress
+  _draw_eterium_glyph(player_pos,0,maxf(92.0,radius*1.95),-now*0.72,Color(0.42,0.9,1.0,alpha*0.78))
   var pulse := 1.0 + sin(now*24.0)*0.08
   draw_arc(player_pos,radius*pulse,0.0,TAU,48,Color(0.35,0.9,1.0,alpha),5.0,true)
   draw_arc(player_pos,radius*0.78,0.0,TAU,48,Color(0.75,0.98,1.0,alpha*0.65),2.0,true)
@@ -1269,16 +1278,28 @@ func _draw_combat_effects() -> void:
    draw_line(inner,outer,Color(0.55,0.95,1.0,alpha*0.8),3.0,true)
   draw_circle(player_pos,12.0+progress*9.0,Color(0.5,0.95,1.0,alpha*0.35))
 
+func _draw_eterium_glyph(center: Vector2, glyph_index: int, size: float, rotation: float, tint: Color) -> void:
+ var safe_index := clampi(glyph_index,0,3)
+ draw_set_transform(center,rotation,Vector2.ONE*(size/128.0))
+ draw_texture_rect_region(ETERIUM_GLYPH_ATLAS,Rect2(-64.0,-64.0,128.0,128.0),Rect2(safe_index*128,0,128,128),tint,false)
+ draw_set_transform(Vector2.ZERO,0.0,Vector2.ONE)
+
 func _draw_player() -> void:
  var moving: bool = bool(held["left"]) or bool(held["right"]) or bool(held["up"]) or bool(held["down"]) or Input.is_action_pressed("ui_left") or Input.is_action_pressed("ui_right") or Input.is_action_pressed("ui_up") or Input.is_action_pressed("ui_down")
  var bob := sin(walk_phase)*2.0 if moving else 0.0
  var p := player_pos
  var race_index := maxi(0,RACES.keys().find(race))
  draw_ellipse_shadow(p+Vector2(0,15),25,9)
+ var glyph_time := float(Time.get_ticks_msec()) / 1000.0
+ if transformed:
+  _draw_eterium_glyph(p+Vector2(0,5),3,116.0,glyph_time*0.48,Color(1.0,0.73,0.3,0.56))
  var frame := 1 if moving and int(Time.get_ticks_msec()/145)%2 == 0 else 0
  var invuln_flash := player_invuln > 0.0 and int(Time.get_ticks_msec()/90)%2 == 0
  var hero_tint := Color(1.0,0.55,0.48,1.0) if player_hit_flash > 0.0 else (Color(0.55,0.9,1.0,0.58) if invuln_flash else Color.WHITE)
  draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-44,p.y-52+bob,88,88),Rect2(race_index*128,frame*128,128,128),hero_tint,false)
+ if transform_burst > 0.0:
+  var burst_progress := 1.0-transform_burst
+  _draw_eterium_glyph(p,2,132.0+burst_progress*150.0,glyph_time*1.1,Color(1.0,0.82,0.43,transform_burst*0.86))
  if transformed:
   var aura_time := float(Time.get_ticks_msec()) / 1000.0
   var aura_pulse := 0.78 + sin(aura_time*10.0)*0.18
