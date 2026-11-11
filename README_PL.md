@@ -38,3 +38,10 @@
 
 ## Status projektu
 To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między graczami i synchronizacja online nie są jeszcze zaimplementowane. Każdy build traktujemy jako potwierdzony dopiero po poprawnym przejściu walidacji Godot i eksporcie APK w GitHub Actions; zachowanie w grze wymaga jeszcze testu na urządzeniu.
+
+## Eksploracja regionów
+- Podczas podróży HUD pokazuje aktualny region.
+- Odkrywanie nowych obszarów daje jednorazową nagrodę 25 XP i 10 złota (Kamienny Krąg jest strefą startową bez nagrody).
+- Mapa oznacza odkryte regiony i zachowuje postęp eksploracji w lokalnym zapisie.
+- Zapis w wersji 3 pozostaje zgodny wstecz z wcześniejszymi zapisami wersji 1 i 2.
+

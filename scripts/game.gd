@@ -54,6 +54,7 @@ const RACES := {
 }
 const ENEMY_NAMES := ["Dzik Eterowy","Strażnik Ruin","Pęknięty Łowca","Golem Odłamków"]
 const ENEMY_COLORS := [Color("#a96b48"),Color("#8c9b9e"),Color("#684f87"),Color("#777b83")]
+const REGION_NAMES := ["Kamienny Krąg","Zielone Ostępy","Korona Gór","Krypta Kryształów","Złote Pustkowia","Wschodnie Ruiny","Popielne Ziemie","Szlak Eterium"]
 var race := "Varkari"
 var player_pos := START_POS
 var player_facing := Vector2.DOWN
@@ -80,6 +81,8 @@ var skill_cd := 0.0
 var skill_anim := 0.0
 var quest := 0
 var kills := 0
+var current_region := ""
+var discovered_regions: Array[String] = []
 var inventory := {"Mikstura HP":3,"Odłamek Eterium":0,"Skóra bestii":0}
 var equipment := {"Broń":"Ostrze Wędrowca","Pancerz":"Tunika Wędrowca"}
 var owned_gear: Array[String] = ["Ostrze Wędrowca","Tunika Wędrowca"]
@@ -100,6 +103,7 @@ var rng := RandomNumberGenerator.new()
 var camera: Camera2D
 var ui: CanvasLayer
 var status: Label
+var region_label: Label
 var hp_bar: ProgressBar
 var ether_bar: ProgressBar
 var action_buttons: Array[Button] = []
@@ -153,6 +157,10 @@ func _build_ui() -> void:
  status = Label.new()
  status.add_theme_font_size_override("font_size",16)
  left.add_child(status)
+ region_label = Label.new()
+ region_label.add_theme_font_size_override("font_size",13)
+ region_label.add_theme_color_override("font_color",Color("#9fd8dc"))
+ left.add_child(region_label)
  hp_bar = _create_hud_bar(left,Color("#e45b69"))
  ether_bar = _create_hud_bar(left,Color("#55c9df"))
  quest_label = Label.new()
@@ -366,6 +374,9 @@ func _start_game(selected_race: String) -> void:
  atk = stats["atk"]
  defense = stats["def"]
  started = true
+ discovered_regions.clear()
+ current_region = ""
+ _update_region(false)
  _clear_panel()
  panel.hide()
  _say("Witaj w Aetherion. Przyjmij zadanie u Kronikarza przy Kamiennym Kręgu.")
@@ -411,6 +422,7 @@ func _process(delta: float) -> void:
   player_pos += direction * (205.0 if transformed else 165.0) * delta
  player_pos.x = clampf(player_pos.x,24.0,WORLD_SIZE.x-24.0)
  player_pos.y = clampf(player_pos.y,24.0,WORLD_SIZE.y-24.0)
+ _update_region(true)
  camera.position = player_pos
  for i in range(enemies.size()):
   var enemy := enemies[i]
@@ -537,6 +549,41 @@ func _draw_ambient_particles() -> void:
   var tint: Color = mote["tint"]
   draw_circle(position,size*4.0,Color(tint.r,tint.g,tint.b,pulse*0.10))
   draw_circle(position,size,Color(tint.r,tint.g,tint.b,pulse*0.72))
+
+func _region_for_position(position: Vector2) -> String:
+ if Rect2(180.0,130.0,440.0,390.0).has_point(position):
+  return "Kamienny Krąg"
+ if Rect2(0.0,510.0,880.0,450.0).has_point(position):
+  return "Zielone Ostępy"
+ if Rect2(1270.0,0.0,650.0,520.0).has_point(position):
+  return "Korona Gór"
+ if Rect2(880.0,90.0,390.0,500.0).has_point(position):
+  return "Krypta Kryształów"
+ if Rect2(0.0,960.0,850.0,480.0).has_point(position):
+  return "Złote Pustkowia"
+ if Rect2(1260.0,520.0,660.0,360.0).has_point(position):
+  return "Wschodnie Ruiny"
+ if Rect2(1280.0,880.0,640.0,560.0).has_point(position):
+  return "Popielne Ziemie"
+ return "Szlak Eterium"
+
+func _update_region(award_discovery: bool = true) -> void:
+ var next_region := _region_for_position(player_pos)
+ if next_region == current_region:
+  return
+ current_region = next_region
+ if is_instance_valid(region_label):
+  region_label.text = "REGION • " + current_region.to_upper()
+ if discovered_regions.has(current_region):
+  return
+ discovered_regions.append(current_region)
+ if award_discovery and current_region != "Kamienny Krąg":
+  gold += 10
+  _grant_xp(25)
+  _say("ODKRYTO: %s  •  +25 XP  •  +10 ZŁOTA" % current_region.to_upper())
+ else:
+  _say("ODKRYTO REGION: %s" % current_region)
+ _update_hud()
 
 func _on_virtual_stick(value: Vector2) -> void:
  held["left"] = value.x < -0.18
@@ -856,7 +903,10 @@ func _show_panel(panel_name: String) -> void:
   body.text = "Wytwarzaj wyposażenie z materiałów z potworów.\\nOstrze Eterium: 4 skóry + 3 odłamki (Atak +7).\\nPancerz Łowcy: 5 skór + 2 odłamki (Obrona +4, HP +30).\\nMikstura HP: 2 skóry + 1 odłamek."
  elif panel_name == "Mapa":
   var objective_text := "CEL: Wschodnie Ruiny" if quest >= 3 and quest <= 5 else ("CEL: wróć do Kronikarza" if quest == 2 else "CEL: Kamienny Krąg i pierwsze polowanie")
-  body.text = "%s\\nPozycja: %d, %d\\n\\nKamienny Krąg • Zielone Ostępy • Korona Gór\\nKrypta Kryształów • Złote Pustkowia\\nWschodnie Ruiny • Popielne Ziemie" % [objective_text,int(player_pos.x),int(player_pos.y)]
+  var discovered_text := ""
+  for region_name in REGION_NAMES:
+   discovered_text += ("✓ " if discovered_regions.has(region_name) else "· ") + region_name + "   "
+  body.text = "%s\\nAktualny region: %s\\nOdkryte regiony: %d/%d\\n%s\\nPozycja: %d, %d" % [objective_text,current_region,discovered_regions.size(),REGION_NAMES.size(),discovered_text,int(player_pos.x),int(player_pos.y)]
  elif panel_name == "Kodeks":
   body.text = "AETHERION — KRONIKI ETERIUM\\n\\nPIĘĆ RODÓW\\nTerranie — wszechstronni i wytrwali.\\nVarkari — silni wojownicy o niezłomnej woli.\\nElarianie — urodzeni przewodnicy energii.\\nSylvari — strażnicy dzikiej równowagi.\\nNoctari — badacze mocy ukrytej w cieniu.\\n\\nKRAINA\\nKamienny Krąg jest bezpiecznym schronieniem wędrowców. Zielone Ostępy skrywają pradawne ścieżki, Korona Gór strzeże źródeł Eterium, a Kryształowa Krypta pulsuje nieznaną energią. Złote Pustkowia i Popielne Ziemie kryją ślady dawnych katastrof. Wschodnie Ruiny pozostają zamknięte dla tych, którzy nie poznali ich sekretu.\\n\\nETERIUM\\nEterium jest pierwotną siłą przenikającą świat. Wzmacnia techniki, pozwala przekraczać granice ciała i budzi Przebudzenie Rdzenia — lecz jego moc wymaga dyscypliny."
  else:
@@ -948,7 +998,7 @@ func _save_game(silent: bool=false) -> void:
   if bool(enemy.get("is_boss",false)):
    boss_state = {"name":str(enemy["name"]),"pos":[enemy["pos"].x,enemy["pos"].y],"hp":float(enemy["hp"]),"max_hp":float(enemy["max_hp"]),"damage":float(enemy["damage"]),"speed":float(enemy["speed"])}
    break
- var data := {"save_version":2,"race":race,"pos":[player_pos.x,player_pos.y],"hp":hp,"ether":ether,"level":level,"xp":xp,"gold":gold,"atk":atk,"defense":defense,"quest":quest,"kills":kills,"inventory":inventory,"equipment":equipment,"owned_gear":owned_gear,"boss_spawned":boss_spawned,"boss_defeated":boss_defeated,"loot_drops":saved_loot,"boss_state":boss_state}
+ var data := {"save_version":3,"race":race,"pos":[player_pos.x,player_pos.y],"hp":hp,"ether":ether,"level":level,"xp":xp,"gold":gold,"atk":atk,"defense":defense,"quest":quest,"kills":kills,"inventory":inventory,"equipment":equipment,"owned_gear":owned_gear,"boss_spawned":boss_spawned,"boss_defeated":boss_defeated,"loot_drops":saved_loot,"boss_state":boss_state,"discovered_regions":discovered_regions}
  var file := FileAccess.open(SAVE_PATH,FileAccess.WRITE)
  if file:
   file.store_string(JSON.stringify(data))
@@ -970,7 +1020,7 @@ func _load_game() -> void:
   _say("Uszkodzony zapis.")
   return
  var save_version := int(data.get("save_version",1))
- if save_version < 1 or save_version > 2:
+ if save_version < 1 or save_version > 3:
   _say("Zapis pochodzi z nieobsługiwanej wersji gry.")
   return
  race = str(data.get("race","Varkari"))
@@ -981,6 +1031,15 @@ func _load_game() -> void:
  gold = clampi(int(data.get("gold",0)),0,999999999)
  kills = clampi(int(data.get("kills",0)),0,999999999)
  quest = clampi(int(data.get("quest",0)),0,6)
+ discovered_regions.clear()
+ var saved_regions = data.get("discovered_regions",[])
+ if typeof(saved_regions) == TYPE_ARRAY:
+  for saved_region in saved_regions:
+   var region_name := str(saved_region)
+   if REGION_NAMES.has(region_name) and not discovered_regions.has(region_name):
+    discovered_regions.append(region_name)
+ if not discovered_regions.has("Kamienny Krąg"):
+  discovered_regions.append("Kamienny Krąg")
  var saved_position = data.get("pos",[])
  if typeof(saved_position) == TYPE_ARRAY and saved_position.size() >= 2:
   player_pos = Vector2(
@@ -1067,6 +1126,8 @@ func _load_game() -> void:
  dash_anim = 0.0
  damage_numbers.clear()
  started = true
+ current_region = ""
+ _update_region(false)
  panel.hide()
  camera.position = player_pos
  _say("Wczytano zapis.")
@@ -1083,6 +1144,8 @@ func _notification(what: int) -> void:
 func _update_hud() -> void:
  if not is_instance_valid(status): return
  status.text = "WĘDROWIEC  •  %s  •  POZ. %d  •  ZŁOTO %d" % [race.to_upper(),level,gold]
+ if is_instance_valid(region_label):
+  region_label.text = "REGION • " + current_region.to_upper()
  if is_instance_valid(hp_bar):
   hp_bar.max_value = max_hp
   hp_bar.value = hp

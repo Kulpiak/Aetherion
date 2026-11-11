@@ -55,3 +55,10 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Glify są renderowane bezpośrednio w scenie: pojawiają się podczas przygotowania ataków przeciwników, przy ataku podstawowym i Promieniu, w fali obszarowej oraz w aurze i impulsie aktywacji Przebudzenia Rdzenia.
 - Zachowano wektorowe źródła i skalowanie bez utraty ostrości; efekty nie wymagają dodatkowych węzłów ani ciężkich shaderów, co ogranicza koszt na Androidzie.
 - To zintegrowane efekty walki, nie finalna wymiana sprite'ów bohaterów i pełnych animacji kierunkowych.
+
+## Iteracja eksploracji — odkrywanie regionów
+- Dodano osiem logicznych stref świata: Kamienny Krąg, Zielone Ostępy, Korona Gór, Krypta Kryształów, Złote Pustkowia, Wschodnie Ruiny, Popielne Ziemie i Szlak Eterium.
+- HUD pokazuje aktualną strefę, a wejście do nieodkrytego regionu wyświetla komunikat i — poza początkowym Kamiennym Kręgiem — przyznaje jednorazowo 25 XP oraz 10 złota.
+- Mapa pokazuje liczbę i listę odkrytych regionów. Odkrycia są zapisywane lokalnie.
+- Format zapisu podniesiono do wersji 3; odczyt nadal obsługuje zapisy wersji 1 i 2, a brakujące dane eksploracji są bezpiecznie uzupełniane bez naliczania wstecznych nagród.
+
