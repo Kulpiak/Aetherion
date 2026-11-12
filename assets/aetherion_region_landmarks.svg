@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="192" viewBox="0 0 1536 192">
+<defs>
+ <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e8d8ae"/><stop offset=".48" stop-color="#8e9a91"/><stop offset="1" stop-color="#394d52"/></linearGradient>
+ <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff1bd"/><stop offset=".48" stop-color="#dcae5d"/><stop offset="1" stop-color="#77503a"/></linearGradient>
+ <linearGradient id="leaf" x2="0" y2="1"><stop stop-color="#d5f5a3"/><stop offset=".45" stop-color="#62b978"/><stop offset="1" stop-color="#174d46"/></linearGradient>
+ <linearGradient id="ice" x2="0" y2="1"><stop stop-color="#ffffff"/><stop offset=".45" stop-color="#9ee9f5"/><stop offset="1" stop-color="#426f9b"/></linearGradient>
+ <linearGradient id="crystal" x2="0" y2="1"><stop stop-color="#f1ffff"/><stop offset=".45" stop-color="#70ddec"/><stop offset="1" stop-color="#315b92"/></linearGradient>
+ <linearGradient id="sand" x2="0" y2="1"><stop stop-color="#ffe8ae"/><stop offset=".55" stop-color="#d49a58"/><stop offset="1" stop-color="#87543e"/></linearGradient>
+ <linearGradient id="ruin" x2="0" y2="1"><stop stop-color="#d5c6a1"/><stop offset=".55" stop-color="#827f70"/><stop offset="1" stop-color="#424c50"/></linearGradient>
+ <linearGradient id="lava" x2="0" y2="1"><stop stop-color="#fff0a0"/><stop offset=".35" stop-color="#ff9b45"/><stop offset="1" stop-color="#a52f38"/></linearGradient>
+ <linearGradient id="ether" x2="0" y2="1"><stop stop-color="#f5ffff"/><stop offset=".42" stop-color="#91f4e6"/><stop offset="1" stop-color="#397ba6"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#9cf7ef" stop-opacity=".48"/><stop offset="1" stop-color="#59cde0" stop-opacity="0"/></radialGradient>
+</defs>
+
+<!-- 01 Stone Circle: a warded waystone -->
+<g transform="translate(96 96)">
+ <ellipse cy="61" rx="72" ry="17" fill="#101e29" opacity=".34"/>
+ <path d="M-57 47L-46 22 0 10 48 23 59 47 35 61-36 61Z" fill="url(#stone)" stroke="#354a50" stroke-width="4"/>
+ <path d="M-39 34L0 23 39 34 32 48-31 48Z" fill="#4c6968" stroke="#c4c3a1" stroke-width="2"/>
+ <path d="M-25 42L0 35 25 42" fill="none" stroke="#f0d18c" stroke-width="3"/>
+ <path d="M-17 16L-12-44 0-63 13-44 18 16Z" fill="url(#stone)" stroke="#344b54" stroke-width="4"/>
+ <path d="M-12-43L0-63 13-44 0-34Z" fill="#e8e2c8" opacity=".72"/>
+ <path d="M-8-26L0-39 8-26 0-8Z" fill="url(#ether)" stroke="#e4ffff" stroke-width="2"/>
+ <ellipse cy="-5" rx="43" ry="55" fill="none" stroke="url(#gold)" stroke-width="5" transform="rotate(-24)"/>
+ <path d="M-48-2L-37-13M37 13L48 2M-8-57L-5-68M7 57L10 68" stroke="#fff0bd" stroke-width="4" stroke-linecap="round"/>
+ <path d="M-29 53L-21 45M29 53L21 45" stroke="#d6f8e9" stroke-width="2"/>
+ <circle r="5" cy="-17" fill="#f8ffff"/>
+</g>
+
+<!-- 02 Green Wilds: elder tree and spirit lights -->
+<g transform="translate(288 96)">
+ <ellipse cy="63" rx="72" ry="16" fill="#102d2a" opacity=".34"/>
+ <path d="M-17 54Q-10 20-20-4Q-35-23-45-39Q-20-30-9-12Q-13-40 0-63Q13-35 9-11Q27-35 47-39Q25-15 18 4Q13 28 24 55Z" fill="#694f3b" stroke="#2d4b3d" stroke-width="5"/>
+ <path d="M-12 48Q-31 58-47 51M11 48Q29 60 47 50M0 47L-2 64" fill="none" stroke="#b78a59" stroke-width="5" stroke-linecap="round"/>
+ <path d="M-56-28Q-55-58-25-62Q-12-83 8-67Q39-78 49-50Q73-31 53-8Q42 15 15 6Q-11 23-31 4Q-64 3-56-28Z" fill="url(#leaf)" stroke="#205a48" stroke-width="4"/>
+ <path d="M-45-35Q-23-52-4-33Q11-60 35-46M-34-12Q-9-27 3-9Q25-30 46-16" fill="none" stroke="#d5f6a9" stroke-width="4" opacity=".8"/>
+ <path d="M0-42L-2-7M-25-39L-8-15M25-36L8-12" stroke="#e5ffc0" stroke-width="2" opacity=".7"/>
+ <circle cx="-57" cy="-55" r="5" fill="#e5ffc0"/><circle cx="59" cy="-34" r="4" fill="#a5f4df"/><circle cx="45" cy="18" r="3" fill="#f5e9a7"/>
+ <path d="M-65 40Q-34 27-18 40T18 40T65 40" fill="none" stroke="#76bf79" stroke-width="4"/>
+ <path d="M-48 48l-8-13 14 5M44 47l9-14-15 5" fill="#8fd48b"/>
+</g>
+
+<!-- 03 Crown of Mountains: glacial summit -->
+<g transform="translate(480 96)">
+ <ellipse cy="62" rx="75" ry="16" fill="#1b3446" opacity=".34"/>
+ <path d="M-75 53L-46-3-25 18 5-58 31-12 48-30 76 53Z" fill="url(#stone)" stroke="#405c6a" stroke-width="4" stroke-linejoin="round"/>
+ <path d="M-46-3L-25 18-11 0-4 17 5-58 17-18 31-12 48-30 58-7 76 53H-75Z" fill="#82999b" opacity=".48"/>
+ <path d="M-5-58L-18-10-2-20 7-5 17-18Z" fill="#f3ffff" stroke="#d7f8ff" stroke-width="2"/>
+ <path d="M-46-3L-57 20-42 14-30 29-25 18M31-12L42 8 54 3 63 22" fill="#e9f7f8" stroke="#c4e8ee" stroke-width="2"/>
+ <path d="M-8 54L0 23 9 54Z" fill="url(#ice)" stroke="#d9ffff" stroke-width="3"/>
+ <path d="M0 23L0-1" stroke="#f8ffff" stroke-width="2"/>
+ <path d="M-58 43L-39 33M40 39L61 31" stroke="#b9d8dc" stroke-width="3" opacity=".8"/>
+ <circle cx="0" cy="-28" r="7" fill="#d9ffff" opacity=".85"/>
+ <path d="M-70 54Q-30 45 0 54T70 54" fill="none" stroke="#d5edf0" stroke-width="4"/>
+</g>
+
+<!-- 04 Crystal Crypt: sealed crystal arch -->
+<g transform="translate(672 96)">
+ <ellipse cy="62" rx="72" ry="16" fill="#102535" opacity=".36"/>
+ <path d="M-57 56V-5Q-57-62 0-70Q57-62 57-5V56H38V-4Q38-43 0-48Q-38-43-38-4V56Z" fill="url(#stone)" stroke="#3d6676" stroke-width="5"/>
+ <path d="M-28 56V-4Q-28-34 0-37Q28-34 28-4V56Z" fill="#122e45" stroke="#a4e9f1" stroke-width="3"/>
+ <path d="M0-54L20-18 12 20 0 44-13 20-20-18Z" fill="url(#crystal)" stroke="#e8ffff" stroke-width="3"/>
+ <path d="M0-54V44M-20-18L0-2 20-18M-13 20L0 8 12 20" fill="none" stroke="#f1ffff" stroke-width="2" opacity=".8"/>
+ <path d="M-48 30L-64 48-45 53M48 30L64 48 45 53" fill="none" stroke="#6ed8eb" stroke-width="5" stroke-linecap="round"/>
+ <path d="M-64 55L-54 22-44 55M64 55L54 22 44 55" fill="url(#crystal)" stroke="#c4fbff" stroke-width="2"/>
+ <circle cy="-6" r="46" fill="none" stroke="#75d8ec" stroke-width="2" stroke-dasharray="3 8" opacity=".8"/>
+</g>
+
+<!-- 05 Golden Wastes: sunken oasis shrine -->
+<g transform="translate(864 96)">
+ <ellipse cy="61" rx="76" ry="17" fill="#49372c" opacity=".32"/>
+ <path d="M-76 47Q-42 24-9 40T76 39V61H-76Z" fill="url(#sand)" stroke="#a96f48" stroke-width="3"/>
+ <path d="M-68 25Q-35 3 0 18T68 18" fill="none" stroke="#f8d89a" stroke-width="5"/>
+ <path d="M-31 44V-31L-15-52H15L31-31V44Z" fill="url(#sand)" stroke="#81533d" stroke-width="4"/>
+ <path d="M-18 44V-22Q0-42 18-22V44Z" fill="#593f42" stroke="#f4d28f" stroke-width="3"/>
+ <path d="M-9 43V-9Q0-22 9-9V43Z" fill="#142f3a"/>
+ <path d="M-35-31L0-66 35-31" fill="none" stroke="url(#gold)" stroke-width="8" stroke-linejoin="round"/>
+ <circle cy="-37" r="12" fill="#fff0ae" stroke="#d48d4f" stroke-width="4"/>
+ <path d="M-50 55Q-30 43-10 55T30 55T60 55" fill="none" stroke="#58b8a5" stroke-width="6"/>
+ <path d="M-4 57Q-26 28-43 18Q-17 21-4 57M4 57Q18 27 43 18Q20 24 4 57" fill="#5e9a60" stroke="#2e654d" stroke-width="2"/>
+ <path d="M-64 12l-8-13 15 5M64 12l8-13-15 5" fill="#e8c27c"/>
+</g>
+
+<!-- 06 Eastern Ruins: broken observatory -->
+<g transform="translate(1056 96)">
+ <ellipse cy="62" rx="76" ry="17" fill="#172b2d" opacity=".36"/>
+ <path d="M-67 50V-14L-49-37-31-14V50M31 50V-14L49-37 67-14V50" fill="url(#ruin)" stroke="#465b58" stroke-width="5"/>
+ <path d="M-72-15L-49-52-26-15M26-15L49-52 72-15" fill="#cbbd9b" stroke="#5d6861" stroke-width="5"/>
+ <path d="M-40 50V-4Q0-67 40-4V50" fill="none" stroke="#b6b198" stroke-width="12"/>
+ <path d="M-28 50V-4Q0-44 28-4V50" fill="#203c46" stroke="#667d78" stroke-width="3"/>
+ <path d="M0-37L16-10 0 18-16-10Z" fill="url(#ether)" stroke="#e7ffff" stroke-width="3"/>
+ <circle cy="-5" r="28" fill="none" stroke="#e3c88c" stroke-width="3" stroke-dasharray="4 6"/>
+ <path d="M-57 21h17M40 21h17M-56 34h14M42 34h14" stroke="#e7d6b1" stroke-width="3"/>
+ <path d="M-75 55L-61 42-50 55M75 55L61 42 50 55" fill="#8b8a77"/>
+</g>
+
+<!-- 07 Ashen Lands: ember-forged basalt spire -->
+<g transform="translate(1248 96)">
+ <ellipse cy="62" rx="77" ry="18" fill="#291f27" opacity=".42"/>
+ <path d="M-74 52L-52 22-36 28-16-12 0 4 23-47 39-4 57 7 75 52Z" fill="#4a4148" stroke="#241f2c" stroke-width="5" stroke-linejoin="round"/>
+ <path d="M-23 52L-8 16 3 26 23-47 31 12 47 52Z" fill="#66505a"/>
+ <path d="M-5 52L8 28 16 36 23-47 30 17 44 52Z" fill="url(#lava)" stroke="#ffb45c" stroke-width="2"/>
+ <path d="M-45 40L-24 22-14 33 0 10M34 27L45 17 57 32" fill="none" stroke="#e35c43" stroke-width="5" stroke-linecap="round"/>
+ <path d="M-57 55Q-30 43-8 55T39 55T72 55" fill="none" stroke="#ff8b48" stroke-width="4"/>
+ <path d="M-2-53Q-23-70-8-82Q-1-68 4-77Q17-64 5-48" fill="#ffb35c" opacity=".8"/>
+ <circle cx="-43" cy="-34" r="4" fill="#ffb45c"/><circle cx="50" cy="-47" r="3" fill="#ffcf76"/><circle cx="61" cy="0" r="4" fill="#ff7148"/>
+</g>
+
+<!-- 08 Etherium Trail: floating astral monolith -->
+<g transform="translate(1440 96)">
+ <ellipse cy="64" rx="68" ry="14" fill="#12303d" opacity=".3"/>
+ <circle r="66" fill="url(#aura)"/>
+ <ellipse rx="66" ry="27" fill="none" stroke="#70d8df" stroke-width="3" transform="rotate(-28)"/>
+ <ellipse rx="58" ry="22" fill="none" stroke="#d8ffff" stroke-width="2" transform="rotate(34)"/>
+ <path d="M0-68L27-25 18 34 0 58-18 34-27-25Z" fill="url(#ether)" stroke="#dfffff" stroke-width="4"/>
+ <path d="M0-68V58M-27-25L0-5 27-25M-18 34L0 15 18 34" fill="none" stroke="#f5ffff" stroke-width="2.5"/>
+ <path d="M-50-2L-67-25-54-48-40-25ZM50 5L66-17 55-42 40-17Z" fill="url(#crystal)" stroke="#b7f9ff" stroke-width="2"/>
+ <path d="M-10-85L0-99 10-85M-10 76L0 91 10 76" fill="none" stroke="#fff2b5" stroke-width="4" stroke-linecap="round"/>
+ <circle r="7" fill="#ffffff"/><circle r="3" fill="#68e6e2"/>
+</g>
+</svg>
