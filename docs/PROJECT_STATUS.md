@@ -62,3 +62,11 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Mapa pokazuje liczbę i listę odkrytych regionów. Odkrycia są zapisywane lokalnie.
 - Format zapisu podniesiono do wersji 3; odczyt nadal obsługuje zapisy wersji 1 i 2, a brakujące dane eksploracji są bezpiecznie uzupełniane bez naliczania wstecznych nagród.
 
+
+
+## Iteracja oprawy świata — autorskie landmarki regionów
+- Dodano wektorowy atlas ośmiu oryginalnych landmarków: kamiennego strażnika kręgu, prastare drzewo, lodowy szczyt, kryształową kryptę, pustynne sanktuarium, obserwatorium ruin, bazaltową iglicę i monolit Eterium.
+- Każdy landmark jest renderowany bezpośrednio na mapie w odpowiadającym mu regionie. Odkryte regiony otrzymują wyraźniejszą poświatę i animowany obrys; nieodkryte punkty są subtelniejsze.
+- Drobiny atmosferyczne otrzymały osobne palety barw dla wszystkich ośmiu regionów, zamiast kilku ogólnych warunków kolorystycznych.
+- Atlas jest wektorowy SVG i nie dodaje osobnych węzłów sceny ani ciężkich efektów post-processingu.
+- To pierwszy wizualny pass wyróżniający regiony; mapa nadal jest jedną wspólną lokacją, a landmarki nie zastępują pełnych, osobnych biomów i ich zawartości.
