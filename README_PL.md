@@ -39,6 +39,11 @@
 ## Status projektu
 To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między graczami i synchronizacja online nie są jeszcze zaimplementowane. Każdy build traktujemy jako potwierdzony dopiero po poprawnym przejściu walidacji Godot i eksporcie APK w GitHub Actions; zachowanie w grze wymaga jeszcze testu na urządzeniu.
 
+## Oprawa wizualna regionów
+- Na mapie zintegrowano osiem autorskich landmarków SVG, po jednym dla każdego regionu: Kamiennego Kręgu, Zielonych Ostępów, Korony Gór, Krypty Kryształów, Złotych Pustkowi, Wschodnich Ruin, Popielnych Ziem i Szlaku Eterium.
+- Odkryte punkty otrzymują wyraźniejszą poświatę i animowany obrys; nieodkryte są subtelniejsze.
+- Drobiny atmosferyczne korzystają teraz z osobnych palet kolorystycznych wszystkich ośmiu regionów.
+
 ## Eksploracja regionów
 - Podczas podróży HUD pokazuje aktualny region.
 - Odkrywanie nowych obszarów daje jednorazową nagrodę 25 XP i 10 złota (Kamienny Krąg jest strefą startową bez nagrody).
