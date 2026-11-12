@@ -42,6 +42,7 @@ const SPRITE_ATLAS: Texture2D = preload("res://assets/aetherion_sprites.svg")
 const RACE_CREST_ATLAS: Texture2D = preload("res://assets/aetherion_race_crests.svg")
 const ETERIUM_GLYPH_ATLAS: Texture2D = preload("res://assets/aetherion_eterium_glyphs.svg")
 const WORLD_TEXTURE: Texture2D = preload("res://assets/aetherion_world.svg")
+const REGION_LANDMARK_ATLAS: Texture2D = preload("res://assets/aetherion_region_landmarks.svg")
 const WORLD_SIZE := Vector2(1920, 1440)
 const START_POS := Vector2(480, 380)
 const RUINS_POS := Vector2(1600, 720)
@@ -506,15 +507,7 @@ func _init_ambient_particles() -> void:
  for i in range(118):
   var x := rng.randf_range(24.0,WORLD_SIZE.x-24.0)
   var y := rng.randf_range(24.0,WORLD_SIZE.y-24.0)
-  var tint := Color("#9df4df")
-  if y < 470.0 and x > 1180.0:
-   tint = Color("#c8eaff")
-  elif y > 900.0 and x < 820.0:
-   tint = Color("#ffe0a0")
-  elif y > 850.0 and x > 1260.0:
-   tint = Color("#ffad82")
-  elif x > 930.0 and x < 1320.0:
-   tint = Color("#8deeff")
+  var tint := _ambient_tint_for_position(Vector2(x,y))
   ambient_particles.append({
    "pos":Vector2(x,y),
    "velocity":Vector2(rng.randf_range(-5.0,5.0),rng.randf_range(-13.0,-3.0)),
@@ -522,6 +515,23 @@ func _init_ambient_particles() -> void:
    "phase":rng.randf_range(0.0,TAU),
    "tint":tint
   })
+
+func _ambient_tint_for_position(position: Vector2) -> Color:
+ if Rect2(180.0,130.0,440.0,390.0).has_point(position):
+  return Color("#f1d08b")
+ if Rect2(0.0,510.0,880.0,450.0).has_point(position):
+  return Color("#a7e8a4")
+ if Rect2(1270.0,0.0,650.0,520.0).has_point(position):
+  return Color("#c8efff")
+ if Rect2(880.0,90.0,390.0,500.0).has_point(position):
+  return Color("#83e9f4")
+ if Rect2(0.0,960.0,850.0,480.0).has_point(position):
+  return Color("#ffd58a")
+ if Rect2(1260.0,520.0,660.0,360.0).has_point(position):
+  return Color("#d9c5a0")
+ if Rect2(1280.0,880.0,640.0,560.0).has_point(position):
+  return Color("#ff9c70")
+ return Color("#a5f4eb")
 
 func _update_ambient_particles(delta: float) -> void:
  for i in range(ambient_particles.size()):
@@ -1194,6 +1204,7 @@ func _draw_world() -> void:
 func _draw_landmarks() -> void:
  var now := float(Time.get_ticks_msec()) / 1000.0
  var pulse := 0.7 + sin(now * 2.4) * 0.2
+ _draw_region_landmarks(now)
  draw_circle(START_POS,116.0,Color(0.35,0.95,0.9,0.07 * pulse))
  draw_circle(RUINS_POS,150.0,Color(0.55,0.85,1.0,0.045 * pulse))
  var font := ThemeDB.fallback_font
@@ -1211,6 +1222,34 @@ func _draw_landmarks() -> void:
   draw_circle(marker,15.0+sin(now*5.0)*3.0,Color(0.3,0.85,1.0,0.22))
   draw_arc(marker,23.0,0.0,TAU,32,Color(0.55,0.94,1.0,0.85),3.0,true)
   draw_string(font,marker+Vector2(-50,-28),"CEL ZADANIA",HORIZONTAL_ALIGNMENT_CENTER,-1,14,Color(0.72,0.96,1.0,0.95))
+
+func _draw_region_landmarks(now: float) -> void:
+ var positions := [
+  Vector2(545,460),Vector2(540,790),Vector2(1650,300),Vector2(1085,465),
+  Vector2(625,1265),Vector2(1780,800),Vector2(1790,1270),Vector2(1010,930)
+ ]
+ var tints := [
+  Color("#f1d08b"),Color("#a7e8a4"),Color("#c8efff"),Color("#83e9f4"),
+  Color("#ffd58a"),Color("#d9c5a0"),Color("#ff9c70"),Color("#a5f4eb")
+ ]
+ var landmark_size := 132.0
+ for index in range(positions.size()):
+  var landmark_pos: Vector2 = positions[index]
+  var discovered := discovered_regions.has(REGION_NAMES[index])
+  var tint: Color = tints[index]
+  var pulse := 0.72 + sin(now*1.6+float(index)*0.8)*0.12
+  draw_ellipse_shadow(landmark_pos+Vector2(0,48),96.0,22.0)
+  draw_circle(landmark_pos,76.0,Color(tint.r,tint.g,tint.b,0.075 if discovered else 0.028))
+  var icon_tint := Color.WHITE if discovered else Color(0.78,0.86,0.9,0.88)
+  draw_texture_rect_region(
+   REGION_LANDMARK_ATLAS,
+   Rect2(landmark_pos-Vector2.ONE*(landmark_size*0.5),Vector2.ONE*landmark_size),
+   Rect2(index*192,0,192,192),
+   icon_tint,
+   false
+  )
+  if discovered:
+   draw_arc(landmark_pos+Vector2(0,12),73.0,now*0.12+float(index),now*0.12+float(index)+PI*1.55,36,Color(tint.r,tint.g,tint.b,pulse*0.58),2.2,true)
 
 func _draw_damage_number(number: Dictionary) -> void:
  var life := float(number["life"])
