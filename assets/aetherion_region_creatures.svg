@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1792" height="128" viewBox="0 0 1792 128">
+<defs>
+ <linearGradient id="moss" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d1df8a"/><stop offset=".48" stop-color="#668b50"/><stop offset="1" stop-color="#314d3d"/></linearGradient>
+ <linearGradient id="bark" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b68a5d"/><stop offset="1" stop-color="#563f39"/></linearGradient>
+ <linearGradient id="ice" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1ffff"/><stop offset=".45" stop-color="#75c9dc"/><stop offset="1" stop-color="#355f91"/></linearGradient>
+ <linearGradient id="crystal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e5ffff"/><stop offset=".5" stop-color="#7adfe0"/><stop offset="1" stop-color="#356c9b"/></linearGradient>
+ <linearGradient id="sand" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f6d58a"/><stop offset=".55" stop-color="#b87848"/><stop offset="1" stop-color="#69453d"/></linearGradient>
+ <linearGradient id="ash" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b4a2a4"/><stop offset=".5" stop-color="#665b68"/><stop offset="1" stop-color="#302d3d"/></linearGradient>
+ <linearGradient id="ember" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe49a"/><stop offset=".45" stop-color="#ef7847"/><stop offset="1" stop-color="#713b42"/></linearGradient>
+ <linearGradient id="ether" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e5ffff"/><stop offset=".45" stop-color="#82d9e5"/><stop offset="1" stop-color="#7165ae"/></linearGradient>
+ <radialGradient id="glowMint"><stop stop-color="#a7fff0" stop-opacity=".7"/><stop offset="1" stop-color="#70e4dc" stop-opacity="0"/></radialGradient>
+ <radialGradient id="glowGold"><stop stop-color="#ffe7a3" stop-opacity=".65"/><stop offset="1" stop-color="#f0ae62" stop-opacity="0"/></radialGradient>
+ <radialGradient id="glowFire"><stop stop-color="#ffbf75" stop-opacity=".65"/><stop offset="1" stop-color="#ed6249" stop-opacity="0"/></radialGradient>
+</defs>
+<!-- 01 Mchowy Kieł -->
+<g transform="translate(0 0)" stroke="#35433a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="105" rx="42" ry="9" fill="#182c29" opacity=".42"/>
+ <ellipse cx="60" cy="72" rx="36" ry="23" fill="url(#bark)"/>
+ <path d="M29 75l-7 19h12l8-18M72 82l-2 13h12l5-18" fill="#76513f"/>
+ <path d="M79 66q17-25 32-10l5 19-14 12-25-5z" fill="url(#bark)"/>
+ <path d="M88 56l7-17 9 16M101 58l12-11 1 22" fill="url(#moss)"/>
+ <path d="M26 63l-9-13 16 5 4-18 10 15 11-20 4 21 16-12-4 22" fill="url(#moss)"/>
+ <path d="M96 79q-12 8-5 19q10-1 10-15M110 78q11 8 4 17q-10-2-8-13" fill="#f2e5c5"/>
+ <circle cx="101" cy="66" r="3.5" fill="#f5e18b" stroke="#7b4b39"/>
+ <path d="M83 86l-2 14h9l4-14" fill="#65443b"/>
+ <path d="M48 50l-3-9 12 4 8-12 4 13 11-4-7 12" fill="#91b36a" stroke="#526b48"/>
+ <path d="M37 66q14-18 27-7" fill="none" stroke="#d0df9b" stroke-width="4"/>
+</g>
+<!-- 02 Pnączowy Strażnik -->
+<g transform="translate(128 0)" stroke="#355b43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="107" rx="35" ry="8" fill="#172b27" opacity=".4"/>
+ <circle cx="64" cy="58" r="37" fill="url(#glowMint)"/>
+ <path d="M50 96l-8-30 8-23 14-10 14 13 8 23-9 27z" fill="url(#bark)"/>
+ <path d="M48 60L23 43 15 24l17 9 9 15M80 60l24-21 9-19-18 8-12 17" fill="none" stroke="#8baf67" stroke-width="9"/>
+ <path d="M50 43Q27 33 31 13q18 1 24 20Q54 10 69 4q11 17-1 34Q88 19 101 27q-3 22-26 25" fill="url(#moss)"/>
+ <path d="M49 91l-8 14h16l6-14M73 91l4 14h16L82 91" fill="#6b8b50"/>
+ <path d="M53 59l8 5 9-5" fill="none" stroke="#d9e9a0" stroke-width="3"/>
+ <circle cx="56" cy="53" r="3" fill="#f3e9a3"/><circle cx="72" cy="53" r="3" fill="#f3e9a3"/>
+ <path d="M64 70l-7 8 7 5 7-5z" fill="#7be5bf" stroke="#d1fff0"/>
+ <path d="M34 73q-14 9-10 23M94 72q15 10 10 24" fill="none" stroke="#a7c87b" stroke-width="4"/>
+</g>
+<!-- 03 Szronowy Raptor -->
+<g transform="translate(256 0)" stroke="#355b78" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="106" rx="43" ry="8" fill="#152a3a" opacity=".4"/>
+ <path d="M19 75q16-28 47-22 19 2 32 19l15 14-20 9-22-9-26 8-25-7z" fill="url(#ice)"/>
+ <path d="M29 71L8 56l-3-15 25 17M48 88l-5 17h12l8-16M83 89l6 16h12l-7-19" fill="#659eb7"/>
+ <path d="M83 62q7-25 30-18l9 15-13 13-23 1z" fill="url(#ice)"/>
+ <path d="M88 46l-4-18 13 11 8-21 5 23 13-10-5 23" fill="#e6ffff"/>
+ <path d="M110 66l13 7-14 5" fill="#d7f8fa"/>
+ <circle cx="106" cy="56" r="3" fill="#fff1a5" stroke="#47708a"/>
+ <path d="M51 58l-8-18 16 11 7-23 7 25 13-9-5 20" fill="#b8f4f3"/>
+ <path d="M37 80l-3 8 15 4M74 81l12 10" fill="none" stroke="#e9ffff" stroke-width="3"/>
+</g>
+<!-- 04 Burzowy Odłamek -->
+<g transform="translate(384 0)" stroke="#426c91" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="107" rx="31" ry="7" fill="#1b3041" opacity=".35"/>
+ <circle cx="64" cy="62" r="48" fill="url(#glowMint)"/>
+ <path d="M64 17l19 29-8 39-12 20-19-27 3-38z" fill="url(#crystal)" stroke="#d5ffff" stroke-width="4"/>
+ <path d="M64 20l1 72 13-47z" fill="#d7ffff" opacity=".7"/>
+ <path d="M34 39l13 8-5 17-17-7zM91 34l12 15-11 12-10-13zM35 82l14-7 9 16-16 8zM94 77l13-8 9 15-18 9z" fill="#70c9df" stroke="#d5ffff"/>
+ <path d="M29 26l7-10 4 16M102 20l-3-13 12 8" fill="none" stroke="#b9faff" stroke-width="4"/>
+ <path d="M64 38l-9 19 10 4-7 20 19-27-11-3 7-13" fill="#fff4b4" stroke="#f4ffff" stroke-width="2"/>
+ <circle cx="64" cy="63" r="6" fill="#f7ffff"/>
+</g>
+<!-- 05 Kryształowy Pająk -->
+<g transform="translate(512 0)" stroke="#4c6483" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+ <ellipse cx="64" cy="107" rx="39" ry="8" fill="#182a3b" opacity=".4"/>
+ <path d="M46 76L17 56 9 35M43 83L14 84 7 101M52 87L33 108M82 76l28-20 9-21M85 83l29 1 8 17M76 89l20 19" fill="none" stroke="#8bdce4" stroke-width="7"/>
+ <path d="M47 63q-8-19 8-29l17 0q18 11 9 31l-8 22-23 0z" fill="url(#ash)"/>
+ <path d="M48 39l16-27 18 28-6 25-21 0z" fill="url(#crystal)" stroke="#e2ffff" stroke-width="4"/>
+ <path d="M64 16l1 46 13-23z" fill="#eaffff" opacity=".75"/>
+ <path d="M49 69l-11-13 3-15 12 10M80 69l11-13-3-15-12 10" fill="#8acbdc"/>
+ <circle cx="55" cy="70" r="3" fill="#ffde9a"/><circle cx="73" cy="70" r="3" fill="#ffde9a"/>
+ <path d="M56 83l8 9 8-9" fill="none" stroke="#b9f9f2" stroke-width="3"/>
+</g>
+<!-- 06 Eterowy Skryba -->
+<g transform="translate(640 0)" stroke="#4c557b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="63" cy="108" rx="32" ry="7" fill="#1a2639" opacity=".4"/>
+ <circle cx="64" cy="57" r="47" fill="url(#glowMint)"/>
+ <path d="M34 102q-3-32 11-52l18-18 20 18q17 28 11 52l-30 8z" fill="url(#ash)"/>
+ <path d="M43 53q-4-29 21-39 24 10 21 39L64 68z" fill="#34344e" stroke="#a6b6dc" stroke-width="4"/>
+ <path d="M48 56q16-18 32 0l-8 23H56z" fill="#1c273d"/>
+ <path d="M54 60l7 5-7 4M73 60l-7 5 7 4" fill="none" stroke="#a6f5ef" stroke-width="4"/>
+ <path d="M63 76l-9 21h20z" fill="#6b7cb1"/>
+ <path d="M90 45l18-13 8 13-17 13" fill="none" stroke="#9bdfe8" stroke-width="4"/>
+ <path d="M104 19l8 13-8 13-8-13z" fill="url(#crystal)" stroke="#eaffff"/>
+ <path d="M38 84l-12 15M89 84l13 14" stroke="#8b9dc3" stroke-width="5"/>
+ <path d="M64 26v-13M58 19h12" stroke="#e8f4ff" stroke-width="3"/>
+</g>
+<!-- 07 Piaskowy Szperacz -->
+<g transform="translate(768 0)" stroke="#79523d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="107" rx="43" ry="8" fill="#382d2b" opacity=".4"/>
+ <path d="M30 77q-15-18-6-31l15 7 9 15 23-4 16 9 6 20-23 8-29-7z" fill="url(#sand)"/>
+ <path d="M36 81L17 95 8 88l17-22M51 91l-6 16h12l7-14M81 91l8 16h12l-8-20" fill="#9c6544"/>
+ <path d="M84 72q15-19 28-8l8 17-17 13-20-7z" fill="url(#sand)"/>
+ <path d="M95 59q22-14 19-30 18 22-3 40" fill="none" stroke="#dca45f" stroke-width="8"/>
+ <path d="M25 66l-16-17M31 79L10 78M88 88l17 10M82 82l22 2" fill="none" stroke="#e2bd7a" stroke-width="6"/>
+ <path d="M42 62l-3-15 13 10 9-17 7 19" fill="#d8b16f"/>
+ <circle cx="105" cy="73" r="3.5" fill="#ffe8a2"/>
+ <path d="M107 86l12 5-13 2" fill="#f1d9a6"/>
+</g>
+<!-- 08 Strażnik Wydm -->
+<g transform="translate(896 0)" stroke="#70543e" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="108" rx="43" ry="8" fill="#382e2b" opacity=".4"/>
+ <path d="M26 79l8-29 28-15 30 15 10 29-17 22H43z" fill="url(#sand)"/>
+ <path d="M34 70L12 55 7 73l23 15M96 70l21-15 5 18-23 15" fill="#b17a4d"/>
+ <path d="M42 94l-9 14h17l7-13M77 94l8 14h17L91 94" fill="#72513f"/>
+ <path d="M39 52l-9-21 24 9 10-25 11 26 22-10-10 25" fill="#d9ae6e"/>
+ <path d="M46 63l18 9 18-9-7 24H53z" fill="#74503e" stroke="#e4bd7b"/>
+ <circle cx="55" cy="70" r="3" fill="#ffe59c"/><circle cx="73" cy="70" r="3" fill="#ffe59c"/>
+ <path d="M64 77l-5 7h10z" fill="#e4b86e"/>
+ <path d="M48 49l16-15 17 15" fill="none" stroke="#ffe0a0" stroke-width="4"/>
+</g>
+<!-- 09 Pęknięty Legionista -->
+<g transform="translate(1024 0)" stroke="#5b5962" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="108" rx="33" ry="7" fill="#202a34" opacity=".42"/>
+ <path d="M43 99l-5-42 13-23 26 0 14 24-7 42-20 8z" fill="url(#ash)"/>
+ <path d="M43 46l-12-16 7-15 24 8 3 18zM83 46l13-16-7-15-24 8-3 18z" fill="#8d8b98"/>
+ <path d="M48 59l16-10 17 10-5 26H53z" fill="#4b5361" stroke="#c2b6a2"/>
+ <path d="M56 64l8 7 8-7" fill="none" stroke="#e9d5a6" stroke-width="3"/>
+ <path d="M39 62L18 83l7 11 25-20M87 62l20 19-7 12-23-18" fill="#777988"/>
+ <path d="M50 93l-9 15h17l6-13M77 93l8 15h16L88 92" fill="#55515d"/>
+ <path d="M64 50l-6 19 9 7-8 15 18-21-10-5 7-15" fill="#ef9b6c"/>
+ <path d="M18 83l-5-20 7-6 8 16" fill="none" stroke="#b9a88e" stroke-width="5"/>
+</g>
+<!-- 10 Runiczny Tropiciel -->
+<g transform="translate(1152 0)" stroke="#4e5b72" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="108" rx="43" ry="8" fill="#1c2938" opacity=".4"/>
+ <path d="M19 79q12-28 42-24l24 9 17 15-9 17-28-2-22 8-25-10z" fill="url(#ash)"/>
+ <path d="M31 80L9 68l-5-17 25 11M47 92l-6 16h12l7-15M81 91l8 16h12l-8-19" fill="#626f83"/>
+ <path d="M80 64q10-24 32-15l12 17-16 15-23-3z" fill="#747d94"/>
+ <path d="M91 51l-4-23 17 15 10-23 6 28" fill="#a6dfe2" stroke="#d8ffff"/>
+ <circle cx="107" cy="65" r="3.5" fill="#ffdf9a"/>
+ <path d="M43 59l8-15 9 14 9-22 8 23" fill="#7c9eb4"/>
+ <path d="M53 77l12 6 13-6M59 92l5-9 6 9" fill="none" stroke="#b7f3eb" stroke-width="3"/>
+ <path d="M29 73l-8 7 10 6M70 64l8-7 7 9" fill="none" stroke="#d6c7a0" stroke-width="3"/>
+</g>
+<!-- 11 Popielny Łupieżca -->
+<g transform="translate(1280 0)" stroke="#4d414c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="108" rx="42" ry="8" fill="#201f2c" opacity=".45"/>
+ <path d="M19 80q8-30 40-28l29 12 18 19-18 18-27-8-24 8-23-12z" fill="url(#ash)"/>
+ <path d="M31 68L13 48l21 8 4-24 13 23 13-24 3 27" fill="#9a7b7b"/>
+ <path d="M44 91l-5 17h14l7-17M80 91l7 17h14L92 90" fill="#554650"/>
+ <path d="M83 64q10-22 30-12l10 18-16 17-24-6z" fill="#76616d"/>
+ <path d="M92 55l-5-18 15 10 9-20 8 25" fill="#b28b7a"/>
+ <circle cx="105" cy="70" r="4" fill="#ffb16d"/>
+ <path d="M108 84l12 6-14 3" fill="#d5b5a0"/>
+ <path d="M23 79l-13 13 20 2M64 57l8-18 7 18" fill="none" stroke="#c08c79" stroke-width="4"/>
+ <path d="M55 82l9 6 10-6" fill="none" stroke="#e5b18a" stroke-width="3"/>
+</g>
+<!-- 12 Żarowy Golem -->
+<g transform="translate(1408 0)" stroke="#69434a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="109" rx="42" ry="8" fill="#271e2b" opacity=".45"/>
+ <path d="M34 93l-8-39 18-23 39-1 22 26-8 40-28 15-28-9z" fill="url(#ash)"/>
+ <path d="M34 48L14 35l11 31 16 8M94 48l20-13-10 31-17 8" fill="#6c5963"/>
+ <path d="M44 41l-4-20 19 13 7-23 11 24 18-12-5 25" fill="#a96b58"/>
+ <path d="M46 62l18-10 20 10-7 27H52z" fill="#3b3542"/>
+ <path d="M62 52l-8 18 12 6-9 17 23-26-12-5 7-15" fill="#ffb36d" stroke="#ffe2a0" stroke-width="2"/>
+ <circle cx="53" cy="58" r="4" fill="#ffbd76"/><circle cx="76" cy="58" r="4" fill="#ffbd76"/>
+ <path d="M43 91l-7 18h18l9-15M80 91l7 18h18L94 90" fill="#5a424d"/>
+ <path d="M29 76l-10 13 17 4M94 76l14 13-18 4" fill="none" stroke="#f18a5b" stroke-width="5"/>
+</g>
+<!-- 13 Eterowy Widmowiec -->
+<g transform="translate(1536 0)" stroke="#4f5e91" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="109" rx="30" ry="7" fill="#1d2b40" opacity=".35"/>
+ <circle cx="64" cy="56" r="48" fill="url(#glowMint)"/>
+ <path d="M38 102q-9-23 0-49l26-30 27 30q8 27-1 49l-13 10-13-13-13 13z" fill="url(#ether)" stroke="#c8ffff" stroke-width="3"/>
+ <path d="M46 53q18-23 36 0l-6 27H53z" fill="#3e477b"/>
+ <path d="M52 59l8 5-8 5M76 59l-8 5 8 5" fill="none" stroke="#c7fff8" stroke-width="4"/>
+ <path d="M64 17l-9 18 9 10 9-10z" fill="#fff0b0" stroke="#a6f3ed"/>
+ <path d="M39 85l-17 17 7-24M88 84l18 18-7-25" fill="none" stroke="#93dce9" stroke-width="5"/>
+ <path d="M51 98l-9 12M77 98l10 12" stroke="#d4ffff" stroke-width="4"/>
+ <circle cx="64" cy="74" r="4" fill="#fff2b6"/>
+</g>
+<!-- 14 Strażnik Szczeliny -->
+<g transform="translate(1664 0)" stroke="#4e477d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="64" cy="109" rx="38" ry="8" fill="#1b2035" opacity=".45"/>
+ <circle cx="64" cy="62" r="51" fill="url(#glowMint)"/>
+ <path d="M42 97l-5-43 13-28h28l14 28-7 43-21 13z" fill="url(#ash)" stroke="#a7a2d9"/>
+ <path d="M45 38L29 20l22 7M83 38l17-18-22 7" fill="#8b84bd"/>
+ <path d="M47 57l17-13 18 13-5 28H52z" fill="#373753" stroke="#b8b1e8"/>
+ <path d="M55 62l9 6 9-6" fill="none" stroke="#d8ffff" stroke-width="4"/>
+ <path d="M64 28l-10 23 10 8 10-8z" fill="url(#crystal)" stroke="#e6ffff"/>
+ <path d="M37 65L16 82l11 17 20-19M91 65l21 17-11 17-20-19" fill="#68648f"/>
+ <path d="M51 91l-8 18h18l4-14M77 91l4 18h18l-11-18" fill="#554c76"/>
+ <path d="M18 18q-11 16 0 32M110 18q11 16 0 32" fill="none" stroke="#a5f8f1" stroke-width="4"/>
+ <circle cx="64" cy="70" r="5" fill="#fff1b5"/>
+</g>
+</svg>
