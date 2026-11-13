@@ -43,6 +43,7 @@ const RACE_CREST_ATLAS: Texture2D = preload("res://assets/aetherion_race_crests.
 const ETERIUM_GLYPH_ATLAS: Texture2D = preload("res://assets/aetherion_eterium_glyphs.svg")
 const WORLD_TEXTURE: Texture2D = preload("res://assets/aetherion_world.svg")
 const REGION_LANDMARK_ATLAS: Texture2D = preload("res://assets/aetherion_region_landmarks.svg")
+const REGION_CREATURE_ATLAS: Texture2D = preload("res://assets/aetherion_region_creatures.svg")
 const WORLD_SIZE := Vector2(1920, 1440)
 const START_POS := Vector2(480, 380)
 const RUINS_POS := Vector2(1600, 720)
@@ -53,9 +54,38 @@ const RACES := {
  "Sylvari":{"hp":130,"ep":110,"atk":11,"def":6},
  "Noctari":{"hp":112,"ep":120,"atk":14,"def":3}
 }
-const ENEMY_NAMES := ["Dzik Eterowy","Strażnik Ruin","Pęknięty Łowca","Golem Odłamków"]
-const ENEMY_COLORS := [Color("#a96b48"),Color("#8c9b9e"),Color("#684f87"),Color("#777b83")]
 const REGION_NAMES := ["Kamienny Krąg","Zielone Ostępy","Korona Gór","Krypta Kryształów","Złote Pustkowia","Wschodnie Ruiny","Popielne Ziemie","Szlak Eterium"]
+const REGION_ENCOUNTERS := [
+ {"name":"Kamienny Krąg","bounds":Rect2(180.0,130.0,440.0,390.0),"creatures":[]},
+ {"name":"Zielone Ostępy","bounds":Rect2(0.0,510.0,880.0,450.0),"creatures":[
+  {"name":"Mchowy Kieł","type":0,"hp":46.0,"damage":8.0,"speed":54.0,"xp":22,"gold":6},
+  {"name":"Pnączowy Strażnik","type":1,"hp":70.0,"damage":10.0,"speed":38.0,"xp":28,"gold":8}
+ ]},
+ {"name":"Korona Gór","bounds":Rect2(1270.0,0.0,650.0,520.0),"creatures":[
+  {"name":"Szronowy Raptor","type":2,"hp":82.0,"damage":13.0,"speed":72.0,"xp":34,"gold":10},
+  {"name":"Burzowy Odłamek","type":3,"hp":94.0,"damage":15.0,"speed":42.0,"xp":40,"gold":12}
+ ]},
+ {"name":"Krypta Kryształów","bounds":Rect2(880.0,90.0,390.0,500.0),"creatures":[
+  {"name":"Kryształowy Pająk","type":4,"hp":78.0,"damage":14.0,"speed":62.0,"xp":38,"gold":11},
+  {"name":"Eterowy Skryba","type":5,"hp":88.0,"damage":16.0,"speed":48.0,"xp":44,"gold":13}
+ ]},
+ {"name":"Złote Pustkowia","bounds":Rect2(0.0,960.0,850.0,480.0),"creatures":[
+  {"name":"Piaskowy Szperacz","type":6,"hp":90.0,"damage":15.0,"speed":66.0,"xp":42,"gold":13},
+  {"name":"Strażnik Wydm","type":7,"hp":112.0,"damage":18.0,"speed":40.0,"xp":50,"gold":16}
+ ]},
+ {"name":"Wschodnie Ruiny","bounds":Rect2(1260.0,520.0,660.0,360.0),"creatures":[
+  {"name":"Pęknięty Legionista","type":8,"hp":104.0,"damage":17.0,"speed":48.0,"xp":48,"gold":15},
+  {"name":"Runiczny Tropiciel","type":9,"hp":98.0,"damage":19.0,"speed":64.0,"xp":54,"gold":17}
+ ]},
+ {"name":"Popielne Ziemie","bounds":Rect2(1280.0,880.0,640.0,560.0),"creatures":[
+  {"name":"Popielny Łupieżca","type":10,"hp":126.0,"damage":20.0,"speed":61.0,"xp":58,"gold":18},
+  {"name":"Żarowy Golem","type":11,"hp":158.0,"damage":23.0,"speed":36.0,"xp":68,"gold":22}
+ ]},
+ {"name":"Szlak Eterium","bounds":Rect2(850.0,600.0,410.0,840.0),"creatures":[
+  {"name":"Eterowy Widmowiec","type":12,"hp":142.0,"damage":22.0,"speed":70.0,"xp":66,"gold":21},
+  {"name":"Strażnik Szczeliny","type":13,"hp":180.0,"damage":26.0,"speed":42.0,"xp":80,"gold":26}
+ ]}
+]
 var race := "Varkari"
 var player_pos := START_POS
 var player_facing := Vector2.DOWN
@@ -141,9 +171,46 @@ func _ready() -> void:
  camera.make_current()
 
 func _spawn_enemies() -> void:
+ enemies.clear()
  for i in range(18):
-  var enemy_hp := 42.0 + float(i % 4) * 13.0
-  enemies.append({"name":ENEMY_NAMES[i%4],"pos":Vector2(rng.randf_range(90,1830),rng.randf_range(90,1350)),"hp":enemy_hp,"max_hp":enemy_hp,"damage":7.0+float(i%4)*2.0,"speed":42.0+float(i%4)*8.0,"alive":true,"type":i%4,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.52,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN})
+  var region_index := 1 + (i % (REGION_ENCOUNTERS.size()-1))
+  var region_data: Dictionary = REGION_ENCOUNTERS[region_index]
+  var creatures: Array = region_data["creatures"]
+  if creatures.is_empty():
+   continue
+  var creature_index := int(i / (REGION_ENCOUNTERS.size()-1)) % creatures.size()
+  var creature: Dictionary = creatures[creature_index]
+  var bounds: Rect2 = region_data["bounds"]
+  var enemy_hp := float(creature["hp"])
+  enemies.append({
+   "name":str(creature["name"]),
+   "pos":_random_point_in_bounds(bounds),
+   "hp":enemy_hp,
+   "max_hp":enemy_hp,
+   "damage":float(creature["damage"]),
+   "speed":float(creature["speed"]),
+   "alive":true,
+   "type":int(creature["type"]),
+   "region":str(region_data["name"]),
+   "spawn_bounds":bounds,
+   "xp_reward":int(creature["xp"]),
+   "gold_reward":int(creature["gold"]),
+   "timer":0.0,
+   "respawn":0.0,
+   "attack_anim":0.0,
+   "windup":0.0,
+   "windup_total":0.52,
+   "hit_flash":0.0,
+   "walk_phase":0.0,
+   "facing":Vector2.DOWN
+  })
+
+func _random_point_in_bounds(bounds: Rect2, margin: float = 48.0) -> Vector2:
+ var safe_margin := minf(margin,minf(bounds.size.x,bounds.size.y)*0.25)
+ return Vector2(
+  rng.randf_range(bounds.position.x+safe_margin,bounds.position.x+bounds.size.x-safe_margin),
+  rng.randf_range(bounds.position.y+safe_margin,bounds.position.y+bounds.size.y-safe_margin)
+ )
 
 func _build_ui() -> void:
  ui = CanvasLayer.new()
@@ -435,7 +502,8 @@ func _process(delta: float) -> void:
    if enemy["respawn"] >= 18.0:
     enemy["alive"] = true
     enemy["hp"] = enemy["max_hp"]
-    enemy["pos"] = Vector2(rng.randf_range(90,1830),rng.randf_range(90,1350))
+    var spawn_bounds: Rect2 = enemy.get("spawn_bounds",Rect2(90.0,90.0,1740.0,1260.0))
+    enemy["pos"] = _random_point_in_bounds(spawn_bounds)
     enemy["timer"] = 0.0
     enemy["windup"] = 0.0
     enemy["windup_total"] = 0.52
@@ -561,20 +629,11 @@ func _draw_ambient_particles() -> void:
   draw_circle(position,size,Color(tint.r,tint.g,tint.b,pulse*0.72))
 
 func _region_for_position(position: Vector2) -> String:
- if Rect2(180.0,130.0,440.0,390.0).has_point(position):
-  return "Kamienny Krąg"
- if Rect2(0.0,510.0,880.0,450.0).has_point(position):
-  return "Zielone Ostępy"
- if Rect2(1270.0,0.0,650.0,520.0).has_point(position):
-  return "Korona Gór"
- if Rect2(880.0,90.0,390.0,500.0).has_point(position):
-  return "Krypta Kryształów"
- if Rect2(0.0,960.0,850.0,480.0).has_point(position):
-  return "Złote Pustkowia"
- if Rect2(1260.0,520.0,660.0,360.0).has_point(position):
-  return "Wschodnie Ruiny"
- if Rect2(1280.0,880.0,640.0,560.0).has_point(position):
-  return "Popielne Ziemie"
+ for index in range(REGION_ENCOUNTERS.size()-1):
+  var region_data: Dictionary = REGION_ENCOUNTERS[index]
+  var bounds: Rect2 = region_data["bounds"]
+  if bounds.has_point(position):
+   return str(region_data["name"])
  return "Szlak Eterium"
 
 func _update_region(award_discovery: bool = true) -> void:
@@ -752,8 +811,10 @@ func _kill_enemy(index: int) -> void:
  var enemy := enemies[index]
  enemy["alive"] = false
  enemies[index] = enemy
- _grant_xp(20)
- gold += 5
+ var xp_reward := int(enemy.get("xp_reward",20))
+ var gold_reward := int(enemy.get("gold_reward",5))
+ _grant_xp(xp_reward)
+ gold += gold_reward
  kills += 1
  if rng.randf() < 0.35:
   loot_drops.append({"item":"Skóra bestii","pos":enemy["pos"]+Vector2(rng.randf_range(-16,16),rng.randf_range(-16,16)),"life":60.0})
@@ -766,7 +827,7 @@ func _kill_enemy(index: int) -> void:
   _grant_xp(300)
   _say("STRAŻNIK RDZENIA POKONANY! +250 złota, +300 XP.")
  else:
-  _say("Pokonano %s! +20 XP, +5 złota." % enemy["name"])
+  _say("Pokonano %s! +%d XP, +%d złota." % [enemy["name"],xp_reward,gold_reward])
  if quest == 5 and bool(enemy.get("is_boss",false)):
   quest = 6
  if quest == 1 and kills >= 5:
@@ -918,7 +979,7 @@ func _show_panel(panel_name: String) -> void:
    discovered_text += ("✓ " if discovered_regions.has(region_name) else "· ") + region_name + "   "
   body.text = "%s\\nAktualny region: %s\\nOdkryte regiony: %d/%d\\n%s\\nPozycja: %d, %d" % [objective_text,current_region,discovered_regions.size(),REGION_NAMES.size(),discovered_text,int(player_pos.x),int(player_pos.y)]
  elif panel_name == "Kodeks":
-  body.text = "AETHERION — KRONIKI ETERIUM\\n\\nPIĘĆ RODÓW\\nTerranie — wszechstronni i wytrwali.\\nVarkari — silni wojownicy o niezłomnej woli.\\nElarianie — urodzeni przewodnicy energii.\\nSylvari — strażnicy dzikiej równowagi.\\nNoctari — badacze mocy ukrytej w cieniu.\\n\\nKRAINA\\nKamienny Krąg jest bezpiecznym schronieniem wędrowców. Zielone Ostępy skrywają pradawne ścieżki, Korona Gór strzeże źródeł Eterium, a Kryształowa Krypta pulsuje nieznaną energią. Złote Pustkowia i Popielne Ziemie kryją ślady dawnych katastrof. Wschodnie Ruiny pozostają zamknięte dla tych, którzy nie poznali ich sekretu.\\n\\nETERIUM\\nEterium jest pierwotną siłą przenikającą świat. Wzmacnia techniki, pozwala przekraczać granice ciała i budzi Przebudzenie Rdzenia — lecz jego moc wymaga dyscypliny."
+  body.text = "AETHERION — KRONIKI ETERIUM\\n\\nPIĘĆ RODÓW\\nTerranie — wszechstronni i wytrwali.\\nVarkari — silni wojownicy o niezłomnej woli.\\nElarianie — urodzeni przewodnicy energii.\\nSylvari — strażnicy dzikiej równowagi.\\nNoctari — badacze mocy ukrytej w cieniu.\\n\\nFAUNA REGIONÓW\\nZielone Ostępy: Mchowy Kieł, Pnączowy Strażnik.\\nKorona Gór: Szronowy Raptor, Burzowy Odłamek.\\nKrypta Kryształów: Kryształowy Pająk, Eterowy Skryba.\\nZłote Pustkowia: Piaskowy Szperacz, Strażnik Wydm.\\nWschodnie Ruiny: Pęknięty Legionista, Runiczny Tropiciel.\\nPopielne Ziemie: Popielny Łupieżca, Żarowy Golem.\\nSzlak Eterium: Eterowy Widmowiec, Strażnik Szczeliny.\\n\\nETERIUM\\nEterium jest pierwotną siłą przenikającą świat. Wzmacnia techniki, pozwala przekraczać granice ciała i budzi Przebudzenie Rdzenia — lecz jego moc wymaga dyscypliny."
  else:
   body.text = "Technika Eterium: koszt 20, fala obszarowa, cooldown 4 s.\\nPromień Eterium: koszt 28, zasięg 285, potrójne obrażenia, cooldown 6 s.\\nSzarża: koszt 16, zasięg 310, cooldown 5 s.\\nPrzebudzenie Rdzenia: 16 s."
  box.add_child(body)
@@ -1308,7 +1369,10 @@ func _draw_enemy(enemy: Dictionary) -> void:
    var shock_radius := 42.0 + attack_progress*54.0
    draw_arc(p,shock_radius,0.0,TAU,40,Color(1.0,0.42,0.28,1.0-attack_progress),5.0,true)
  var sprite_rect := Rect2(p.x-sprite_size*0.5+lunge.x,p.y-sprite_size*0.55+bob+lunge.y,sprite_size,sprite_size)
- draw_texture_rect_region(SPRITE_ATLAS,sprite_rect,Rect2((5+kind)*128,frame*128,128,128),body_color,false)
+ if is_boss:
+  draw_texture_rect_region(SPRITE_ATLAS,sprite_rect,Rect2((5+kind)*128,frame*128,128,128),body_color,false)
+ else:
+  draw_texture_rect_region(REGION_CREATURE_ATLAS,sprite_rect,Rect2(kind*128,0,128,128),body_color,false)
  if float(enemy.get("hit_flash",0.0)) > 0.0:
   var hit_phase := float(enemy.get("hit_flash",0.0)) / 0.22
   for spark_index in range(6):
