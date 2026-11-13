@@ -70,3 +70,11 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Drobiny atmosferyczne otrzymały osobne palety barw dla wszystkich ośmiu regionów, zamiast kilku ogólnych warunków kolorystycznych.
 - Atlas jest wektorowy SVG i nie dodaje osobnych węzłów sceny ani ciężkich efektów post-processingu.
 - To pierwszy wizualny pass wyróżniający regiony; mapa nadal jest jedną wspólną lokacją, a landmarki nie zastępują pełnych, osobnych biomów i ich zawartości.
+
+## Iteracja zawartości regionów — lokalne bestiariusze
+- Dodano autorski atlas SVG z 14 odrębnymi sylwetkami stworzeń: po dwa gatunki dla każdego z siedmiu niebezpiecznych regionów.
+- Zielone Ostępy, Korona Gór, Krypta Kryształów, Złote Pustkowia, Wschodnie Ruiny, Popielne Ziemie i Szlak Eterium otrzymały własne nazwy przeciwników, wygląd, zdrowie, obrażenia i szybkość.
+- Na mapie pojawia się 18 spotkań rozmieszczonych w rodzimych strefach; po pokonaniu przeciwnicy odradzają się w obrębie swojej strefy.
+- Nagrody XP i złota skalują się z siłą regionalnego przeciwnika. Kamienny Krąg pozostaje bezpiecznym obszarem bez zwykłych wrogów.
+- Kodeks zawiera teraz spis regionalnej fauny. Strażnik Rdzenia nadal korzysta z dotychczasowego sprite'a bossa i własnego stanu zapisu.
+- Zwykłe spotkania są odtwarzane przy rozpoczęciu sesji; nie dodano jeszcze osobnych map regionów ani trwałego zapisu stanu każdego zwykłego przeciwnika.
