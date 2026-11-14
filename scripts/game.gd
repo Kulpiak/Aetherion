@@ -44,6 +44,7 @@ const ETERIUM_GLYPH_ATLAS: Texture2D = preload("res://assets/aetherion_eterium_g
 const WORLD_TEXTURE: Texture2D = preload("res://assets/aetherion_world.svg")
 const REGION_LANDMARK_ATLAS: Texture2D = preload("res://assets/aetherion_region_landmarks.svg")
 const REGION_CREATURE_ATLAS: Texture2D = preload("res://assets/aetherion_region_creatures.svg")
+const PLAYER_DIRECTION_ATLAS: Texture2D = preload("res://assets/aetherion_player_directions.svg")
 const WORLD_SIZE := Vector2(1920, 1440)
 const START_POS := Vector2(480, 380)
 const RUINS_POS := Vector2(1600, 720)
@@ -1462,7 +1463,20 @@ func _draw_player() -> void:
  var frame := 1 if moving and int(Time.get_ticks_msec()/145)%2 == 0 else 0
  var invuln_flash := player_invuln > 0.0 and int(Time.get_ticks_msec()/90)%2 == 0
  var hero_tint := Color(1.0,0.55,0.48,1.0) if player_hit_flash > 0.0 else (Color(0.55,0.9,1.0,0.58) if invuln_flash else Color.WHITE)
- draw_texture_rect_region(SPRITE_ATLAS,Rect2(p.x-44,p.y-52+bob,88,88),Rect2(race_index*128,frame*128,128,128),hero_tint,false)
+ var sprite_texture: Texture2D = SPRITE_ATLAS
+ var sprite_region := Rect2(race_index*128,frame*128,128,128)
+ var sprite_scale := Vector2.ONE
+ if absf(player_facing.y) >= absf(player_facing.x) and player_facing.y < 0.0:
+  sprite_texture = PLAYER_DIRECTION_ATLAS
+  sprite_region = Rect2(race_index*128,frame*128,128,128)
+ elif absf(player_facing.x) > absf(player_facing.y):
+  sprite_texture = PLAYER_DIRECTION_ATLAS
+  sprite_region = Rect2(race_index*128,(2+frame)*128,128,128)
+  if player_facing.x < 0.0:
+   sprite_scale.x = -1.0
+ draw_set_transform(p,0.0,sprite_scale)
+ draw_texture_rect_region(sprite_texture,Rect2(-44,-52+bob,88,88),sprite_region,hero_tint,false)
+ draw_set_transform(Vector2.ZERO,0.0,Vector2.ONE)
  if transform_burst > 0.0:
   var burst_progress := 1.0-transform_burst
   _draw_eterium_glyph(p,2,132.0+burst_progress*150.0,glyph_time*1.1,Color(1.0,0.82,0.43,transform_burst*0.86))
