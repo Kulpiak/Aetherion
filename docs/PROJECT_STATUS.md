@@ -29,7 +29,7 @@
 
 ## W trakcie przebudowy i walidacji
 - Kolejne iteracje wyglądu oraz czytelności interfejsu na rzeczywistych ekranach Androida.
-- Lepsze, pełne animacje kierunkowe postaci i przeciwników.
+- Dalsze animacje kierunkowe przeciwników; bohater ma już cztery kierunki ruchu i dwa klatki chodu dla każdej orientacji.
 - Dopracowanie regionów jako odrębnych, eksplorowalnych obszarów z własnymi zawartościami.
 - Testy na fizycznym telefonie, wydajność, skalowanie i ergonomia dotyku.
 
@@ -78,3 +78,11 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Nagrody XP i złota skalują się z siłą regionalnego przeciwnika. Kamienny Krąg pozostaje bezpiecznym obszarem bez zwykłych wrogów.
 - Kodeks zawiera teraz spis regionalnej fauny. Strażnik Rdzenia nadal korzysta z dotychczasowego sprite'a bossa i własnego stanu zapisu.
 - Zwykłe spotkania są odtwarzane przy rozpoczęciu sesji; nie dodano jeszcze osobnych map regionów ani trwałego zapisu stanu każdego zwykłego przeciwnika.
+
+
+## Iteracja animacji bohatera — cztery kierunki
+- Dodano oryginalny wektorowy atlas 640×512 z widokami od tyłu i z profilu dla wszystkich pięciu ras; każda orientacja ma dwie klatki animacji.
+- Bohater używa dotychczasowego atlasu frontowego przy ruchu w dół, nowych sprite'ów tyłem przy ruchu w górę oraz profilu przy ruchu w lewo/prawo (profil jest lustrzany dla lewej strony).
+- Klatki chodu są wybierane zgodnie z ruchem; zachowano tint trafienia, migotanie nietykalności i efekty Przebudzenia Rdzenia.
+- Kierunek ukośny wybiera dominującą oś, więc animacja jest czterokierunkowa, a nie ośmiokierunkowa.
+- Zmiana dotyczy bohatera. Regionalne stworzenia i boss nadal wymagają osobnych zestawów animacji kierunkowych; atlas nie zastępuje jeszcze docelowych animowanych modeli anime.
