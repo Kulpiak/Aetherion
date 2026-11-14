@@ -50,3 +50,8 @@ To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między gra
 - Mapa oznacza odkryte regiony i zachowuje postęp eksploracji w lokalnym zapisie.
 - Zapis w wersji 3 pozostaje zgodny wstecz z wcześniejszymi zapisami wersji 1 i 2.
 
+
+
+## Animacje kierunkowe bohatera
+- Bohater ma cztery orientacje: przód, tył i profil w obie strony. Dla wszystkich pięciu ras dodano autorskie sprite'y tyłem i z profilu, z dwiema klatkami chodu.
+- Ruch ukośny korzysta z dominującej osi. Animacje kierunkowe przeciwników pozostają w planie dalszych prac.
