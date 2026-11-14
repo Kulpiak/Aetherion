@@ -29,7 +29,7 @@
 
 ## W trakcie przebudowy i walidacji
 - Kolejne iteracje wyglądu oraz czytelności interfejsu na rzeczywistych ekranach Androida.
-- Dalsze animacje kierunkowe przeciwników; bohater ma już cztery kierunki ruchu i dwa klatki chodu dla każdej orientacji.
+- Dalsze animacje kierunkowe przeciwników; bohater ma już cztery kierunki ruchu i dwie klatki chodu dla każdej orientacji.
 - Dopracowanie regionów jako odrębnych, eksplorowalnych obszarów z własnymi zawartościami.
 - Testy na fizycznym telefonie, wydajność, skalowanie i ergonomia dotyku.
 
