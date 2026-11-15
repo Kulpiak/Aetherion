@@ -29,7 +29,7 @@
 
 ## W trakcie przebudowy i walidacji
 - Kolejne iteracje wyglądu oraz czytelności interfejsu na rzeczywistych ekranach Androida.
-- Dalsze animacje kierunkowe przeciwników; bohater ma już cztery kierunki ruchu i dwie klatki chodu dla każdej orientacji.
+- Pełne animacje kierunkowe przeciwników; obecna iteracja dodaje proceduralny chód, odwracanie sylwetki i pochylenia, ale nie osobne arkusze przód/tył.
 - Dopracowanie regionów jako odrębnych, eksplorowalnych obszarów z własnymi zawartościami.
 - Testy na fizycznym telefonie, wydajność, skalowanie i ergonomia dotyku.
 
@@ -86,3 +86,11 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Klatki chodu są wybierane zgodnie z ruchem; zachowano tint trafienia, migotanie nietykalności i efekty Przebudzenia Rdzenia.
 - Kierunek ukośny wybiera dominującą oś, więc animacja jest czterokierunkowa, a nie ośmiokierunkowa.
 - Zmiana dotyczy bohatera. Regionalne stworzenia i boss nadal wymagają osobnych zestawów animacji kierunkowych; atlas nie zastępuje jeszcze docelowych animowanych modeli anime.
+
+
+## Iteracja animacji regionalnej fauny — orientacja i ruch
+- Wszystkie 14 regionalnych stworzeń oraz Strażnik Rdzenia korzystają teraz z animacji ruchu zależnej od własnej fazy chodu, zamiast wspólnego przełączania klatek według zegara globalnego.
+- Sylwetki odwracają się poziomo zgodnie z kierunkiem pościgu; ruch pionowy otrzymuje subtelne pochylenie, a krok jest wspierany przez niezależne kołysanie, squash/stretch i krótkie ślady pyłu.
+- Stworzenia eteryczne i kryształowe otrzymały spokojniejszy, unoszący się ruch spoczynkowy. Przygotowanie ataku odsuwa sylwetkę w kierunku przeciwnym do celu, a sam cios pochyla ją do przodu.
+- Zachowano istniejące telegraphy, obrażenia, błysk trafienia, paski HP i oryginalne atlasowe sylwetki.
+- To lekka animacja proceduralna na bazie obecnych sprite'ów, bez pełnych nowych klatek i bez czterokierunkowych arkuszy dla każdego stworzenia. Docelowe animowane modele i osobne pozy przód/tył nadal pozostają do wykonania.
