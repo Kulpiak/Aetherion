@@ -1336,21 +1336,29 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var kind := int(enemy["type"])
  var is_boss := bool(enemy.get("is_boss",false))
  var sprite_size := 126.0 if is_boss else 80.0
- var chasing := player_pos.distance_to(p) < 300.0
- var attacking := float(enemy.get("attack_anim",0.0)) > 0.0
- var frame := 1 if chasing and int(Time.get_ticks_msec()/145)%2 == 0 else 0
- var phase := float(enemy.get("walk_phase",0.0))
- var bob := sin(phase)*3.0 if chasing else sin(float(Time.get_ticks_msec())/260.0+float(kind))*1.5
- var enemy_facing: Vector2 = enemy.get("facing",Vector2.DOWN)
+ var now := float(Time.get_ticks_msec()) / 1000.0
+ var distance_to_player := player_pos.distance_to(p)
+ var attack_range := 112.0 if is_boss else 48.0
+ var chasing := distance_to_player < 300.0
  var windup_left := float(enemy.get("windup",0.0))
+ var windup_total := maxf(0.01,float(enemy.get("windup_total",0.52)))
+ var warning_progress := clampf(1.0-windup_left/windup_total,0.0,1.0) if windup_left > 0.0 else 0.0
+ var is_moving := chasing and distance_to_player > attack_range and windup_left <= 0.0
+ var attacking := float(enemy.get("attack_anim",0.0)) > 0.0
+ var phase := float(enemy.get("walk_phase",0.0))
+ var stride := sin(phase*2.0)
+ var hoverer := kind == 3 or kind == 5 or kind == 12 or kind == 13
+ var idle_bob := sin(now*(2.7 if hoverer else 1.8)+float(kind)*0.73)
+ var bob := (stride*2.6+absf(stride)*1.5) if is_moving else idle_bob*(3.2 if hoverer else 1.25)
+ var frame := int(floor(phase*1.3)) % 2 if is_moving else 0
+ var enemy_facing: Vector2 = enemy.get("facing",Vector2.DOWN)
  var lunge := enemy_facing * (7.0 if attacking else 0.0)
+ var recoil := -enemy_facing * warning_progress * (8.0 if is_boss else 4.0)
  var body_color := Color(1.0,0.55,0.48,1.0) if float(enemy.get("hit_flash",0.0)) > 0.0 else Color.WHITE
- draw_ellipse_shadow(p+Vector2(0,13),sprite_size*0.48,14.0 if is_boss else 8.0)
+ draw_ellipse_shadow(p+Vector2(0,13),sprite_size*0.48*(1.0+absf(stride)*0.025),14.0 if is_boss else 8.0)
  if windup_left > 0.0:
-  var glyph_rotation := float(Time.get_ticks_msec()) / 1000.0 * 0.32
+  var glyph_rotation := now * 0.32
   _draw_eterium_glyph(p,0,290.0 if is_boss else 118.0,glyph_rotation,Color(1.0,0.32,0.2,0.55))
-  var windup_total := maxf(0.01,float(enemy.get("windup_total",0.52)))
-  var warning_progress := clampf(1.0-windup_left/windup_total,0.0,1.0)
   var warning_alpha := 0.42+warning_progress*0.48
   if is_boss:
    draw_circle(p,112.0,Color(1.0,0.18,0.15,0.035+warning_progress*0.045))
@@ -1360,20 +1368,34 @@ func _draw_enemy(enemy: Dictionary) -> void:
    draw_arc(p,43.0,warning_angle-0.82,warning_angle+0.82,24,Color(1.0,0.32,0.2,warning_alpha),4.0,true)
    draw_line(p,p+enemy_facing*48.0,Color(1.0,0.4,0.25,warning_alpha),3.0,true)
  if is_boss:
-  var boss_pulse := 0.72 + sin(float(Time.get_ticks_msec())/190.0)*0.16
+  var boss_pulse := 0.72 + sin(now/0.19)*0.16
   draw_circle(p,76.0,Color(0.55,0.16,0.25,0.09*boss_pulse))
-  draw_arc(p,72.0,0.0,TAU,48,Color(0.95,0.35,0.32,0.65),4.0,true)
+  draw_arc(p,72.0,now*0.12,now*0.12+TAU,48,Color(0.95,0.35,0.32,0.55+boss_pulse*0.12),4.0,true)
  if attacking:
   var attack_progress := 1.0 - float(enemy.get("attack_anim",0.0))/0.34
   draw_arc(p,37.0 if not is_boss else 66.0,0.0,TAU,28,Color(1.0,0.28,0.22,0.72),3.0,true)
   if is_boss:
    var shock_radius := 42.0 + attack_progress*54.0
    draw_arc(p,shock_radius,0.0,TAU,40,Color(1.0,0.42,0.28,1.0-attack_progress),5.0,true)
- var sprite_rect := Rect2(p.x-sprite_size*0.5+lunge.x,p.y-sprite_size*0.55+bob+lunge.y,sprite_size,sprite_size)
+ # Regional creatures keep their original silhouette, but now turn toward the target,
+ # lean into vertical movement, and use a per-creature gait instead of a global timer.
+ var flip_x := -1.0 if enemy_facing.x < -0.12 else 1.0
+ var gait := absf(stride) if is_moving else 0.0
+ var sprite_scale := Vector2(flip_x*(1.0+gait*0.035),1.0-gait*0.045)
+ var sprite_rotation := clampf(enemy_facing.y*0.055+(0.06 if attacking else -warning_progress*0.035),-0.09,0.09)
+ var sprite_center := p+lunge+recoil+Vector2(0,bob)
+ draw_set_transform(sprite_center,sprite_rotation,sprite_scale)
+ var sprite_rect := Rect2(-sprite_size*0.5,-sprite_size*0.55,sprite_size,sprite_size)
  if is_boss:
   draw_texture_rect_region(SPRITE_ATLAS,sprite_rect,Rect2((5+kind)*128,frame*128,128,128),body_color,false)
  else:
   draw_texture_rect_region(REGION_CREATURE_ATLAS,sprite_rect,Rect2(kind*128,0,128,128),body_color,false)
+ draw_set_transform(Vector2.ZERO,0.0,Vector2.ONE)
+ if is_moving:
+  var dust_color := Color(0.63,0.78,0.69,0.18) if kind < 2 else Color(0.61,0.79,0.91,0.16)
+  for dust_index in range(2):
+   var dust_pos := p-enemy_facing*(18.0+float(dust_index)*9.0)+Vector2(0,8.0+float(dust_index)*3.0)
+   draw_circle(dust_pos,3.0-float(dust_index)*0.7,dust_color)
  if float(enemy.get("hit_flash",0.0)) > 0.0:
   var hit_phase := float(enemy.get("hit_flash",0.0)) / 0.22
   for spark_index in range(6):
