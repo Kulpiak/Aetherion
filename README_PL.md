@@ -55,3 +55,9 @@ To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między gra
 ## Animacje kierunkowe bohatera
 - Bohater ma cztery orientacje: przód, tył i profil w obie strony. Dla wszystkich pięciu ras dodano autorskie sprite'y tyłem i z profilu, z dwiema klatkami chodu.
 - Ruch ukośny korzysta z dominującej osi. Animacje kierunkowe przeciwników pozostają w planie dalszych prac.
+
+
+## Animacja stworzeń
+- Regionalne stworzenia i Strażnik Rdzenia korzystają z własnej fazy ruchu: sylwetki odwracają się w lewo/prawo, kołyszą podczas pościgu i otrzymują subtelne pochylenie zależne od kierunku.
+- Istoty eteryczne i kryształowe unoszą się w spoczynku; przygotowanie ataku daje odrzut w tył, a cios — pochylenie do przodu. Krótkie ślady pyłu podkreślają ruch stworzeń naziemnych.
+- Jest to proceduralna animacja na istniejących sprite'ach, a nie komplet nowych klatek kierunkowych. Pełne zestawy przód/tył i animowane modele pozostają w planie.
