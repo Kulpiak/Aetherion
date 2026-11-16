@@ -94,3 +94,12 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Stworzenia eteryczne i kryształowe otrzymały spokojniejszy, unoszący się ruch spoczynkowy. Przygotowanie ataku odsuwa sylwetkę w kierunku przeciwnym do celu, a sam cios pochyla ją do przodu.
 - Zachowano istniejące telegraphy, obrażenia, błysk trafienia, paski HP i oryginalne atlasowe sylwetki.
 - To lekka animacja proceduralna na bazie obecnych sprite'ów, bez pełnych nowych klatek i bez czterokierunkowych arkuszy dla każdego stworzenia. Docelowe animowane modele i osobne pozy przód/tył nadal pozostają do wykonania.
+
+
+## Iteracja zapisu świata — trwały stan regionalnych przeciwników
+- Podniesiono format lokalnego zapisu do wersji 4; odczyt nadal akceptuje wersje 1–3.
+- Każdy z 18 regionalnych punktów odrodzenia ma stabilny identyfikator, dzięki czemu zapis nie zależy od losowej pozycji przeciwnika ani kolejności jego ruchu.
+- Zapis przechowuje dla zwykłych przeciwników aktualne HP, pozycję, stan życia oraz postęp 18-sekundowego odrodzenia. Po wczytaniu przywracane są dane świata, a chwilowe animacje i przygotowania ataków są bezpiecznie resetowane.
+- Stan regionalnej fauny jest zapisywany również natychmiast po pokonaniu przeciwnika, oprócz autosave i zapisu przy pauzie/zamknięciu.
+- Strażnik Rdzenia nadal korzysta z osobnego mechanizmu zapisu bossa; nowy zapis regionalny go nie nadpisuje.
+- Stare zapisy bez pola `enemy_states` zachowują dotychczasowe zachowanie i rozpoczynają regionalne spotkania od wartości początkowych.
