@@ -61,3 +61,7 @@ To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między gra
 - Regionalne stworzenia i Strażnik Rdzenia korzystają z własnej fazy ruchu: sylwetki odwracają się w lewo/prawo, kołyszą podczas pościgu i otrzymują subtelne pochylenie zależne od kierunku.
 - Istoty eteryczne i kryształowe unoszą się w spoczynku; przygotowanie ataku daje odrzut w tył, a cios — pochylenie do przodu. Krótkie ślady pyłu podkreślają ruch stworzeń naziemnych.
 - Jest to proceduralna animacja na istniejących sprite'ach, a nie komplet nowych klatek kierunkowych. Pełne zestawy przód/tył i animowane modele pozostają w planie.
+
+
+### Trwały stan regionalnych przeciwników
+Lokalny zapis v4 zachowuje dla każdego regionalnego punktu odrodzenia stan pokonania, pozostałe HP, pozycję i licznik odrodzenia. Postęp walki w regionach nie resetuje się po ponownym uruchomieniu gry; starsze zapisy v1–v3 pozostają obsługiwane.
