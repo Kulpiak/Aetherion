@@ -184,6 +184,7 @@ func _spawn_enemies() -> void:
   var bounds: Rect2 = region_data["bounds"]
   var enemy_hp := float(creature["hp"])
   enemies.append({
+   "spawn_id":"regional_%02d" % i,
    "name":str(creature["name"]),
    "pos":_random_point_in_bounds(bounds),
    "hp":enemy_hp,
@@ -836,6 +837,7 @@ func _kill_enemy(index: int) -> void:
   gold += 35
   _grant_xp(50)
   _say("Zadanie wykonane. Wróć do Kronikarza.")
+ _save_game(true)
 
 func _quest_interact() -> void:
  if not started: return
@@ -1060,6 +1062,57 @@ func _equip_gear(item_name: String) -> void:
  equipment[slot] = item_name
  _update_hud()
 
+func _serialize_enemy_states() -> Array[Dictionary]:
+ var states: Array[Dictionary] = []
+ for enemy in enemies:
+  if bool(enemy.get("is_boss",false)):
+   continue
+  var enemy_pos: Vector2 = enemy["pos"]
+  states.append({
+   "spawn_id":str(enemy.get("spawn_id","")),
+   "alive":bool(enemy.get("alive",true)),
+   "hp":float(enemy.get("hp",enemy.get("max_hp",1.0))),
+   "pos":[enemy_pos.x,enemy_pos.y],
+   "respawn":float(enemy.get("respawn",0.0))
+  })
+ return states
+
+func _restore_enemy_states(saved_states) -> void:
+ if typeof(saved_states) != TYPE_ARRAY:
+  return
+ var states_by_id: Dictionary = {}
+ for saved_state in saved_states:
+  if typeof(saved_state) != TYPE_DICTIONARY:
+   continue
+  var spawn_id := str(saved_state.get("spawn_id",""))
+  if not spawn_id.is_empty():
+   states_by_id[spawn_id] = saved_state
+ for index in range(enemies.size()):
+  var enemy: Dictionary = enemies[index]
+  if bool(enemy.get("is_boss",false)):
+   continue
+  var spawn_id := str(enemy.get("spawn_id",""))
+  if not states_by_id.has(spawn_id):
+   continue
+  var saved_state: Dictionary = states_by_id[spawn_id]
+  var saved_position = saved_state.get("pos",[])
+  if typeof(saved_position) == TYPE_ARRAY and saved_position.size() >= 2:
+   enemy["pos"] = Vector2(
+    clampf(float(saved_position[0]),24.0,WORLD_SIZE.x-24.0),
+    clampf(float(saved_position[1]),24.0,WORLD_SIZE.y-24.0)
+   )
+  var is_alive := bool(saved_state.get("alive",true))
+  enemy["alive"] = is_alive
+  enemy["hp"] = clampf(float(saved_state.get("hp",enemy["max_hp"])),1.0,float(enemy["max_hp"])) if is_alive else 0.0
+  enemy["respawn"] = clampf(float(saved_state.get("respawn",0.0)),0.0,18.0) if not is_alive else 0.0
+  enemy["timer"] = 0.0
+  enemy["windup"] = 0.0
+  enemy["attack_anim"] = 0.0
+  enemy["hit_flash"] = 0.0
+  enemy["walk_phase"] = 0.0
+  enemy["facing"] = Vector2.DOWN
+  enemies[index] = enemy
+
 func _save_game(silent: bool=false) -> void:
  if not started: return
  var saved_loot: Array[Dictionary] = []
@@ -1070,7 +1123,7 @@ func _save_game(silent: bool=false) -> void:
   if bool(enemy.get("is_boss",false)):
    boss_state = {"name":str(enemy["name"]),"pos":[enemy["pos"].x,enemy["pos"].y],"hp":float(enemy["hp"]),"max_hp":float(enemy["max_hp"]),"damage":float(enemy["damage"]),"speed":float(enemy["speed"])}
    break
- var data := {"save_version":3,"race":race,"pos":[player_pos.x,player_pos.y],"hp":hp,"ether":ether,"level":level,"xp":xp,"gold":gold,"atk":atk,"defense":defense,"quest":quest,"kills":kills,"inventory":inventory,"equipment":equipment,"owned_gear":owned_gear,"boss_spawned":boss_spawned,"boss_defeated":boss_defeated,"loot_drops":saved_loot,"boss_state":boss_state,"discovered_regions":discovered_regions}
+ var data := {"save_version":4,"race":race,"pos":[player_pos.x,player_pos.y],"hp":hp,"ether":ether,"level":level,"xp":xp,"gold":gold,"atk":atk,"defense":defense,"quest":quest,"kills":kills,"inventory":inventory,"equipment":equipment,"owned_gear":owned_gear,"boss_spawned":boss_spawned,"boss_defeated":boss_defeated,"loot_drops":saved_loot,"boss_state":boss_state,"discovered_regions":discovered_regions,"enemy_states":_serialize_enemy_states()}
  var file := FileAccess.open(SAVE_PATH,FileAccess.WRITE)
  if file:
   file.store_string(JSON.stringify(data))
@@ -1092,7 +1145,7 @@ func _load_game() -> void:
   _say("Uszkodzony zapis.")
   return
  var save_version := int(data.get("save_version",1))
- if save_version < 1 or save_version > 3:
+ if save_version < 1 or save_version > 4:
   _say("Zapis pochodzi z nieobsługiwanej wersji gry.")
   return
  race = str(data.get("race","Varkari"))
@@ -1175,6 +1228,7 @@ func _load_game() -> void:
       clampf(float(drop_position[1]),24.0,WORLD_SIZE.y-24.0)
      )
      loot_drops.append({"item":item_name,"pos":drop_pos,"life":clampf(float(saved_drop.get("life",60.0)),0.1,60.0)})
+ _restore_enemy_states(data.get("enemy_states",[]))
  if boss_spawned and not boss_defeated:
   var saved_boss = data.get("boss_state",{})
   if typeof(saved_boss) != TYPE_DICTIONARY:
