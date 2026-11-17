@@ -68,6 +68,6 @@ Lokalny zapis v4 zachowuje dla każdego regionalnego punktu odrodzenia stan poko
 
 
 ## Testy regresji zapisu
-- GitHub Actions uruchamia headless test migracji zapisu v3 oraz round-trip zapisu v4 przed eksportem APK.
+- GitHub Actions uruchamia headless test migracji zapisu v3 oraz round-trip zapisu v4 przed eksportem APK; build #95 zaliczył wszystkie 12 asercji.
 - Test kontroluje zachowanie postaci i odkrytych regionów, HP/pozycję/stan życia/czas odrodzenia 18 spotkań oraz osobny zapis HP Strażnika Rdzenia.
 - Sukces eksportu i testu CI nie zastępuje jeszcze testu na fizycznym urządzeniu Android.
