@@ -48,7 +48,7 @@ To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między gra
 - Podczas podróży HUD pokazuje aktualny region.
 - Odkrywanie nowych obszarów daje jednorazową nagrodę 25 XP i 10 złota (Kamienny Krąg jest strefą startową bez nagrody).
 - Mapa oznacza odkryte regiony i zachowuje postęp eksploracji w lokalnym zapisie.
-- Zapis w wersji 3 pozostaje zgodny wstecz z wcześniejszymi zapisami wersji 1 i 2.
+- Zapis w wersji 4 pozostaje zgodny wstecz z wcześniejszymi zapisami wersji 1–3.
 
 
 
@@ -65,3 +65,9 @@ To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między gra
 
 ### Trwały stan regionalnych przeciwników
 Lokalny zapis v4 zachowuje dla każdego regionalnego punktu odrodzenia stan pokonania, pozostałe HP, pozycję i licznik odrodzenia. Postęp walki w regionach nie resetuje się po ponownym uruchomieniu gry; starsze zapisy v1–v3 pozostają obsługiwane.
+
+
+## Testy regresji zapisu
+- GitHub Actions uruchamia headless test migracji zapisu v3 oraz round-trip zapisu v4 przed eksportem APK.
+- Test kontroluje zachowanie postaci i odkrytych regionów, HP/pozycję/stan życia/czas odrodzenia 18 spotkań oraz osobny zapis HP Strażnika Rdzenia.
+- Sukces eksportu i testu CI nie zastępuje jeszcze testu na fizycznym urządzeniu Android.
