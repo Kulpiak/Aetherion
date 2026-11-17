@@ -109,5 +109,5 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Dodano headless test integracyjny `tests/test_enemy_save.gd`, uruchamiany przez GitHub Actions przed eksportem APK.
 - Test sprawdza migrację zapisu v3 bez pola `enemy_states`, zachowanie pięciu kluczowych danych postaci i odkryć oraz bezpieczne użycie początkowych spotkań przy braku danych regionalnych.
 - Test v4 zapisuje i odtwarza HP, pozycję, pokonanie oraz czas odrodzenia regionalnych przeciwników, a także kontroluje osobne odtworzenie HP Strażnika Rdzenia.
-- Workflow ma przerwać eksport, jeśli test nie zakończy się komunikatem `AETHERION_SAVE_TESTS: PASS`. Pierwszy wynik tej nowej ścieżki jest weryfikowany w bieżącym buildzie CI.
+- Workflow przerywa eksport, jeśli test nie zakończy się komunikatem `AETHERION_SAVE_TESTS: PASS`. Build #95 zakończył wszystkie 12 asercji sukcesem, a następnie poprawnie wyeksportował APK.
 - Test automatyczny nie zastępuje testu zapisu na rzeczywistym Androidzie; ten nadal jest wymagany.
