@@ -77,7 +77,7 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Na mapie pojawia się 18 spotkań rozmieszczonych w rodzimych strefach; po pokonaniu przeciwnicy odradzają się w obrębie swojej strefy.
 - Nagrody XP i złota skalują się z siłą regionalnego przeciwnika. Kamienny Krąg pozostaje bezpiecznym obszarem bez zwykłych wrogów.
 - Kodeks zawiera teraz spis regionalnej fauny. Strażnik Rdzenia nadal korzysta z dotychczasowego sprite'a bossa i własnego stanu zapisu.
-- Zwykłe spotkania są odtwarzane przy rozpoczęciu sesji; nie dodano jeszcze osobnych map regionów ani trwałego zapisu stanu każdego zwykłego przeciwnika.
+- Każde z 18 spotkań regionalnych ma stabilny `spawn_id`; zapis v4 zachowuje HP, pozycję, stan życia i licznik odrodzenia. Nie dodano jeszcze osobnych map regionów.
 
 
 ## Iteracja animacji bohatera — cztery kierunki
@@ -103,3 +103,11 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Stan regionalnej fauny jest zapisywany również natychmiast po pokonaniu przeciwnika, oprócz autosave i zapisu przy pauzie/zamknięciu.
 - Strażnik Rdzenia nadal korzysta z osobnego mechanizmu zapisu bossa; nowy zapis regionalny go nie nadpisuje.
 - Stare zapisy bez pola `enemy_states` zachowują dotychczasowe zachowanie i rozpoczynają regionalne spotkania od wartości początkowych.
+
+
+## Iteracja jakości — regresja lokalnego zapisu
+- Dodano headless test integracyjny `tests/test_enemy_save.gd`, uruchamiany przez GitHub Actions przed eksportem APK.
+- Test sprawdza migrację zapisu v3 bez pola `enemy_states`, zachowanie pięciu kluczowych danych postaci i odkryć oraz bezpieczne użycie początkowych spotkań przy braku danych regionalnych.
+- Test v4 zapisuje i odtwarza HP, pozycję, pokonanie oraz czas odrodzenia regionalnych przeciwników, a także kontroluje osobne odtworzenie HP Strażnika Rdzenia.
+- Workflow ma przerwać eksport, jeśli test nie zakończy się komunikatem `AETHERION_SAVE_TESTS: PASS`. Pierwszy wynik tej nowej ścieżki jest weryfikowany w bieżącym buildzie CI.
+- Test automatyczny nie zastępuje testu zapisu na rzeczywistym Androidzie; ten nadal jest wymagany.
