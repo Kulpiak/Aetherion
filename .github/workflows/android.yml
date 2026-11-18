@@ -93,6 +93,13 @@ jobs:
           godot --headless --path . --script res://tests/test_enemy_save.gd 2>&1 | tee /tmp/godot-save-tests.log
           grep -q "AETHERION_SAVE_TESTS: PASS" /tmp/godot-save-tests.log
 
+      - name: Verify Android launcher icons
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --script res://tests/test_android_icons.gd 2>&1 | tee /tmp/godot-icon-tests.log
+          grep -q "AETHERION_ICON_TESTS: PASS" /tmp/godot-icon-tests.log
+
       - name: Export Android debug APK
         run: |
           godot --headless --verbose --path . --export-debug "Android" build/Aetherion-debug.apk
