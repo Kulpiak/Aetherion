@@ -97,3 +97,8 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Dodano headless test integracyjny `tests/test_enemy_save.gd`, uruchamiany przez GitHub Actions przed eksportem APK.
 - Build #95 zaliczył wszystkie 12 asercji migracji i odtwarzania zapisu.
 - Test automatyczny nie zastępuje testu zapisu na rzeczywistym Androidzie.
+
+
+## Korekta ikon Android — bezpieczny obszar adaptacyjny
+- Zmniejszono znak na warstwie foreground i monochromatycznej do 92% skali, zachowując środek kompozycji; istotne elementy mieszczą się teraz w centralnej strefie ochronnej Android Adaptive Icons.
+- Wariant główny pozostaje pełną kompozycją kwadratową, a tło adaptacyjne nie zawiera elementów krytycznych dla rozpoznawalności znaku.
