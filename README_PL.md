@@ -20,14 +20,20 @@
 - Lokalny zapis postępu: przycisk **ZAPISZ / WCZYTAJ**, automatyczny zapis co 30 sekund oraz zapis przy wstrzymaniu aplikacji.
 
 ## Sterowanie
-- Przyciski kierunkowe na dolnym pasku poruszają postacią.
+- Wirtualny joystick w lewym dolnym rogu porusza postacią.
 - **ATAK** — podstawowy atak.
-- **TECHNIKA** — umiejętność obszarowa.
-- **FORMA** — czasowe przebudzenie.
-- **MIKSTURA** — leczenie.
-- Przyciski w prawym górnym rogu otwierają postać, torbę, umiejętności, rzemiosło i mapę.
+- **FALA**, **PROMIEŃ** i **SZARŻA** — techniki Eterium i unik.
+- **FORMA** — czasowe Przebudzenie Rdzenia.
+- **HP** — użycie mikstury.
+- Przyciski w prawym górnym rogu otwierają postać, torbę, umiejętności, rzemiosło, mapę i Kodeks.
 - **ZADANIE** służy do rozmowy z Kronikarzem i badania ruin.
 - **ZAPISZ / WCZYTAJ** obsługują lokalny zapis.
+
+## Ikona aplikacji Android
+- Dodano autorską ikonę Aetherion: kryształowe serce Eterium otoczone pięcioramiennym znakiem.
+- Projekt ma osobny wariant główny, foreground i background dla Android Adaptive Icons oraz wariant monochromatyczny dla ikon tematycznych Androida 13+.
+- Ikony są wektorowymi plikami SVG zintegrowanymi z `project.godot` i presetem eksportu Android.
+- CI ładuje wszystkie warianty w Godot i sprawdza, czy konfiguracja wskazuje właściwe pliki oraz czy zachowano wymagane minimalne rozmiary.
 
 ## Ostatnia iteracja
 - Dodano pięć autorskich herbów ras w wektorowym atlasie SVG i zintegrowano je z ekranem wyboru postaci.
@@ -37,7 +43,7 @@
 - To nadal etap rozbudowy prototypu; oprawa postaci i świata wymaga pełnego, docelowego przebudowania.
 
 ## Status projektu
-To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między graczami i synchronizacja online nie są jeszcze zaimplementowane. Każdy build traktujemy jako potwierdzony dopiero po poprawnym przejściu walidacji Godot i eksporcie APK w GitHub Actions; zachowanie w grze wymaga jeszcze testu na urządzeniu.
+To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między graczami i synchronizacja online nie są jeszcze zaimplementowane. Każdy build traktujemy jako potwierdzony dopiero po poprawnym przejściu walidacji Godot i eksportu APK w GitHub Actions; zachowanie w grze wymaga jeszcze testu na urządzeniu.
 
 ## Oprawa wizualna regionów
 - Na mapie zintegrowano osiem autorskich landmarków SVG, po jednym dla każdego regionu: Kamiennego Kręgu, Zielonych Ostępów, Korony Gór, Krypty Kryształów, Złotych Pustkowi, Wschodnich Ruin, Popielnych Ziem i Szlaku Eterium.
@@ -50,24 +56,19 @@ To rozwijana wersja testowa offline PvE. Multiplayer, serwer, handel między gra
 - Mapa oznacza odkryte regiony i zachowuje postęp eksploracji w lokalnym zapisie.
 - Zapis w wersji 4 pozostaje zgodny wstecz z wcześniejszymi zapisami wersji 1–3.
 
-
-
 ## Animacje kierunkowe bohatera
 - Bohater ma cztery orientacje: przód, tył i profil w obie strony. Dla wszystkich pięciu ras dodano autorskie sprite'y tyłem i z profilu, z dwiema klatkami chodu.
 - Ruch ukośny korzysta z dominującej osi. Animacje kierunkowe przeciwników pozostają w planie dalszych prac.
-
 
 ## Animacja stworzeń
 - Regionalne stworzenia i Strażnik Rdzenia korzystają z własnej fazy ruchu: sylwetki odwracają się w lewo/prawo, kołyszą podczas pościgu i otrzymują subtelne pochylenie zależne od kierunku.
 - Istoty eteryczne i kryształowe unoszą się w spoczynku; przygotowanie ataku daje odrzut w tył, a cios — pochylenie do przodu. Krótkie ślady pyłu podkreślają ruch stworzeń naziemnych.
 - Jest to proceduralna animacja na istniejących sprite'ach, a nie komplet nowych klatek kierunkowych. Pełne zestawy przód/tył i animowane modele pozostają w planie.
 
-
 ### Trwały stan regionalnych przeciwników
 Lokalny zapis v4 zachowuje dla każdego regionalnego punktu odrodzenia stan pokonania, pozostałe HP, pozycję i licznik odrodzenia. Postęp walki w regionach nie resetuje się po ponownym uruchomieniu gry; starsze zapisy v1–v3 pozostają obsługiwane.
 
-
-## Testy regresji zapisu
-- GitHub Actions uruchamia headless test migracji zapisu v3 oraz round-trip zapisu v4 przed eksportem APK; build #95 zaliczył wszystkie 12 asercji.
-- Test kontroluje zachowanie postaci i odkrytych regionów, HP/pozycję/stan życia/czas odrodzenia 18 spotkań oraz osobny zapis HP Strażnika Rdzenia.
-- Sukces eksportu i testu CI nie zastępuje jeszcze testu na fizycznym urządzeniu Android.
+## Testy regresji
+- GitHub Actions uruchamia headless test migracji zapisu v3 oraz round-trip zapisu v4 przed eksportem APK.
+- Osobny test ikon Androida sprawdza konfigurację projektu i wszystkie cztery źródła ikon, ich ładowanie przez Godot i minimalne wymiary.
+- Sukces eksportu i testów CI nie zastępuje jeszcze testu na fizycznym urządzeniu Android.
