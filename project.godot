@@ -3,6 +3,7 @@ config_version=5
 
 [application]
 config/name="Aetherion"
+config/icon="res://assets/aetherion_app_icon.svg"
 run/main_scene="res://scenes/main.tscn"
 
 [display]
