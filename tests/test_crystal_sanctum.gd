@@ -16,7 +16,7 @@ func _run_tests() -> void:
  game._start_game("Terranie")
  game.player_pos = GAME_SCRIPT.CRYPT_ENTRY
  game._update_region(false)
- var overworld_return := game.player_pos
+ var overworld_return: Vector2 = game.player_pos
  var world_enemy: Dictionary = game.enemies[0]
  world_enemy["hp"] = 31.0
  game.enemies[0] = world_enemy
