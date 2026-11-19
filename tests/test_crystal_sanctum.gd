@@ -14,7 +14,7 @@ func _run_tests() -> void:
  root.add_child(game)
  await process_frame
  game._start_game("Terranie")
- game.player_pos = game.CRYPT_ENTRY
+ game.player_pos = GAME_SCRIPT.CRYPT_ENTRY
  game._update_region(false)
  var overworld_return := game.player_pos
  var world_enemy: Dictionary = game.enemies[0]
@@ -24,7 +24,7 @@ func _run_tests() -> void:
  game._location_interact()
  _check(game.in_crystal_sanctum, "portal enters a separate crystal sanctum")
  _check(game.enemies.size() == 5, "sanctum creates four sentries and one guardian")
- _check(game.player_pos.is_equal_approx(game.CRYPT_START), "entry places the player inside the instance")
+ _check(game.player_pos.is_equal_approx(GAME_SCRIPT.CRYPT_START), "entry places the player inside the instance")
  _check(CRYPT_TEXTURE != null and GUARDIAN_TEXTURE != null, "dedicated room and guardian SVG assets load")
 
  var guardian_index := _enemy_index_by_id(game,"crypt_guardian")
@@ -48,7 +48,7 @@ func _run_tests() -> void:
  game.enemies[guardian_index] = guardian
  game._kill_enemy(guardian_index)
  _check(game.crypt_guardian_defeated, "defeating the Geode Matriarch unlocks the relic")
- game.player_pos = game.CRYPT_RELIC
+ game.player_pos = GAME_SCRIPT.CRYPT_RELIC
  var shards_before := int(game.inventory.get("Odłamek Eterium",0))
  game._location_interact()
  _check(game.crypt_relic_claimed, "relic can be claimed after the guardian falls")
@@ -58,7 +58,7 @@ func _run_tests() -> void:
  game.crypt_relic_claimed = false
  game._load_game()
  _check(game.crypt_relic_claimed, "claimed relic state survives a reload")
- game.player_pos = game.CRYPT_EXIT
+ game.player_pos = GAME_SCRIPT.CRYPT_EXIT
  game._location_interact()
  _check(not game.in_crystal_sanctum, "exit portal returns to the overworld")
  _check(game.player_pos.is_equal_approx(overworld_return), "exit restores the exact overworld position")

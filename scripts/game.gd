@@ -50,7 +50,7 @@ const CRYSTAL_GUARDIAN_TEXTURE: Texture2D = preload("res://assets/aetherion_crys
 const WORLD_SIZE := Vector2(1920, 1440)
 const CRYPT_SIZE := Vector2(1280, 800)
 const CRYPT_ENTRY := Vector2(1085, 465)
-const CRYPT_START := Vector2(640, 665)
+const CRYPT_START := Vector2(640, 590)
 const CRYPT_EXIT := Vector2(640, 720)
 const CRYPT_RELIC := Vector2(640, 155)
 const START_POS := Vector2(480, 380)
@@ -570,7 +570,7 @@ func _show_race_select() -> void:
 func _start_game(selected_race: String) -> void:
  in_crystal_sanctum = false
  overworld_enemies.clear()
- crypt_enemies.clear()
+ crypt_enemies = _create_crypt_enemies()
  overworld_loot_drops.clear()
  crypt_loot_drops.clear()
  crypt_guardian_defeated = false
