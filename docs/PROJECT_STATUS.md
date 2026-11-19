@@ -102,3 +102,12 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 ## Korekta ikon Android — bezpieczny obszar adaptacyjny
 - Zmniejszono znak na warstwie foreground i monochromatycznej do 92% skali, zachowując środek kompozycji; istotne elementy mieszczą się teraz w centralnej strefie ochronnej Android Adaptive Icons.
 - Wariant główny pozostaje pełną kompozycją kwadratową, a tło adaptacyjne nie zawiera elementów krytycznych dla rozpoznawalności znaku.
+
+
+## Iteracja świata — osobna lokacja Sanktuarium Geody
+- Dodano odrębną, eksplorowalną instancję 1280×800 dostępną przez portal w Krypcie Kryształów; ma własną mapę SVG, kryształowe filary, centralny ołtarz i portal powrotny.
+- Lokacja ma czterech strażników (Kryształowe Pająki i Eterowi Skrybowie) oraz unikalnego bossa Matriarchę Geody z osobnym sprite'em SVG.
+- Pokonanie Matriarchy odblokowuje Geodowy Rdzeń; jego zabezpieczenie daje 4 odłamki Eterium, 90 złota i 140 XP.
+- Przejście zachowuje dokładną pozycję gracza, stan przeciwników i łupy obu map. Zapis podniesiono do v5; starsze wersje v1–v4 wczytują się do świata głównego z domyślnym stanem sanktuarium.
+- Dodano test headless przejścia, walki z bossem, nagrody, zapisu i powrotu. Test CI ma potwierdzić tę iterację przed udostępnieniem nowego APK.
+- To pierwsza osobna lokacja, nie komplet ośmiu osobnych biomów. Pozostałe regiony nadal korzystają z jednej mapy świata.

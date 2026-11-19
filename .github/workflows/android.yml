@@ -93,6 +93,13 @@ jobs:
           godot --headless --path . --script res://tests/test_enemy_save.gd 2>&1 | tee /tmp/godot-save-tests.log
           grep -q "AETHERION_SAVE_TESTS: PASS" /tmp/godot-save-tests.log
 
+      - name: Run Crystal Sanctum instance tests
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --script res://tests/test_crystal_sanctum.gd 2>&1 | tee /tmp/godot-crypt-tests.log
+          grep -q "AETHERION_CRYPT_TESTS: PASS" /tmp/godot-crypt-tests.log
+
       - name: Verify Android launcher icons
         shell: bash
         run: |

@@ -72,3 +72,11 @@ Lokalny zapis v4 zachowuje dla każdego regionalnego punktu odrodzenia stan poko
 - GitHub Actions uruchamia headless test migracji zapisu v3 oraz round-trip zapisu v4 przed eksportem APK.
 - Osobny test ikon Androida sprawdza konfigurację projektu i wszystkie cztery źródła ikon, ich ładowanie przez Godot i minimalne wymiary.
 - Sukces eksportu i testów CI nie zastępuje jeszcze testu na fizycznym urządzeniu Android.
+
+
+## Pierwsza osobna lokacja — Sanktuarium Geody
+- Wejście znajduje się przy świecącym portalu w Krypcie Kryształów; przycisk **LOKACJA** służy do wejścia i powrotu.
+- Sanktuarium jest osobną mapą 1280×800 z własnym wektorowym tłem, ołtarzem Geodowego Rdzenia i portalem wyjściowym.
+- W środku spotkasz czterech strażników oraz bossa Matriarchę Geody. Pokonanie bossa odblokowuje rdzeń; jego zabezpieczenie daje 4 odłamki Eterium, 90 złota i 140 XP.
+- Zapis v5 zachowuje oddzielnie pozycję i stan przeciwników/łupów świata głównego oraz sanktuarium. Starsze zapisy v1–v4 pozostają obsługiwane.
+- To pierwsza odrębna lokacja; pozostałe regiony nie mają jeszcze własnych osobnych map.
