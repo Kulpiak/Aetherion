@@ -16,6 +16,7 @@ func _run_tests() -> void:
  _test_v5_migration(game)
 
  game._start_game("Terranie")
+ _check(game.enemies.size() == 18, "starting a new game rebuilds the overworld encounter array")
  var overworld_return: Vector2 = game.player_pos
  var world_enemy: Dictionary = game.enemies[0]
  world_enemy["hp"] = 29.0

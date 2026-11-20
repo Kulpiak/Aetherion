@@ -677,12 +677,14 @@ func _show_race_select() -> void:
 func _start_game(selected_race: String) -> void:
  in_crystal_sanctum = false
  in_verdant_sanctum = false
- overworld_enemies.clear()
+ _spawn_enemies()
+ overworld_enemies = []
  crypt_enemies = _create_crypt_enemies()
  verdant_enemies = _create_verdant_enemies()
- overworld_loot_drops.clear()
- crypt_loot_drops.clear()
- verdant_loot_drops.clear()
+ overworld_loot_drops = []
+ crypt_loot_drops = []
+ verdant_loot_drops = []
+ loot_drops = []
  crypt_guardian_defeated = false
  crypt_relic_claimed = false
  verdant_guardian_defeated = false
