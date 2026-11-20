@@ -80,3 +80,11 @@ Lokalny zapis v4 zachowuje dla każdego regionalnego punktu odrodzenia stan poko
 - W środku spotkasz czterech strażników oraz bossa Matriarchę Geody. Pokonanie bossa odblokowuje rdzeń; jego zabezpieczenie daje 4 odłamki Eterium, 90 złota i 140 XP.
 - Zapis v5 zachowuje oddzielnie pozycję i stan przeciwników/łupów świata głównego oraz sanktuarium. Starsze zapisy v1–v4 pozostają obsługiwane.
 - To pierwsza odrębna lokacja; pozostałe regiony nie mają jeszcze własnych osobnych map.
+
+
+## Druga osobna lokacja — Sanktuarium Korzeni
+- W Zielonych Ostępach znajduje się portal do osobnej mapy 1280×800 z autorskim tłem przedstawiającym pradawne drzewo, sklepienie z korzeni, kamienny krąg i świetlisty basen.
+- W środku walczysz z Pnączowymi Kłami, Mchowymi Wartownikami i bossem Strażnikiem Splotu. Boss ma własny sprite SVG i czytelny sygnał przygotowania ataku.
+- Po pokonaniu Strażnika Splotu można oczyścić Serce Splotu: nagroda to 2 odłamki Eterium, 3 skóry bestii, 110 złota i 170 XP.
+- Lokalny zapis v6 zachowuje pozycję w sanktuarium, stan pięciu przeciwników, łupy, pokonanie bossa i odebranie reliktu. Migracja zapisów v1–v5 pozostaje obsługiwana.
+- GitHub Actions uruchamia osobny test Sanktuarium Korzeni przed eksportem Android APK.

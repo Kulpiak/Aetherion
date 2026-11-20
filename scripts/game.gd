@@ -47,12 +47,19 @@ const REGION_CREATURE_ATLAS: Texture2D = preload("res://assets/aetherion_region_
 const PLAYER_DIRECTION_ATLAS: Texture2D = preload("res://assets/aetherion_player_directions.svg")
 const CRYSTAL_SANCTUM_TEXTURE: Texture2D = preload("res://assets/aetherion_crystal_sanctum.svg")
 const CRYSTAL_GUARDIAN_TEXTURE: Texture2D = preload("res://assets/aetherion_crystal_guardian.svg")
+const VERDANT_SANCTUM_TEXTURE: Texture2D = preload("res://assets/aetherion_verdant_sanctum.svg")
+const VERDANT_GUARDIAN_TEXTURE: Texture2D = preload("res://assets/aetherion_rootwarden.svg")
 const WORLD_SIZE := Vector2(1920, 1440)
 const CRYPT_SIZE := Vector2(1280, 800)
+const VERDANT_SIZE := Vector2(1280, 800)
 const CRYPT_ENTRY := Vector2(1085, 465)
 const CRYPT_START := Vector2(640, 590)
 const CRYPT_EXIT := Vector2(640, 720)
 const CRYPT_RELIC := Vector2(640, 155)
+const VERDANT_ENTRY := Vector2(540, 790)
+const VERDANT_START := Vector2(640, 680)
+const VERDANT_EXIT := Vector2(640, 735)
+const VERDANT_RELIC := Vector2(640, 145)
 const START_POS := Vector2(480, 380)
 const RUINS_POS := Vector2(1600, 720)
 const RACES := {
@@ -161,13 +168,19 @@ var player_invuln := 0.0
 var ambient_particles: Array[Dictionary] = []
 var ambient_time := 0.0
 var in_crystal_sanctum := false
+var in_verdant_sanctum := false
 var overworld_player_pos := START_POS
+var verdant_player_pos := VERDANT_START
 var overworld_enemies: Array[Dictionary] = []
 var crypt_enemies: Array[Dictionary] = []
+var verdant_enemies: Array[Dictionary] = []
 var overworld_loot_drops: Array[Dictionary] = []
 var crypt_loot_drops: Array[Dictionary] = []
+var verdant_loot_drops: Array[Dictionary] = []
 var crypt_guardian_defeated := false
 var crypt_relic_claimed := false
+var verdant_guardian_defeated := false
+var verdant_relic_claimed := false
 
 func _ready() -> void:
  rng.randomize()
@@ -240,14 +253,83 @@ func _create_crypt_enemies() -> Array[Dictionary]:
  result.append({"spawn_id":"crypt_guardian","name":"Matriarcha Geody","pos":Vector2(640,390),"hp":520.0,"max_hp":520.0,"damage":25.0,"speed":42.0,"alive":true,"type":5,"region":"Krypta Kryształów","spawn_bounds":bounds,"xp_reward":0,"gold_reward":0,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":1.05,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true,"is_boss":true,"is_crypt_boss":true})
  return result
 
+func _is_in_instance() -> bool:
+ return in_crystal_sanctum or in_verdant_sanctum
+
+func _active_world_size() -> Vector2:
+ if in_crystal_sanctum:
+  return CRYPT_SIZE
+ if in_verdant_sanctum:
+  return VERDANT_SIZE
+ return WORLD_SIZE
+
+func _active_spawn_position() -> Vector2:
+ if in_crystal_sanctum:
+  return CRYPT_START
+ if in_verdant_sanctum:
+  return VERDANT_START
+ return START_POS
+
 func _apply_camera_bounds() -> void:
  if not is_instance_valid(camera):
   return
- var active_size: Vector2 = CRYPT_SIZE if in_crystal_sanctum else WORLD_SIZE
+ var active_size := _active_world_size()
  camera.limit_left = 0
  camera.limit_top = 0
  camera.limit_right = int(active_size.x)
  camera.limit_bottom = int(active_size.y)
+
+func _create_verdant_enemies() -> Array[Dictionary]:
+ var bounds := Rect2(190.0, 150.0, 900.0, 500.0)
+ var result: Array[Dictionary] = []
+ result.append({"spawn_id":"verdant_00","name":"Pnączowy Kieł","pos":Vector2(340,300),"hp":148.0,"max_hp":148.0,"damage":18.0,"speed":58.0,"alive":true,"type":0,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":58,"gold_reward":18,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.58,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
+ result.append({"spawn_id":"verdant_01","name":"Mchowy Wartownik","pos":Vector2(930,300),"hp":188.0,"max_hp":188.0,"damage":22.0,"speed":39.0,"alive":true,"type":1,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":72,"gold_reward":24,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.62,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
+ result.append({"spawn_id":"verdant_02","name":"Pnączowy Kieł","pos":Vector2(350,500),"hp":148.0,"max_hp":148.0,"damage":18.0,"speed":58.0,"alive":true,"type":0,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":58,"gold_reward":18,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.58,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
+ result.append({"spawn_id":"verdant_03","name":"Mchowy Wartownik","pos":Vector2(930,500),"hp":188.0,"max_hp":188.0,"damage":22.0,"speed":39.0,"alive":true,"type":1,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":72,"gold_reward":24,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.62,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
+ result.append({"spawn_id":"verdant_guardian","name":"Strażnik Splotu","pos":Vector2(640,385),"hp":760.0,"max_hp":760.0,"damage":28.0,"speed":36.0,"alive":true,"type":1,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":0,"gold_reward":0,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":1.12,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true,"is_boss":true,"is_verdant_boss":true})
+ return result
+
+func _enter_verdant_sanctum() -> void:
+ if _is_in_instance():
+  return
+ overworld_player_pos = player_pos
+ overworld_enemies = enemies
+ overworld_loot_drops = loot_drops
+ if verdant_enemies.is_empty():
+  verdant_enemies = _create_verdant_enemies()
+ enemies = verdant_enemies
+ loot_drops = verdant_loot_drops
+ in_verdant_sanctum = true
+ player_pos = verdant_player_pos
+ held = {"left":false,"right":false,"up":false,"down":false}
+ current_region = ""
+ _apply_camera_bounds()
+ if is_instance_valid(camera):
+  camera.position = player_pos
+ _update_region(false)
+ _say("SANKTUARIUM KORZENI • Odszukaj Strażnika Splotu i uwolnij serce pradawnego drzewa.")
+ _update_hud()
+ _save_game(true)
+
+func _leave_verdant_sanctum() -> void:
+ if not in_verdant_sanctum:
+  return
+ verdant_enemies = enemies
+ verdant_loot_drops = loot_drops
+ verdant_player_pos = player_pos
+ enemies = overworld_enemies
+ loot_drops = overworld_loot_drops
+ in_verdant_sanctum = false
+ player_pos = overworld_player_pos
+ held = {"left":false,"right":false,"up":false,"down":false}
+ current_region = ""
+ _apply_camera_bounds()
+ if is_instance_valid(camera):
+  camera.position = player_pos
+ _update_region(false)
+ _say("Opuszczono Sanktuarium Korzeni.")
+ _update_hud()
+ _save_game(true)
 
 func _enter_crystal_sanctum() -> void:
  if in_crystal_sanctum:
@@ -314,10 +396,35 @@ func _location_interact() -> void:
    return
   _say("Podejdź do portalu wyjściowego albo do geodowego rdzenia.")
   return
- if player_pos.distance_to(CRYPT_ENTRY) > 120.0:
-  _say("Wejście do Sanktuarium Geody znajduje się przy portalu w Krypcie Kryształów.")
+ if in_verdant_sanctum:
+  if player_pos.distance_to(VERDANT_EXIT) <= 112.0:
+   _leave_verdant_sanctum()
+   return
+  if player_pos.distance_to(VERDANT_RELIC) <= 112.0:
+   if not verdant_guardian_defeated:
+    _say("Serce pradawnego drzewa jest uśpione. Pokonaj najpierw Strażnika Splotu.")
+    return
+   if verdant_relic_claimed:
+    _say("Serce Zielonego Sanktuarium zostało już oczyszczone.")
+    return
+   verdant_relic_claimed = true
+   inventory["Odłamek Eterium"] = int(inventory.get("Odłamek Eterium",0)) + 2
+   inventory["Skóra bestii"] = int(inventory.get("Skóra bestii",0)) + 3
+   gold += 110
+   _grant_xp(170)
+   _say("SERCE SANKTUARIUM OCZYSZCZONE! +2 odłamki, +3 skóry, +110 złota, +170 XP.")
+   _update_hud()
+   _save_game(true)
+   return
+  _say("Podejdź do portalu wyjściowego albo do Serca Splotu.")
   return
- _enter_crystal_sanctum()
+ if player_pos.distance_to(VERDANT_ENTRY) <= 120.0:
+  _enter_verdant_sanctum()
+  return
+ if player_pos.distance_to(CRYPT_ENTRY) <= 120.0:
+  _enter_crystal_sanctum()
+  return
+ _say("Portale znajdują się w Zielonych Ostępach i przy wejściu do Krypty Kryształów.")
 
 func _serialize_loot_drops(source_drops: Array) -> Array[Dictionary]:
  var saved: Array[Dictionary] = []
@@ -569,12 +676,19 @@ func _show_race_select() -> void:
 
 func _start_game(selected_race: String) -> void:
  in_crystal_sanctum = false
+ in_verdant_sanctum = false
  overworld_enemies.clear()
  crypt_enemies = _create_crypt_enemies()
+ verdant_enemies = _create_verdant_enemies()
  overworld_loot_drops.clear()
  crypt_loot_drops.clear()
+ verdant_loot_drops.clear()
  crypt_guardian_defeated = false
  crypt_relic_claimed = false
+ verdant_guardian_defeated = false
+ verdant_relic_claimed = false
+ overworld_player_pos = START_POS
+ verdant_player_pos = VERDANT_START
  player_pos = START_POS
  _apply_camera_bounds()
  race = selected_race
@@ -632,7 +746,7 @@ func _process(delta: float) -> void:
   player_facing = direction
   walk_phase += delta * 11.0
   player_pos += direction * (205.0 if transformed else 165.0) * delta
- var active_size: Vector2 = CRYPT_SIZE if in_crystal_sanctum else WORLD_SIZE
+ var active_size := _active_world_size()
  player_pos.x = clampf(player_pos.x,24.0,active_size.x-24.0)
  player_pos.y = clampf(player_pos.y,24.0,active_size.y-24.0)
  _update_region(true)
@@ -674,7 +788,7 @@ func _process(delta: float) -> void:
      hp -= maxf(2.0,enemy["damage"]-float(defense))
      if hp <= 0.0:
       hp = max_hp
-      player_pos = CRYPT_START if in_crystal_sanctum else START_POS
+      player_pos = _active_spawn_position()
       gold = maxi(0,gold-8)
       _say("Odrodzenie przy kręgu. Utracono 8 złota.")
   elif difference.length() < 300.0 and difference.length() > attack_range:
@@ -781,13 +895,23 @@ func _region_for_position(position: Vector2) -> String:
    return str(region_data["name"])
  return "Szlak Eterium"
 
+func _update_location_label() -> void:
+ if not is_instance_valid(region_label):
+  return
+ if in_crystal_sanctum:
+  region_label.text = "LOKACJA • SANKTUARIUM GEODY"
+ elif in_verdant_sanctum:
+  region_label.text = "LOKACJA • SANKTUARIUM KORZENI"
+ else:
+  region_label.text = "REGION • " + current_region.to_upper()
+
 func _update_region(award_discovery: bool = true) -> void:
- var next_region := "Krypta Kryształów" if in_crystal_sanctum else _region_for_position(player_pos)
+ var next_region := "Krypta Kryształów" if in_crystal_sanctum else ("Zielone Ostępy" if in_verdant_sanctum else _region_for_position(player_pos))
  if next_region == current_region:
+  _update_location_label()
   return
  current_region = next_region
- if is_instance_valid(region_label):
-  region_label.text = "LOKACJA • SANKTUARIUM GEODY" if in_crystal_sanctum else "REGION • " + current_region.to_upper()
+ _update_location_label()
  if discovered_regions.has(current_region):
   return
  discovered_regions.append(current_region)
@@ -895,7 +1019,7 @@ func _skill_dash() -> void:
  var direction: Vector2 = (enemy["pos"] - player_pos).normalized()
  dash_from = player_pos
  dash_to = enemy["pos"] - direction * 58.0
- var active_size: Vector2 = CRYPT_SIZE if in_crystal_sanctum else WORLD_SIZE
+ var active_size := _active_world_size()
  dash_to.x = clampf(dash_to.x,24.0,active_size.x-24.0)
  dash_to.y = clampf(dash_to.y,24.0,active_size.y-24.0)
  player_facing = direction
@@ -960,6 +1084,7 @@ func _kill_enemy(index: int) -> void:
  enemy["alive"] = false
  enemies[index] = enemy
  var is_crypt_boss := bool(enemy.get("is_crypt_boss",false))
+ var is_verdant_boss := bool(enemy.get("is_verdant_boss",false))
  var xp_reward := int(enemy.get("xp_reward",20))
  var gold_reward := int(enemy.get("gold_reward",5))
  _grant_xp(xp_reward)
@@ -974,6 +1099,11 @@ func _kill_enemy(index: int) -> void:
   gold += 120
   _grant_xp(180)
   _say("MATRIARCHA GEODY POKONANA! Rdzeń sanktuarium jest odsłonięty.")
+ elif is_verdant_boss:
+  verdant_guardian_defeated = true
+  gold += 150
+  _grant_xp(220)
+  _say("STRAŻNIK SPLOTU POKONANY! Serce pradawnego drzewa odzyskuje blask.")
  elif bool(enemy.get("is_boss",false)):
   boss_defeated = true
   quest = 6
@@ -982,7 +1112,7 @@ func _kill_enemy(index: int) -> void:
   _say("STRAŻNIK RDZENIA POKONANY! +250 złota, +300 XP.")
  else:
   _say("Pokonano %s! +%d XP, +%d złota." % [enemy["name"],xp_reward,gold_reward])
- if quest == 5 and bool(enemy.get("is_boss",false)) and not is_crypt_boss:
+ if quest == 5 and bool(enemy.get("is_boss",false)) and not is_crypt_boss and not is_verdant_boss:
   quest = 6
  if quest == 1 and kills >= 5:
   quest = 2
@@ -993,8 +1123,8 @@ func _kill_enemy(index: int) -> void:
 
 func _quest_interact() -> void:
  if not started: return
- if in_crystal_sanctum:
-  _say("W Sanktuarium Geody użyj przycisku LOKACJA przy portalu lub rdzeniu.")
+ if _is_in_instance():
+  _say("W osobnej lokacji użyj przycisku LOKACJA przy portalu lub relikcie.")
   return
  # Etap ruin ma własny punkt interakcji — nie może być blokowany dystansem do Kronikarza.
  if quest == 3:
@@ -1076,7 +1206,7 @@ func _show_panel(panel_name: String) -> void:
  _button(header, "X", func(): panel.hide(), 38, 34)
  if panel_name == "Mapa":
   var map_view := TextureRect.new()
-  map_view.texture = CRYSTAL_SANCTUM_TEXTURE if in_crystal_sanctum else WORLD_TEXTURE
+  map_view.texture = CRYSTAL_SANCTUM_TEXTURE if in_crystal_sanctum else (VERDANT_SANCTUM_TEXTURE if in_verdant_sanctum else WORLD_TEXTURE)
   map_view.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
   map_view.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
   map_view.custom_minimum_size = Vector2(610, 365)
@@ -1135,10 +1265,10 @@ func _show_panel(panel_name: String) -> void:
   var discovered_text := ""
   for region_name in REGION_NAMES:
    discovered_text += ("✓ " if discovered_regions.has(region_name) else "· ") + region_name + "   "
-  var location_text := "Sanktuarium Geody — osobna lokacja" if in_crystal_sanctum else "Świat otwarty"
+  var location_text := "Sanktuarium Geody — osobna lokacja" if in_crystal_sanctum else ("Sanktuarium Korzeni — osobna lokacja" if in_verdant_sanctum else "Świat otwarty")
   body.text = "%s\\n%s\\nAktualny region: %s\\nOdkryte regiony: %d/%d\\n%s\\nPozycja: %d, %d" % [objective_text,location_text,current_region,discovered_regions.size(),REGION_NAMES.size(),discovered_text,int(player_pos.x),int(player_pos.y)]
  elif panel_name == "Kodeks":
-  body.text = "AETHERION — KRONIKI ETERIUM\n\nPIĘĆ RODÓW\nTerranie — wszechstronni i wytrwali.\nVarkari — silni wojownicy o niezłomnej woli.\nElarianie — urodzeni przewodnicy energii.\nSylvari — strażnicy dzikiej równowagi.\nNoctari — badacze mocy ukrytej w cieniu.\n\nFAUNA REGIONÓW\nZielone Ostępy: Mchowy Kieł, Pnączowy Strażnik.\nKorona Gór: Szronowy Raptor, Burzowy Odłamek.\nKrypta Kryształów: Kryształowy Pająk, Eterowy Skryba.\nZłote Pustkowia: Piaskowy Szperacz, Strażnik Wydm.\nWschodnie Ruiny: Pęknięty Legionista, Runiczny Tropiciel.\nPopielne Ziemie: Popielny Łupieżca, Żarowy Golem.\nSzlak Eterium: Eterowy Widmowiec, Strażnik Szczeliny.\n\nETERIUM\nEterium jest pierwotną siłą przenikającą świat. Wzmacnia techniki, pozwala przekraczać granice ciała i budzi Przebudzenie Rdzenia — lecz jego moc wymaga dyscypliny."
+  body.text = "AETHERION — KRONIKI ETERIUM\n\nPIĘĆ RODÓW\nTerranie — wszechstronni i wytrwali.\nVarkari — silni wojownicy o niezłomnej woli.\nElarianie — urodzeni przewodnicy energii.\nSylvari — strażnicy dzikiej równowagi.\nNoctari — badacze mocy ukrytej w cieniu.\n\nFAUNA REGIONÓW\nZielone Ostępy: Mchowy Kieł, Pnączowy Strażnik.\nKorona Gór: Szronowy Raptor, Burzowy Odłamek.\nKrypta Kryształów: Kryształowy Pająk, Eterowy Skryba.\nZłote Pustkowia: Piaskowy Szperacz, Strażnik Wydm.\nWschodnie Ruiny: Pęknięty Legionista, Runiczny Tropiciel.\nPopielne Ziemie: Popielny Łupieżca, Żarowy Golem.\nSzlak Eterium: Eterowy Widmowiec, Strażnik Szczeliny.\n\nOSOBNE LOKACJE\nSanktuarium Geody: Matriarcha Geody strzeże Geodowego Rdzenia.\nSanktuarium Korzeni: Strażnik Splotu broni serca pradawnego drzewa.\n\nETERIUM\nEterium jest pierwotną siłą przenikającą świat. Wzmacnia techniki, pozwala przekraczać granice ciała i budzi Przebudzenie Rdzenia — lecz jego moc wymaga dyscypliny."
  else:
   body.text = "Technika Eterium: koszt 20, fala obszarowa, cooldown 4 s.\\nPromień Eterium: koszt 28, zasięg 285, potrójne obrażenia, cooldown 6 s.\\nSzarża: koszt 16, zasięg 310, cooldown 5 s.\\nPrzebudzenie Rdzenia: 16 s."
  box.add_child(body)
@@ -1222,7 +1352,7 @@ func _serialize_enemy_states(source_enemies: Array = []) -> Array[Dictionary]:
  var states: Array[Dictionary] = []
  var selected_enemies: Array = enemies if source_enemies.is_empty() else source_enemies
  for enemy in selected_enemies:
-  if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)):
+  if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)) and not bool(enemy.get("is_verdant_boss",false)):
    continue
   var enemy_pos: Vector2 = enemy["pos"]
   states.append({
@@ -1246,7 +1376,7 @@ func _restore_enemy_states(saved_states, bounds_size: Vector2 = WORLD_SIZE) -> v
    states_by_id[spawn_id] = saved_state
  for index in range(enemies.size()):
   var enemy: Dictionary = enemies[index]
-  if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)):
+  if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)) and not bool(enemy.get("is_verdant_boss",false)):
    continue
   var spawn_id := str(enemy.get("spawn_id",""))
   if not states_by_id.has(spawn_id):
@@ -1271,26 +1401,37 @@ func _restore_enemy_states(saved_states, bounds_size: Vector2 = WORLD_SIZE) -> v
   enemies[index] = enemy
 
 func _save_game(silent: bool=false) -> void:
- if not started: return
- var world_enemy_source: Array[Dictionary] = overworld_enemies if in_crystal_sanctum else enemies
+ if not started:
+  return
+ if in_verdant_sanctum:
+  verdant_player_pos = player_pos
+ var in_instance := _is_in_instance()
+ var world_enemy_source: Array[Dictionary] = overworld_enemies if in_instance else enemies
  var crypt_enemy_source: Array[Dictionary] = enemies if in_crystal_sanctum else crypt_enemies
- var world_loot_source: Array[Dictionary] = overworld_loot_drops if in_crystal_sanctum else loot_drops
+ var verdant_enemy_source: Array[Dictionary] = enemies if in_verdant_sanctum else verdant_enemies
+ var world_loot_source: Array[Dictionary] = overworld_loot_drops if in_instance else loot_drops
  var crypt_loot_source: Array[Dictionary] = loot_drops if in_crystal_sanctum else crypt_loot_drops
+ var verdant_loot_source: Array[Dictionary] = loot_drops if in_verdant_sanctum else verdant_loot_drops
  var boss_state: Dictionary = {}
  for enemy in world_enemy_source:
   if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)):
    var boss_pos: Vector2 = enemy["pos"]
    boss_state = {"name":str(enemy["name"]),"pos":[boss_pos.x,boss_pos.y],"hp":float(enemy["hp"]),"max_hp":float(enemy["max_hp"]),"damage":float(enemy["damage"]),"speed":float(enemy["speed"])}
    break
- var saved_overworld_pos: Vector2 = overworld_player_pos if in_crystal_sanctum else player_pos
+ var saved_overworld_pos: Vector2 = overworld_player_pos if in_instance else player_pos
+ var saved_verdant_pos: Vector2 = player_pos if in_verdant_sanctum else verdant_player_pos
  var data := {
-  "save_version":5,
+  "save_version":6,
   "race":race,
   "pos":[player_pos.x,player_pos.y],
   "overworld_pos":[saved_overworld_pos.x,saved_overworld_pos.y],
+  "verdant_pos":[saved_verdant_pos.x,saved_verdant_pos.y],
   "in_crystal_sanctum":in_crystal_sanctum,
+  "in_verdant_sanctum":in_verdant_sanctum,
   "crypt_guardian_defeated":crypt_guardian_defeated,
   "crypt_relic_claimed":crypt_relic_claimed,
+  "verdant_guardian_defeated":verdant_guardian_defeated,
+  "verdant_relic_claimed":verdant_relic_claimed,
   "hp":hp,
   "ether":ether,
   "level":level,
@@ -1307,10 +1448,12 @@ func _save_game(silent: bool=false) -> void:
   "boss_defeated":boss_defeated,
   "loot_drops":_serialize_loot_drops(world_loot_source),
   "crypt_loot_drops":_serialize_loot_drops(crypt_loot_source),
+  "verdant_loot_drops":_serialize_loot_drops(verdant_loot_source),
   "boss_state":boss_state,
   "discovered_regions":discovered_regions,
   "enemy_states":_serialize_enemy_states(world_enemy_source),
-  "crypt_enemy_states":_serialize_enemy_states(crypt_enemy_source)
+  "crypt_enemy_states":_serialize_enemy_states(crypt_enemy_source),
+  "verdant_enemy_states":_serialize_enemy_states(verdant_enemy_source)
  }
  var file := FileAccess.open(SAVE_PATH,FileAccess.WRITE)
  if file:
@@ -1333,7 +1476,7 @@ func _load_game() -> void:
   _say("Uszkodzony zapis.")
   return
  var save_version := int(data.get("save_version",1))
- if save_version < 1 or save_version > 5:
+ if save_version < 1 or save_version > 6:
   _say("Zapis pochodzi z nieobsługiwanej wersji gry.")
   return
  _spawn_enemies()
@@ -1346,8 +1489,11 @@ func _load_game() -> void:
  kills = clampi(int(data.get("kills",0)),0,999999999)
  quest = clampi(int(data.get("quest",0)),0,6)
  in_crystal_sanctum = bool(data.get("in_crystal_sanctum",false))
+ in_verdant_sanctum = bool(data.get("in_verdant_sanctum",false)) and not in_crystal_sanctum
  crypt_guardian_defeated = bool(data.get("crypt_guardian_defeated",false))
  crypt_relic_claimed = bool(data.get("crypt_relic_claimed",false))
+ verdant_guardian_defeated = bool(data.get("verdant_guardian_defeated",false))
+ verdant_relic_claimed = bool(data.get("verdant_relic_claimed",false))
  discovered_regions.clear()
  var saved_regions = data.get("discovered_regions",[])
  if typeof(saved_regions) == TYPE_ARRAY:
@@ -1358,8 +1504,11 @@ func _load_game() -> void:
  if not discovered_regions.has("Kamienny Krąg"):
   discovered_regions.append("Kamienny Krąg")
  overworld_player_pos = _parse_saved_position(data.get("overworld_pos",data.get("pos",[])),WORLD_SIZE,START_POS)
- var active_size: Vector2 = CRYPT_SIZE if in_crystal_sanctum else WORLD_SIZE
- player_pos = _parse_saved_position(data.get("pos",[]),active_size,CRYPT_START if in_crystal_sanctum else START_POS)
+ verdant_player_pos = _parse_saved_position(data.get("verdant_pos",[]),VERDANT_SIZE,VERDANT_START)
+ var active_size := _active_world_size()
+ player_pos = _parse_saved_position(data.get("pos",[]),active_size,_active_spawn_position())
+ if in_verdant_sanctum:
+  verdant_player_pos = player_pos
  inventory = {"Mikstura HP":3,"Odłamek Eterium":0,"Skóra bestii":0}
  var saved_inventory = data.get("inventory",{})
  if typeof(saved_inventory) == TYPE_DICTIONARY:
@@ -1404,6 +1553,7 @@ func _load_game() -> void:
   quest = 6
  var restored_world_loot := _deserialize_loot_drops(data.get("loot_drops",[]),WORLD_SIZE)
  var restored_crypt_loot := _deserialize_loot_drops(data.get("crypt_loot_drops",[]),CRYPT_SIZE)
+ var restored_verdant_loot := _deserialize_loot_drops(data.get("verdant_loot_drops",[]),VERDANT_SIZE)
  _restore_enemy_states(data.get("enemy_states",[]),WORLD_SIZE)
  if boss_spawned and not boss_defeated:
   var saved_boss = data.get("boss_state",{})
@@ -1423,13 +1573,21 @@ func _load_game() -> void:
  enemies = _create_crypt_enemies()
  _restore_enemy_states(data.get("crypt_enemy_states",[]),CRYPT_SIZE)
  var restored_crypt_enemies: Array[Dictionary] = enemies
+ enemies = _create_verdant_enemies()
+ _restore_enemy_states(data.get("verdant_enemy_states",[]),VERDANT_SIZE)
+ var restored_verdant_enemies: Array[Dictionary] = enemies
  overworld_enemies = restored_world_enemies
  crypt_enemies = restored_crypt_enemies
+ verdant_enemies = restored_verdant_enemies
  overworld_loot_drops = restored_world_loot
  crypt_loot_drops = restored_crypt_loot
+ verdant_loot_drops = restored_verdant_loot
  if in_crystal_sanctum:
   enemies = crypt_enemies
   loot_drops = crypt_loot_drops
+ elif in_verdant_sanctum:
+  enemies = verdant_enemies
+  loot_drops = verdant_loot_drops
  else:
   enemies = overworld_enemies
   loot_drops = overworld_loot_drops
@@ -1459,7 +1617,7 @@ func _update_hud() -> void:
  if not is_instance_valid(status): return
  status.text = "WĘDROWIEC  •  %s  •  POZ. %d  •  ZŁOTO %d" % [race.to_upper(),level,gold]
  if is_instance_valid(region_label):
-  region_label.text = "LOKACJA • SANKTUARIUM GEODY" if in_crystal_sanctum else "REGION • " + current_region.to_upper()
+  _update_location_label()
  if is_instance_valid(hp_bar):
   hp_bar.max_value = max_hp
   hp_bar.value = hp
@@ -1487,10 +1645,10 @@ func _refresh_action_buttons() -> void:
 
 func _draw() -> void:
  _draw_world()
- if not in_crystal_sanctum:
+ if not _is_in_instance():
   _draw_ambient_particles()
  _draw_landmarks()
- if started and not in_crystal_sanctum:
+ if started and not _is_in_instance():
   _draw_npc()
  for enemy in enemies:
   if enemy["alive"]:
@@ -1506,6 +1664,8 @@ func _draw() -> void:
 func _draw_world() -> void:
  if in_crystal_sanctum:
   draw_texture_rect(CRYSTAL_SANCTUM_TEXTURE,Rect2(Vector2.ZERO,CRYPT_SIZE),false)
+ elif in_verdant_sanctum:
+  draw_texture_rect(VERDANT_SANCTUM_TEXTURE,Rect2(Vector2.ZERO,VERDANT_SIZE),false)
  else:
   draw_texture_rect(WORLD_TEXTURE,Rect2(Vector2.ZERO,WORLD_SIZE),false)
 
@@ -1513,6 +1673,9 @@ func _draw_landmarks() -> void:
  var now := float(Time.get_ticks_msec()) / 1000.0
  if in_crystal_sanctum:
   _draw_crypt_landmarks(now)
+  return
+ if in_verdant_sanctum:
+  _draw_verdant_landmarks(now)
   return
  var pulse := 0.7 + sin(now * 2.4) * 0.2
  _draw_region_landmarks(now)
@@ -1531,6 +1694,11 @@ func _draw_landmarks() -> void:
  draw_arc(CRYPT_ENTRY,39.0,now*0.35,now*0.35+TAU,48,Color(0.55,0.95,1.0,0.88),4.0,true)
  draw_arc(CRYPT_ENTRY,29.0,-now*0.52,-now*0.52+PI*1.45,36,Color(0.82,0.98,1.0,0.75),2.0,true)
  draw_string(font,CRYPT_ENTRY+Vector2(-78,66),"SANKTUARIUM",HORIZONTAL_ALIGNMENT_CENTER,-1,13,Color("#a7f4f0"))
+ var root_pulse := 0.7 + sin(now*2.8+0.7)*0.22
+ draw_circle(VERDANT_ENTRY,39.0,Color(0.34,0.88,0.49,0.09*root_pulse))
+ draw_arc(VERDANT_ENTRY,35.0,-now*0.3,-now*0.3+TAU,48,Color("#9cdda0"),3.5,true)
+ draw_arc(VERDANT_ENTRY,25.0,now*0.52,now*0.52+PI*1.55,36,Color("#d5f4b2"),2.0,true)
+ draw_string(font,VERDANT_ENTRY+Vector2(-82,58),"SANKTUARIUM KORZENI",HORIZONTAL_ALIGNMENT_CENTER,-1,12,Color("#c7edb0"))
  var marker := RUINS_POS + Vector2(0,-190.0+sin(now*4.0)*8.0)
  if quest >= 3 and quest <= 5:
   draw_line(player_pos,marker,Color(0.36,0.86,1.0,0.18),2.0,true)
@@ -1557,6 +1725,34 @@ func _draw_crypt_landmarks(now: float) -> void:
  draw_arc(CRYPT_EXIT,43.0,now*0.42,now*0.42+TAU,48,Color(0.46,0.91,0.96,0.9),4.0,true)
  draw_arc(CRYPT_EXIT,31.0,-now*0.58,-now*0.58+PI*1.6,36,Color(0.85,0.98,1.0,0.72),2.0,true)
  draw_string(ThemeDB.fallback_font,CRYPT_EXIT+Vector2(-58,66),"POWRÓT",HORIZONTAL_ALIGNMENT_CENTER,-1,13,Color("#a7f4f0"))
+
+
+func _draw_verdant_landmarks(now: float) -> void:
+ var pulse := 0.72 + sin(now*2.2)*0.18
+ draw_ellipse_shadow(VERDANT_RELIC+Vector2(0,72),190.0,34.0)
+ draw_circle(VERDANT_RELIC,102.0,Color(0.28,0.86,0.47,0.08*pulse))
+ draw_arc(VERDANT_RELIC,82.0,now*0.18,now*0.18+TAU,64,Color(0.48,0.91,0.56,0.68*pulse),3.5,true)
+ draw_arc(VERDANT_RELIC,61.0,-now*0.28,-now*0.28+PI*1.55,48,Color(0.76,0.96,0.61,0.72),2.0,true)
+ draw_colored_polygon(PackedVector2Array([
+  VERDANT_RELIC+Vector2(0,-68),VERDANT_RELIC+Vector2(26,-26),VERDANT_RELIC+Vector2(21,28),
+  VERDANT_RELIC+Vector2(0,58),VERDANT_RELIC+Vector2(-22,31),VERDANT_RELIC+Vector2(-28,-23)
+ ]),Color("#79c77a") if verdant_guardian_defeated else Color("#486b55"))
+ draw_colored_polygon(PackedVector2Array([
+  VERDANT_RELIC+Vector2(0,-68),VERDANT_RELIC+Vector2(0,46),VERDANT_RELIC+Vector2(-22,31),VERDANT_RELIC+Vector2(-28,-23)
+ ]),Color(0.76,0.96,0.7,0.8))
+ draw_line(VERDANT_RELIC+Vector2(0,-48),VERDANT_RELIC+Vector2(0,45),Color("#e4ffd0"),2.0,true)
+ draw_string(ThemeDB.fallback_font,VERDANT_RELIC+Vector2(-94,-86),"SERCE SPLOTU",HORIZONTAL_ALIGNMENT_CENTER,-1,16,Color("#d6f3c2"))
+ for root_index in range(6):
+  var angle := TAU*float(root_index)/6.0+now*0.08
+  var root_start := VERDANT_RELIC+Vector2.RIGHT.rotated(angle)*76.0
+  var root_end := VERDANT_RELIC+Vector2.RIGHT.rotated(angle+0.16)*122.0
+  draw_line(root_start,root_end,Color(0.36,0.67,0.38,0.7),7.0,true)
+  draw_line(root_start,root_end,Color(0.72,0.86,0.52,0.58),2.0,true)
+ var exit_pulse := 0.68 + sin(now*3.0+1.0)*0.2
+ draw_circle(VERDANT_EXIT,52.0,Color(0.32,0.82,0.43,0.08*exit_pulse))
+ draw_arc(VERDANT_EXIT,43.0,now*0.34,now*0.34+TAU,48,Color(0.57,0.91,0.56,0.9),4.0,true)
+ draw_arc(VERDANT_EXIT,30.0,-now*0.48,-now*0.48+PI*1.6,36,Color(0.83,0.97,0.7,0.74),2.0,true)
+ draw_string(ThemeDB.fallback_font,VERDANT_EXIT+Vector2(-58,66),"POWRÓT",HORIZONTAL_ALIGNMENT_CENTER,-1,13,Color("#d2efbd"))
 
 func _draw_region_landmarks(now: float) -> void:
  var positions := [
@@ -1631,7 +1827,8 @@ func _draw_enemy(enemy: Dictionary) -> void:
  draw_ellipse_shadow(p+Vector2(0,13),sprite_size*0.48*(1.0+absf(stride)*0.025),14.0 if is_boss else 8.0)
  if windup_left > 0.0:
   var glyph_rotation := now * 0.32
-  _draw_eterium_glyph(p,0,290.0 if is_boss else 118.0,glyph_rotation,Color(1.0,0.32,0.2,0.55))
+  var warning_tint := Color("#a8e99c") if bool(enemy.get("is_verdant_boss",false)) else Color(1.0,0.32,0.2,0.55)
+  _draw_eterium_glyph(p,0,290.0 if is_boss else 118.0,glyph_rotation,warning_tint)
   var warning_alpha := 0.42+warning_progress*0.48
   if is_boss:
    draw_circle(p,112.0,Color(1.0,0.18,0.15,0.035+warning_progress*0.045))
@@ -1642,8 +1839,9 @@ func _draw_enemy(enemy: Dictionary) -> void:
    draw_line(p,p+enemy_facing*48.0,Color(1.0,0.4,0.25,warning_alpha),3.0,true)
  if is_boss:
   var boss_pulse := 0.72 + sin(now/0.19)*0.16
-  draw_circle(p,76.0,Color(0.55,0.16,0.25,0.09*boss_pulse))
-  draw_arc(p,72.0,now*0.12,now*0.12+TAU,48,Color(0.95,0.35,0.32,0.55+boss_pulse*0.12),4.0,true)
+  var boss_ring := Color("#9cdd8e") if bool(enemy.get("is_verdant_boss",false)) else Color("#ef7165")
+  draw_circle(p,76.0,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.09*boss_pulse))
+  draw_arc(p,72.0,now*0.12,now*0.12+TAU,48,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.55+boss_pulse*0.12),4.0,true)
  if attacking:
   var attack_progress := 1.0 - float(enemy.get("attack_anim",0.0))/0.34
   draw_arc(p,37.0 if not is_boss else 66.0,0.0,TAU,28,Color(1.0,0.28,0.22,0.72),3.0,true)
@@ -1661,6 +1859,8 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var sprite_rect := Rect2(-sprite_size*0.5,-sprite_size*0.55,sprite_size,sprite_size)
  if bool(enemy.get("is_crypt_boss",false)):
   draw_texture_rect(CRYSTAL_GUARDIAN_TEXTURE,sprite_rect,false,body_color)
+ elif bool(enemy.get("is_verdant_boss",false)):
+  draw_texture_rect(VERDANT_GUARDIAN_TEXTURE,sprite_rect,false,body_color)
  elif is_boss:
   draw_texture_rect_region(SPRITE_ATLAS,sprite_rect,Rect2((5+kind)*128,frame*128,128,128),body_color,false)
  else:

@@ -13,7 +13,7 @@ func _run_tests() -> void:
 	await process_frame
 
 	_test_legacy_v3_migration(game)
-	_test_v4_enemy_round_trip(game)
+	_test_v6_enemy_round_trip(game)
 
 	game.queue_free()
 	await process_frame
@@ -107,18 +107,18 @@ func _test_v4_enemy_round_trip(game) -> void:
 
 	var restored_first: Dictionary = _enemy_by_id(game, "regional_00")
 	var restored_second: Dictionary = _enemy_by_id(game, "regional_01")
-	_check(is_equal_approx(float(restored_first.get("hp", 0.0)), 21.5), "v4 restores remaining enemy HP")
-	_check(restored_first.get("pos", Vector2.ZERO).is_equal_approx(Vector2(720.0, 680.0)), "v4 restores enemy position by stable spawn ID")
-	_check(not bool(restored_second.get("alive", true)), "v4 restores defeated enemy state")
-	_check(is_equal_approx(float(restored_second.get("respawn", 0.0)), 7.25), "v4 restores remaining respawn time")
+	_check(is_equal_approx(float(restored_first.get("hp", 0.0)), 21.5), "v6 restores remaining enemy HP")
+	_check(restored_first.get("pos", Vector2.ZERO).is_equal_approx(Vector2(720.0, 680.0)), "v6 restores enemy position by stable spawn ID")
+	_check(not bool(restored_second.get("alive", true)), "v6 restores defeated enemy state")
+	_check(is_equal_approx(float(restored_second.get("respawn", 0.0)), 7.25), "v6 restores remaining respawn time")
 	var boss_count := 0
 	var restored_boss_hp := 0.0
 	for enemy in game.enemies:
 		if bool(enemy.get("is_boss", false)):
 			boss_count += 1
 			restored_boss_hp = float(enemy.get("hp", 0.0))
-	_check(boss_count == 1, "v4 restores exactly one active boss")
-	_check(is_equal_approx(restored_boss_hp, 312.0), "v4 preserves boss HP separately from regional enemies")
+	_check(boss_count == 1, "v6 restores exactly one active boss")
+	_check(is_equal_approx(restored_boss_hp, 312.0), "v6 preserves boss HP separately from regional enemies")
 
 func _enemy_by_id(game, spawn_id: String) -> Dictionary:
 	for enemy in game.enemies:

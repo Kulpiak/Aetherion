@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800">
+<defs>
+ <linearGradient id="forestFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#102b27"/><stop offset=".48" stop-color="#173b30"/><stop offset="1" stop-color="#081c1b"/></linearGradient>
+ <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#71836b"/><stop offset=".48" stop-color="#354d40"/><stop offset="1" stop-color="#172e29"/></linearGradient>
+ <linearGradient id="rootWood" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a18a56"/><stop offset=".45" stop-color="#5d6840"/><stop offset="1" stop-color="#283e2c"/></linearGradient>
+ <radialGradient id="heartGlow"><stop stop-color="#d8ff9d" stop-opacity=".95"/><stop offset=".25" stop-color="#8be68d" stop-opacity=".6"/><stop offset="1" stop-color="#45c47a" stop-opacity="0"/></radialGradient>
+ <radialGradient id="pool"><stop stop-color="#a7f5b2" stop-opacity=".78"/><stop offset=".35" stop-color="#3b9e78" stop-opacity=".45"/><stop offset="1" stop-color="#0a302b" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1280" height="800" fill="url(#forestFloor)"/>
+<path d="M0 0H1280V155C1120 188 1040 125 910 172S650 210 520 155 260 185 0 138Z" fill="#183d30"/>
+<path d="M0 0H1280V76C1100 126 1020 45 880 98S620 140 490 82 240 118 0 72Z" fill="#244b35" opacity=".85"/>
+<path d="M0 800V560C160 490 255 560 380 505S610 500 730 550 1010 470 1280 555V800Z" fill="#0b2722"/>
+<path d="M0 800V675C180 610 285 690 430 630S720 610 850 660 1080 600 1280 650V800Z" fill="#163a2b"/>
+<path d="M0 0L145 0 118 215 185 340 118 465 205 800H0Z" fill="#091d1b"/>
+<path d="M1280 0H1128L1164 180 1095 340 1170 470 1090 800H1280Z" fill="#091d1b"/>
+<path d="M60 0C145 108 95 188 188 280S250 445 165 540M1220 0C1120 118 1185 198 1090 285S1030 448 1110 560" fill="none" stroke="#425b37" stroke-width="34" stroke-linecap="round" opacity=".85"/>
+<path d="M0 255C145 212 170 290 260 265S390 208 485 258M1280 230C1140 188 1100 270 1020 245S900 205 825 258" fill="none" stroke="#557044" stroke-width="16" opacity=".55"/>
+<path d="M0 460C160 410 250 450 355 420S560 395 670 445 930 420 1050 395 1190 410 1280 380" fill="none" stroke="#78905a" stroke-width="8" opacity=".18"/>
+<path d="M160 800C220 665 350 660 425 590S540 485 640 480 755 500 855 585 1040 660 1120 800" fill="none" stroke="#a08b58" stroke-width="104" opacity=".18"/>
+<path d="M160 800C220 665 350 660 425 590S540 485 640 480 755 500 855 585 1040 660 1120 800" fill="none" stroke="#344b35" stroke-width="72" opacity=".78"/>
+<path d="M160 800C220 665 350 660 425 590S540 485 640 480 755 500 855 585 1040 660 1120 800" fill="none" stroke="#87905b" stroke-width="4" stroke-dasharray="18 24" opacity=".45"/>
+<ellipse cx="640" cy="410" rx="330" ry="250" fill="#0a201e" opacity=".55"/>
+<ellipse cx="640" cy="410" rx="270" ry="204" fill="none" stroke="#657b4c" stroke-width="22" opacity=".58"/>
+<ellipse cx="640" cy="410" rx="240" ry="178" fill="none" stroke="#a1a66a" stroke-width="5" stroke-dasharray="24 18" opacity=".6"/>
+<path d="M320 420C350 260 485 190 640 190S930 260 960 420" fill="none" stroke="#4f7043" stroke-width="22" stroke-linecap="round"/>
+<path d="M360 445C400 300 505 250 640 250S880 300 920 445" fill="none" stroke="#9ba66a" stroke-width="5" opacity=".55"/>
+<g opacity=".92">
+ <path d="M250 0C280 130 250 210 330 290S350 430 430 505" fill="none" stroke="url(#rootWood)" stroke-width="44" stroke-linecap="round"/>
+ <path d="M1030 0C1000 130 1030 210 950 290S930 430 850 505" fill="none" stroke="url(#rootWood)" stroke-width="44" stroke-linecap="round"/>
+ <path d="M250 0C310 105 365 95 420 175S485 260 510 310M1030 0C970 105 915 95 860 175S795 260 770 310" fill="none" stroke="#667448" stroke-width="18" stroke-linecap="round"/>
+ <path d="M180 0C235 145 180 250 280 365S320 520 390 585M1100 0C1045 145 1100 250 1000 365S960 520 890 585" fill="none" stroke="#314e31" stroke-width="28" stroke-linecap="round"/>
+ <path d="M245 365C360 360 395 425 470 465M1035 365C920 360 885 425 810 465" fill="none" stroke="#9a8b58" stroke-width="12" stroke-linecap="round"/>
+</g>
+<g fill="#284d32" stroke="#597748" stroke-width="5">
+ <path d="M75 120C20 35 100 5 160 65 215 8 285 60 250 130 300 190 225 240 160 205 105 250 35 200 75 120Z"/>
+ <path d="M1020 100C980 20 1060 0 1110 52 1175 5 1245 58 1215 125 1260 185 1180 228 1120 198 1060 238 990 188 1020 100Z"/>
+ <path d="M400 55C360 -5 435 -22 480 24 530 -12 585 32 558 86 590 130 520 160 478 130 430 158 380 115 400 55Z"/>
+ <path d="M730 65C700 5 770 -15 815 28 870 -8 920 35 890 90 925 140 850 168 808 137 760 166 710 120 730 65Z"/>
+</g>
+<g fill="#6c8c4c" opacity=".78">
+ <path d="M130 115l45 24-34 10zM1080 105l45 20-33 17zM450 55l38 18-27 16zM785 65l39 15-28 17z"/>
+ <path d="M90 180l58 12-42 26zM1150 175l55 8-41 27zM470 125l45 8-32 25zM820 130l45 8-32 25z"/>
+</g>
+<g fill="#203e2d" stroke="#718354" stroke-width="5">
+ <path d="M80 585l55-52 72 22 28 68-56 50-82-16z"/>
+ <path d="M1040 590l62-58 78 26 26 70-63 48-80-18z"/>
+ <path d="M210 690l50-40 62 18 22 55-50 42-70-15z"/>
+ <path d="M960 700l54-45 65 20 18 58-55 42-70-18z"/>
+</g>
+<g fill="#6f8c53" opacity=".72">
+ <path d="M80 584l55-52 72 22-36 13-52-4zM1040 590l62-58 78 26-40 12-56-5z"/>
+ <path d="M210 690l50-40 62 18-33 12-45-3zM960 700l54-45 65 20-38 11-48-3z"/>
+</g>
+<ellipse cx="640" cy="605" rx="250" ry="112" fill="url(#pool)"/>
+<ellipse cx="640" cy="610" rx="175" ry="66" fill="#174b3b" stroke="#5d9460" stroke-width="7"/>
+<ellipse cx="640" cy="610" rx="138" ry="43" fill="#2d8b68" opacity=".55"/>
+<path d="M485 610C545 578 590 646 650 608S760 590 800 618" fill="none" stroke="#b2ef9a" stroke-width="4" opacity=".5"/>
+<g fill="url(#stone)" stroke="#82906b" stroke-width="6">
+ <path d="M505 510L535 420 585 398 615 438 604 535 565 562 520 548Z"/>
+ <path d="M675 438L705 398 755 420 785 510 770 548 725 562 686 535Z"/>
+ <path d="M450 600L475 555 515 562 535 615 515 655 475 650Z"/>
+ <path d="M745 615L765 562 805 555 830 600 805 650 765 655Z"/>
+</g>
+<g fill="#3f5b3e" stroke="#9ba16b" stroke-width="4">
+ <path d="M545 420l40-22 30 40-25 25zM705 398l50 22-45 43-25-25z"/>
+ <path d="M470 560l42 2 22 53-44 20-28-35zM768 562l42-2 28 40-28 35-44-20z"/>
+</g>
+<g>
+ <path d="M640 495C600 425 585 350 610 280 620 246 630 210 640 165 650 210 660 246 670 280 695 350 680 425 640 495Z" fill="url(#rootWood)" stroke="#c3b477" stroke-width="7"/>
+ <path d="M640 482C625 410 620 345 640 270 660 345 655 410 640 482Z" fill="#344f32" opacity=".8"/>
+ <path d="M640 370C560 340 520 290 490 225M640 370C720 340 760 290 790 225M640 315C575 270 565 215 560 170M640 315C705 270 715 215 720 170" fill="none" stroke="#8d9258" stroke-width="20" stroke-linecap="round"/>
+ <path d="M640 365C600 320 580 275 580 230M640 365C680 320 700 275 700 230" fill="none" stroke="#c0b777" stroke-width="5" opacity=".75"/>
+ <path d="M640 420C570 450 540 480 510 530M640 420C710 450 740 480 770 530" fill="none" stroke="#5c7542" stroke-width="22" stroke-linecap="round"/>
+ <path d="M640 480C600 515 575 555 565 590M640 480C680 515 705 555 715 590" fill="none" stroke="#829453" stroke-width="14" stroke-linecap="round"/>
+</g>
+<ellipse cx="640" cy="270" rx="150" ry="150" fill="url(#heartGlow)" opacity=".78"/>
+<path d="M640 225L678 270 664 325 640 346 616 325 602 270Z" fill="#8de59b" stroke="#d9ffbc" stroke-width="7"/>
+<path d="M640 225V346L616 325 602 270Z" fill="#d6ffb6" opacity=".72"/>
+<path d="M640 243L656 273 640 305 624 273Z" fill="#f1ffd5" opacity=".8"/>
+<g fill="#b5e68a" stroke="#d5f5ad" stroke-width="3">
+ <path d="M490 250C445 195 470 150 520 175 542 118 600 148 585 205 565 255 525 268 490 250Z"/>
+ <path d="M790 250C835 195 810 150 760 175 738 118 680 148 695 205 715 255 755 268 790 250Z"/>
+ <path d="M540 160C515 105 550 75 585 110 610 70 660 95 645 145 625 188 575 190 540 160Z"/>
+ <path d="M740 160C765 105 730 75 695 110 670 70 620 95 635 145 655 188 705 190 740 160Z"/>
+</g>
+<g fill="#d7f5a0" opacity=".9">
+ <circle cx="280" cy="310" r="4"/><circle cx="320" cy="250" r="3"/><circle cx="930" cy="310" r="4"/><circle cx="970" cy="250" r="3"/>
+ <circle cx="390" cy="560" r="3"/><circle cx="890" cy="560" r="3"/><circle cx="570" cy="720" r="4"/><circle cx="710" cy="720" r="4"/>
+ <circle cx="190" cy="420" r="3"/><circle cx="1090" cy="420" r="3"/><circle cx="640" cy="90" r="4"/><circle cx="640" cy="755" r="3"/>
+</g>
+<g fill="#8fb56a" opacity=".8">
+ <path d="M300 700l12-22 12 22zM350 735l9-18 10 18zM925 700l12-22 12 22zM875 735l9-18 10 18z"/>
+ <path d="M100 760l10-20 10 20zM1170 760l10-20 10 20zM60 390l10-20 10 20zM1200 390l10-20 10 20z"/>
+</g>
+<rect x="8" y="8" width="1264" height="784" rx="26" fill="none" stroke="#6c9561" stroke-width="10" opacity=".18"/>
+</svg>

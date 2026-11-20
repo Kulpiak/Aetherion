@@ -111,3 +111,12 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Przejście zachowuje dokładną pozycję gracza, stan przeciwników i łupy obu map. Zapis podniesiono do v5; starsze wersje v1–v4 wczytują się do świata głównego z domyślnym stanem sanktuarium.
 - Dodano test headless przejścia, walki z bossem, nagrody, zapisu i powrotu. Test CI ma potwierdzić tę iterację przed udostępnieniem nowego APK.
 - To pierwsza osobna lokacja, nie komplet ośmiu osobnych biomów. Pozostałe regiony nadal korzystają z jednej mapy świata.
+
+
+## Druga osobna lokacja — Sanktuarium Korzeni
+- W Zielonych Ostępach dodano drugi portal prowadzący do odrębnej mapy 1280×800 z autorskim tłem SVG: starożytny krąg korzeni, kamienny ołtarz, świetlisty basen i organiczne sklepienie.
+- Sanktuarium zawiera czterech strażników (Pnączowe Kły i Mchowych Wartowników) oraz unikalnego bossa Strażnika Splotu z osobnym sprite'em SVG.
+- Pokonanie Strażnika Splotu odblokowuje Serce Splotu. Oczyszczenie reliktu daje 2 odłamki Eterium, 3 skóry bestii, 110 złota i 170 XP.
+- Zapis v6 zachowuje osobno stan przeciwników, łupów, bossa i reliktu Sanktuarium Korzeni, a także pozycję gracza wewnątrz lokacji. Zapisy v1–v5 są nadal obsługiwane.
+- Dodano headless test migracji v5 oraz pełnego cyklu wejścia, walki, zapisu, nagrody i powrotu; test jest częścią workflow Android przed eksportem APK.
+- To druga osobna lokacja. Pozostałe regiony nadal wymagają własnych map, a grafika bohaterów i fauna potrzebują dalszych pełnych animacji i docelowego dopracowania.
