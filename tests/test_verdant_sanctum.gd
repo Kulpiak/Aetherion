@@ -27,6 +27,7 @@ func _run_tests() -> void:
  _check(not game.in_crystal_sanctum, "the two instances remain mutually exclusive")
  _check(game.enemies.size() == 5, "sanctum creates four sentries and one unique guardian")
  _check(game.player_pos.is_equal_approx(GAME_SCRIPT.VERDANT_START), "entry restores the saved sanctum position")
+ _check(game.player_pos.distance_to(GAME_SCRIPT.VERDANT_EXIT) > 112.0, "entry is safely separated from the exit portal")
  _check(SANCTUM_TEXTURE != null and GUARDIAN_TEXTURE != null, "dedicated forest room and guardian SVG assets load")
  _check(str(game.enemies[4].get("spawn_id","")) == "verdant_guardian", "the Rootweave Guardian has a stable spawn ID")
 
