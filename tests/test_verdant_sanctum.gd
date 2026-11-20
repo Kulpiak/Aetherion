@@ -56,7 +56,7 @@ func _run_tests() -> void:
  game.player_pos = GAME_SCRIPT.VERDANT_RELIC
  var shards_before := int(game.inventory.get("Odłamek Eterium",0))
  var skins_before := int(game.inventory.get("Skóra bestii",0))
- var gold_before := game.gold
+ var gold_before: int = int(game.gold)
  game._location_interact()
  _check(game.verdant_relic_claimed, "the Heart of the Weave can be cleansed after the guardian falls")
  _check(int(game.inventory.get("Odłamek Eterium",0)) == shards_before+2, "relic grants two Etherium shards")

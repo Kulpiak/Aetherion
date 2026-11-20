@@ -62,7 +62,7 @@ func _test_legacy_v3_migration(game) -> void:
 			all_default_enemies_alive = false
 	_check(all_default_enemies_alive, "v3 save without enemy_states safely uses default encounters")
 
-func _test_v4_enemy_round_trip(game) -> void:
+func _test_v6_enemy_round_trip(game) -> void:
 	var first: Dictionary = game.enemies[0]
 	first["hp"] = 21.5
 	first["pos"] = Vector2(720.0, 680.0)
