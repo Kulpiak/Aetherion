@@ -17,11 +17,11 @@ func _run_tests() -> void:
 
  game._start_game("Terranie")
  _check(game.enemies.size() == 18, "starting a new game rebuilds the overworld encounter array")
- var overworld_return: Vector2 = game.player_pos
  var world_enemy: Dictionary = game.enemies[0]
  world_enemy["hp"] = 29.0
  game.enemies[0] = world_enemy
  game.player_pos = GAME_SCRIPT.VERDANT_ENTRY
+ var overworld_return: Vector2 = game.player_pos
  game._location_interact()
 
  _check(game.in_verdant_sanctum, "forest portal enters a separate Rootweave Sanctum")
