@@ -1275,9 +1275,9 @@ func _show_panel(panel_name: String) -> void:
   body.text = "Technika Eterium: koszt 20, fala obszarowa, cooldown 4 s.\\nPromień Eterium: koszt 28, zasięg 285, potrójne obrażenia, cooldown 6 s.\\nSzarża: koszt 16, zasięg 310, cooldown 5 s.\\nPrzebudzenie Rdzenia: 16 s."
  box.add_child(body)
  if panel_name == "Rzemiosło":
-  _button(box,"WYT WÓRZ OSTRZE ETERIUM",func(): _craft_item("Ostrze Eterium"),370,34)
-  _button(box,"WYT WÓRZ PANCERZ ŁOWCY",func(): _craft_item("Pancerz ŁOWCY"),370,34)
-  _button(box,"WYT WÓRZ MIKSTURĘ",func(): _craft_item("Mikstura HP"),370,34)
+  _button(box,"WYTWÓRZ OSTRZE ETERIUM",func(): _craft_item("Ostrze Eterium"),370,34)
+  _button(box,"WYTWÓRZ PANCERZ ŁOWCY",func(): _craft_item("Pancerz Łowcy"),370,34)
+  _button(box,"WYTWÓRZ MIKSTURĘ",func(): _craft_item("Mikstura HP"),370,34)
  _button(box,"ZAMKNIJ",func(): panel.hide(),370,38)
 
 func _show_item_detail(item_name: String) -> void:
@@ -1305,6 +1305,9 @@ func _show_item_detail(item_name: String) -> void:
  _button(box,"WRÓĆ DO PLECAKA",func(): _show_panel("Ekwipunek"),320,38)
 
 func _craft_item(item_name: String) -> void:
+ if item_name != "Mikstura HP" and not GEAR_STATS.has(item_name):
+  _say("Nieznana receptura.")
+  return
  if item_name != "Mikstura HP" and owned_gear.has(item_name):
   _say("Ten przedmiot już posiadasz.")
   return
@@ -1328,6 +1331,7 @@ func _craft_item(item_name: String) -> void:
   inventory["Odłamek Eterium"] -= 1
   inventory["Mikstura HP"] += 1
   _say("Wytworzono miksturę HP.")
+  _save_game(true)
   _show_panel("Rzemiosło")
   return
  if not owned_gear.has(item_name):
@@ -1349,6 +1353,7 @@ func _equip_gear(item_name: String) -> void:
  hp = minf(hp,max_hp)
  equipment[slot] = item_name
  _update_hud()
+ _save_game(true)
 
 func _serialize_enemy_states(source_enemies: Array = []) -> Array[Dictionary]:
  var states: Array[Dictionary] = []
