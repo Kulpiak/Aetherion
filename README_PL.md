@@ -88,3 +88,10 @@ Lokalny zapis v4 zachowuje dla każdego regionalnego punktu odrodzenia stan poko
 - Po pokonaniu Strażnika Splotu można oczyścić Serce Splotu: nagroda to 2 odłamki Eterium, 3 skóry bestii, 110 złota i 170 XP.
 - Lokalny zapis v6 zachowuje pozycję w sanktuarium, stan pięciu przeciwników, łupy, pokonanie bossa i odebranie reliktu. Migracja zapisów v1–v5 pozostaje obsługiwana.
 - GitHub Actions uruchamia osobny test Sanktuarium Korzeni przed eksportem Android APK.
+
+
+## Rzemiosło — poprawka receptur i trwałość
+- Poprawiono identyfikator receptury Pancerza Łowcy w przycisku warsztatu; wcześniej różnica wielkości liter mogła dodać błędną nazwę do plecaka zamiast wytworzyć wyposażenie.
+- Nieznane identyfikatory receptur są odrzucane, a ponowne wytwarzanie posiadanego wyposażenia nie zużywa materiałów.
+- Wytworzenie mikstury i założenie wykonanego wyposażenia zapisuje postęp od razu, bez czekania na 30-sekundowy autosave.
+- CI uruchamia osobny test receptur: koszty materiałów, bonusy statystyk, duplikaty, brak materiałów oraz zapis/odczyt wytworzonego wyposażenia.
