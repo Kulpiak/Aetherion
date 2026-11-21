@@ -107,6 +107,13 @@ jobs:
           godot --headless --path . --script res://tests/test_verdant_sanctum.gd 2>&1 | tee /tmp/godot-verdant-tests.log
           grep -q "AETHERION_VERDANT_TESTS: PASS" /tmp/godot-verdant-tests.log
 
+      - name: Run crafting recipe tests
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --script res://tests/test_crafting.gd 2>&1 | tee /tmp/godot-crafting-tests.log
+          grep -q "AETHERION_CRAFT_TESTS: PASS" /tmp/godot-crafting-tests.log
+
       - name: Verify Android launcher icons
         shell: bash
         run: |
