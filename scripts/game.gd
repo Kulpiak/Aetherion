@@ -49,9 +49,12 @@ const CRYSTAL_SANCTUM_TEXTURE: Texture2D = preload("res://assets/aetherion_cryst
 const CRYSTAL_GUARDIAN_TEXTURE: Texture2D = preload("res://assets/aetherion_crystal_guardian.svg")
 const VERDANT_SANCTUM_TEXTURE: Texture2D = preload("res://assets/aetherion_verdant_sanctum.svg")
 const VERDANT_GUARDIAN_TEXTURE: Texture2D = preload("res://assets/aetherion_rootwarden.svg")
+const FROST_SANCTUM_TEXTURE: Texture2D = preload("res://assets/aetherion_frost_sanctum.svg")
+const FROST_GUARDIAN_TEXTURE: Texture2D = preload("res://assets/aetherion_stormwarden.svg")
 const WORLD_SIZE := Vector2(1920, 1440)
 const CRYPT_SIZE := Vector2(1280, 800)
 const VERDANT_SIZE := Vector2(1280, 800)
+const FROST_SIZE := Vector2(1280, 800)
 const CRYPT_ENTRY := Vector2(1085, 465)
 const CRYPT_START := Vector2(640, 590)
 const CRYPT_EXIT := Vector2(640, 720)
@@ -60,6 +63,10 @@ const VERDANT_ENTRY := Vector2(540, 790)
 const VERDANT_START := Vector2(640, 700)
 const VERDANT_EXIT := Vector2(1120, 720)
 const VERDANT_RELIC := Vector2(640, 145)
+const FROST_ENTRY := Vector2(1650, 420)
+const FROST_START := Vector2(640, 690)
+const FROST_EXIT := Vector2(640, 730)
+const FROST_RELIC := Vector2(640, 145)
 const START_POS := Vector2(480, 380)
 const RUINS_POS := Vector2(1600, 720)
 const RACES := {
@@ -169,18 +176,24 @@ var ambient_particles: Array[Dictionary] = []
 var ambient_time := 0.0
 var in_crystal_sanctum := false
 var in_verdant_sanctum := false
+var in_frost_sanctum := false
 var overworld_player_pos := START_POS
 var verdant_player_pos := VERDANT_START
+var frost_player_pos := FROST_START
 var overworld_enemies: Array[Dictionary] = []
 var crypt_enemies: Array[Dictionary] = []
 var verdant_enemies: Array[Dictionary] = []
+var frost_enemies: Array[Dictionary] = []
 var overworld_loot_drops: Array[Dictionary] = []
 var crypt_loot_drops: Array[Dictionary] = []
 var verdant_loot_drops: Array[Dictionary] = []
+var frost_loot_drops: Array[Dictionary] = []
 var crypt_guardian_defeated := false
 var crypt_relic_claimed := false
 var verdant_guardian_defeated := false
 var verdant_relic_claimed := false
+var frost_guardian_defeated := false
+var frost_relic_claimed := false
 
 func _ready() -> void:
  rng.randomize()
@@ -254,13 +267,15 @@ func _create_crypt_enemies() -> Array[Dictionary]:
  return result
 
 func _is_in_instance() -> bool:
- return in_crystal_sanctum or in_verdant_sanctum
+ return in_crystal_sanctum or in_verdant_sanctum or in_frost_sanctum
 
 func _active_world_size() -> Vector2:
  if in_crystal_sanctum:
   return CRYPT_SIZE
  if in_verdant_sanctum:
   return VERDANT_SIZE
+ if in_frost_sanctum:
+  return FROST_SIZE
  return WORLD_SIZE
 
 func _active_spawn_position() -> Vector2:
@@ -268,6 +283,8 @@ func _active_spawn_position() -> Vector2:
   return CRYPT_START
  if in_verdant_sanctum:
   return VERDANT_START
+ if in_frost_sanctum:
+  return FROST_START
  return START_POS
 
 func _apply_camera_bounds() -> void:
@@ -288,6 +305,58 @@ func _create_verdant_enemies() -> Array[Dictionary]:
  result.append({"spawn_id":"verdant_03","name":"Mchowy Wartownik","pos":Vector2(930,500),"hp":188.0,"max_hp":188.0,"damage":22.0,"speed":39.0,"alive":true,"type":1,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":72,"gold_reward":24,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.62,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
  result.append({"spawn_id":"verdant_guardian","name":"Strażnik Splotu","pos":Vector2(640,385),"hp":760.0,"max_hp":760.0,"damage":28.0,"speed":36.0,"alive":true,"type":1,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":0,"gold_reward":0,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":1.12,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true,"is_boss":true,"is_verdant_boss":true})
  return result
+
+func _create_frost_enemies() -> Array[Dictionary]:
+ var bounds := Rect2(180.0, 150.0, 920.0, 500.0)
+ var result: Array[Dictionary] = []
+ result.append({"spawn_id":"frost_00","name":"Szronowy Raptor","pos":Vector2(340,300),"hp":172.0,"max_hp":172.0,"damage":22.0,"speed":72.0,"alive":true,"type":2,"region":"Korona Gór","spawn_bounds":bounds,"xp_reward":80,"gold_reward":24,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.58,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
+ result.append({"spawn_id":"frost_01","name":"Burzowy Odłamek","pos":Vector2(930,300),"hp":198.0,"max_hp":198.0,"damage":26.0,"speed":42.0,"alive":true,"type":3,"region":"Korona Gór","spawn_bounds":bounds,"xp_reward":92,"gold_reward":28,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.62,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
+ result.append({"spawn_id":"frost_02","name":"Szronowy Raptor","pos":Vector2(350,500),"hp":172.0,"max_hp":172.0,"damage":22.0,"speed":72.0,"alive":true,"type":2,"region":"Korona Gór","spawn_bounds":bounds,"xp_reward":80,"gold_reward":24,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.58,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
+ result.append({"spawn_id":"frost_03","name":"Burzowy Odłamek","pos":Vector2(930,500),"hp":198.0,"max_hp":198.0,"damage":26.0,"speed":42.0,"alive":true,"type":3,"region":"Korona Gór","spawn_bounds":bounds,"xp_reward":92,"gold_reward":28,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.62,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
+ result.append({"spawn_id":"frost_guardian","name":"Władca Burzowego Kryształu","pos":Vector2(640,390),"hp":840.0,"max_hp":840.0,"damage":34.0,"speed":38.0,"alive":true,"type":3,"region":"Korona Gór","spawn_bounds":bounds,"xp_reward":0,"gold_reward":0,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":1.18,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true,"is_boss":true,"is_frost_boss":true})
+ return result
+
+func _enter_frost_sanctum() -> void:
+ if _is_in_instance():
+  return
+ overworld_player_pos = player_pos
+ overworld_enemies = enemies
+ overworld_loot_drops = loot_drops
+ if frost_enemies.is_empty():
+  frost_enemies = _create_frost_enemies()
+ enemies = frost_enemies
+ loot_drops = frost_loot_drops
+ in_frost_sanctum = true
+ player_pos = frost_player_pos
+ held = {"left":false,"right":false,"up":false,"down":false}
+ current_region = ""
+ _apply_camera_bounds()
+ if is_instance_valid(camera):
+  camera.position = player_pos
+ _update_region(false)
+ _say("SANKTUARIUM BURZOWEGO KRYSZTAŁU • Odszukaj Władcę i uwolnij serce lodowej nawałnicy.")
+ _update_hud()
+ _save_game(true)
+
+func _leave_frost_sanctum() -> void:
+ if not in_frost_sanctum:
+  return
+ frost_enemies = enemies
+ frost_loot_drops = loot_drops
+ frost_player_pos = player_pos
+ enemies = overworld_enemies
+ loot_drops = overworld_loot_drops
+ in_frost_sanctum = false
+ player_pos = overworld_player_pos
+ held = {"left":false,"right":false,"up":false,"down":false}
+ current_region = ""
+ _apply_camera_bounds()
+ if is_instance_valid(camera):
+  camera.position = player_pos
+ _update_region(false)
+ _say("Opuszczono Sanktuarium Burzowego Kryształu.")
+ _update_hud()
+ _save_game(true)
 
 func _enter_verdant_sanctum() -> void:
  if _is_in_instance():
@@ -677,20 +746,26 @@ func _show_race_select() -> void:
 func _start_game(selected_race: String) -> void:
  in_crystal_sanctum = false
  in_verdant_sanctum = false
+ in_frost_sanctum = false
  _spawn_enemies()
  overworld_enemies = []
  crypt_enemies = _create_crypt_enemies()
  verdant_enemies = _create_verdant_enemies()
+ frost_enemies = _create_frost_enemies()
  overworld_loot_drops = []
  crypt_loot_drops = []
  verdant_loot_drops = []
+ frost_loot_drops = []
  loot_drops = []
  crypt_guardian_defeated = false
  crypt_relic_claimed = false
  verdant_guardian_defeated = false
  verdant_relic_claimed = false
+ frost_guardian_defeated = false
+ frost_relic_claimed = false
  overworld_player_pos = START_POS
  verdant_player_pos = VERDANT_START
+ frost_player_pos = FROST_START
  player_pos = START_POS
  _apply_camera_bounds()
  race = selected_race
