@@ -1981,6 +1981,7 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var p: Vector2 = enemy["pos"]
  var kind := int(enemy["type"])
  var is_boss := bool(enemy.get("is_boss",false))
+ var is_frost_boss := bool(enemy.get("is_frost_boss",false))
  var sprite_size := 126.0 if is_boss else 80.0
  var now := float(Time.get_ticks_msec()) / 1000.0
  var distance_to_player := player_pos.distance_to(p)
@@ -2004,27 +2005,29 @@ func _draw_enemy(enemy: Dictionary) -> void:
  draw_ellipse_shadow(p+Vector2(0,13),sprite_size*0.48*(1.0+absf(stride)*0.025),14.0 if is_boss else 8.0)
  if windup_left > 0.0:
   var glyph_rotation := now * 0.32
-  var warning_tint := Color("#82e4ff") if bool(enemy.get("is_frost_boss",false)) else (Color("#a8e99c") if bool(enemy.get("is_verdant_boss",false)) else Color(1.0,0.32,0.2,0.55))
+  var warning_tint := Color("#82e4ff") if is_frost_boss else (Color("#a8e99c") if bool(enemy.get("is_verdant_boss",false)) else Color(1.0,0.32,0.2,0.55))
   _draw_eterium_glyph(p,0,290.0 if is_boss else 118.0,glyph_rotation,warning_tint)
   var warning_alpha := 0.42+warning_progress*0.48
   if is_boss:
-   draw_circle(p,112.0,Color(1.0,0.18,0.15,0.035+warning_progress*0.045))
-   draw_arc(p,112.0,0.0,TAU,56,Color(1.0,0.28,0.2,warning_alpha),4.5,true)
+   var warning_circle := Color("#82e4ff") if is_frost_boss else Color(1.0,0.28,0.2,1.0)
+   draw_circle(p,112.0,Color(warning_circle.r,warning_circle.g,warning_circle.b,0.035+warning_progress*0.045))
+   draw_arc(p,112.0,0.0,TAU,56,Color(warning_circle.r,warning_circle.g,warning_circle.b,warning_alpha),4.5,true)
   else:
    var warning_angle := enemy_facing.angle()
    draw_arc(p,43.0,warning_angle-0.82,warning_angle+0.82,24,Color(1.0,0.32,0.2,warning_alpha),4.0,true)
    draw_line(p,p+enemy_facing*48.0,Color(1.0,0.4,0.25,warning_alpha),3.0,true)
  if is_boss:
   var boss_pulse := 0.72 + sin(now/0.19)*0.16
-  var boss_ring := Color("#82dfff") if bool(enemy.get("is_frost_boss",false)) else (Color("#9cdd8e") if bool(enemy.get("is_verdant_boss",false)) else Color("#ef7165"))
+  var boss_ring := Color("#82dfff") if is_frost_boss else (Color("#9cdd8e") if bool(enemy.get("is_verdant_boss",false)) else Color("#ef7165"))
   draw_circle(p,76.0,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.09*boss_pulse))
   draw_arc(p,72.0,now*0.12,now*0.12+TAU,48,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.55+boss_pulse*0.12),4.0,true)
  if attacking:
   var attack_progress := 1.0 - float(enemy.get("attack_anim",0.0))/0.34
-  draw_arc(p,37.0 if not is_boss else 66.0,0.0,TAU,28,Color(1.0,0.28,0.22,0.72),3.0,true)
+  var attack_tint := Color("#82e4ff") if is_frost_boss else Color(1.0,0.28,0.22,1.0)
+  draw_arc(p,37.0 if not is_boss else 66.0,0.0,TAU,28,Color(attack_tint.r,attack_tint.g,attack_tint.b,0.72),3.0,true)
   if is_boss:
    var shock_radius := 42.0 + attack_progress*54.0
-   draw_arc(p,shock_radius,0.0,TAU,40,Color(1.0,0.42,0.28,1.0-attack_progress),5.0,true)
+   draw_arc(p,shock_radius,0.0,TAU,40,Color(attack_tint.r,attack_tint.g,attack_tint.b,1.0-attack_progress),5.0,true)
  # Regional creatures keep their original silhouette, but now turn toward the target,
  # lean into vertical movement, and use a per-creature gait instead of a global timer.
  var flip_x := -1.0 if enemy_facing.x < -0.12 else 1.0
@@ -2060,7 +2063,8 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var bar_width := 100.0 if is_boss else 38.0
  var bar_y := p.y-sprite_size*0.53-10.0
  draw_rect(Rect2(p.x-bar_width*0.5,bar_y,bar_width,6 if is_boss else 5),Color("#251f28"))
- draw_rect(Rect2(p.x-bar_width*0.5+1,bar_y+1,(bar_width-2)*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),4 if is_boss else 3),Color("#e34d5c") if is_boss else Color("#d94d52"))
+ var hp_bar_color := Color("#57cce8") if is_frost_boss else (Color("#e34d5c") if is_boss else Color("#d94d52"))
+ draw_rect(Rect2(p.x-bar_width*0.5+1,bar_y+1,(bar_width-2)*maxf(0.0,float(enemy["hp"])/float(enemy["max_hp"])),4 if is_boss else 3),hp_bar_color)
  draw_string(ThemeDB.fallback_font,p+Vector2(-bar_width*0.5,bar_y-7),str(enemy["name"]),HORIZONTAL_ALIGNMENT_LEFT,-1,15 if is_boss else 10,Color("#ffe0d5") if is_boss else Color("#f4ead2"))
 
 func draw_ellipse_shadow(center: Vector2, width: float, height: float) -> void:
