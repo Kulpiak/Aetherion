@@ -40,6 +40,11 @@ func _run_tests() -> void:
  game.player_pos = Vector2(720,610)
  game.loot_drops.append({"item":"Odłamek Eterium","pos":Vector2(710,620),"life":42.0})
  game._save_game(true)
+ var saved_file := FileAccess.open("user://aetherion_save.json",FileAccess.READ)
+ var saved_data = JSON.parse_string(saved_file.get_as_text()) if saved_file != null else {}
+ if saved_file != null:
+  saved_file.close()
+ _check(typeof(saved_data) == TYPE_DICTIONARY and int(saved_data.get("save_version",0)) == 7, "new saves are written with schema v7")
  guardian["hp"] = 1.0
  game.enemies[guardian_index] = guardian
  game._load_game()
