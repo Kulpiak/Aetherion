@@ -1806,6 +1806,8 @@ func _draw_world() -> void:
   draw_texture_rect(CRYSTAL_SANCTUM_TEXTURE,Rect2(Vector2.ZERO,CRYPT_SIZE),false)
  elif in_verdant_sanctum:
   draw_texture_rect(VERDANT_SANCTUM_TEXTURE,Rect2(Vector2.ZERO,VERDANT_SIZE),false)
+ elif in_frost_sanctum:
+  draw_texture_rect(FROST_SANCTUM_TEXTURE,Rect2(Vector2.ZERO,FROST_SIZE),false)
  else:
   draw_texture_rect(WORLD_TEXTURE,Rect2(Vector2.ZERO,WORLD_SIZE),false)
 
@@ -1816,6 +1818,9 @@ func _draw_landmarks() -> void:
   return
  if in_verdant_sanctum:
   _draw_verdant_landmarks(now)
+  return
+ if in_frost_sanctum:
+  _draw_frost_landmarks(now)
   return
  var pulse := 0.7 + sin(now * 2.4) * 0.2
  _draw_region_landmarks(now)
@@ -1839,6 +1844,11 @@ func _draw_landmarks() -> void:
  draw_arc(VERDANT_ENTRY,35.0,-now*0.3,-now*0.3+TAU,48,Color("#9cdda0"),3.5,true)
  draw_arc(VERDANT_ENTRY,25.0,now*0.52,now*0.52+PI*1.55,36,Color("#d5f4b2"),2.0,true)
  draw_string(font,VERDANT_ENTRY+Vector2(-82,58),"SANKTUARIUM KORZENI",HORIZONTAL_ALIGNMENT_CENTER,-1,12,Color("#c7edb0"))
+ var frost_pulse := 0.72 + sin(now*2.5+1.2)*0.2
+ draw_circle(FROST_ENTRY,42.0,Color(0.35,0.82,1.0,0.09*frost_pulse))
+ draw_arc(FROST_ENTRY,38.0,now*0.38,now*0.38+TAU,48,Color("#8be7ff"),3.8,true)
+ draw_arc(FROST_ENTRY,27.0,-now*0.54,-now*0.54+PI*1.55,36,Color("#d6fbff"),2.0,true)
+ draw_string(font,FROST_ENTRY+Vector2(-108,66),"SANKTUARIUM BURZ",HORIZONTAL_ALIGNMENT_CENTER,-1,12,Color("#bcefff"))
  var marker := RUINS_POS + Vector2(0,-190.0+sin(now*4.0)*8.0)
  if quest >= 3 and quest <= 5:
   draw_line(player_pos,marker,Color(0.36,0.86,1.0,0.18),2.0,true)
@@ -1893,6 +1903,33 @@ func _draw_verdant_landmarks(now: float) -> void:
  draw_arc(VERDANT_EXIT,43.0,now*0.34,now*0.34+TAU,48,Color(0.57,0.91,0.56,0.9),4.0,true)
  draw_arc(VERDANT_EXIT,30.0,-now*0.48,-now*0.48+PI*1.6,36,Color(0.83,0.97,0.7,0.74),2.0,true)
  draw_string(ThemeDB.fallback_font,VERDANT_EXIT+Vector2(-58,66),"POWRÓT",HORIZONTAL_ALIGNMENT_CENTER,-1,13,Color("#d2efbd"))
+
+func _draw_frost_landmarks(now: float) -> void:
+ var pulse := 0.74 + sin(now*2.4)*0.18
+ draw_ellipse_shadow(FROST_RELIC+Vector2(0,70),190.0,34.0)
+ draw_circle(FROST_RELIC,104.0,Color(0.28,0.78,1.0,0.1*pulse))
+ draw_arc(FROST_RELIC,86.0,now*0.2,now*0.2+TAU,64,Color("#8be8ff"),3.5,true)
+ draw_arc(FROST_RELIC,62.0,-now*0.31,-now*0.31+PI*1.55,48,Color("#e0fcff"),2.2,true)
+ draw_colored_polygon(PackedVector2Array([
+  FROST_RELIC+Vector2(0,-70),FROST_RELIC+Vector2(28,-25),FROST_RELIC+Vector2(22,32),
+  FROST_RELIC+Vector2(0,62),FROST_RELIC+Vector2(-24,34),FROST_RELIC+Vector2(-30,-24)
+ ]),Color("#7ce7f8") if frost_guardian_defeated else Color("#4b7898"))
+ draw_colored_polygon(PackedVector2Array([
+  FROST_RELIC+Vector2(0,-70),FROST_RELIC+Vector2(0,48),FROST_RELIC+Vector2(-24,34),FROST_RELIC+Vector2(-30,-24)
+ ]),Color(0.84,0.98,1.0,0.82))
+ draw_line(FROST_RELIC+Vector2(0,-50),FROST_RELIC+Vector2(0,48),Color("#f0ffff"),2.2,true)
+ draw_string(ThemeDB.fallback_font,FROST_RELIC+Vector2(-112,-88),"SERCE BURZOWEGO KRYSZTAŁU",HORIZONTAL_ALIGNMENT_CENTER,-1,15,Color("#d4f8ff"))
+ for shard_index in range(8):
+  var angle := TAU*float(shard_index)/8.0-now*0.1
+  var shard_start := FROST_RELIC+Vector2.RIGHT.rotated(angle)*88.0
+  var shard_end := FROST_RELIC+Vector2.RIGHT.rotated(angle+0.08)*126.0
+  draw_line(shard_start,shard_end,Color(0.54,0.85,1.0,0.72),5.0,true)
+  draw_line(shard_start,shard_end,Color(0.9,0.99,1.0,0.75),1.5,true)
+ var exit_pulse := 0.7 + sin(now*3.1+0.8)*0.18
+ draw_circle(FROST_EXIT,54.0,Color(0.32,0.8,1.0,0.1*exit_pulse))
+ draw_arc(FROST_EXIT,44.0,now*0.38,now*0.38+TAU,48,Color("#8be7ff"),4.0,true)
+ draw_arc(FROST_EXIT,31.0,-now*0.52,-now*0.52+PI*1.6,36,Color("#e0fbff"),2.0,true)
+ draw_string(ThemeDB.fallback_font,FROST_EXIT+Vector2(-58,66),"POWRÓT",HORIZONTAL_ALIGNMENT_CENTER,-1,13,Color("#c8f4ff"))
 
 func _draw_region_landmarks(now: float) -> void:
  var positions := [
@@ -1967,7 +2004,7 @@ func _draw_enemy(enemy: Dictionary) -> void:
  draw_ellipse_shadow(p+Vector2(0,13),sprite_size*0.48*(1.0+absf(stride)*0.025),14.0 if is_boss else 8.0)
  if windup_left > 0.0:
   var glyph_rotation := now * 0.32
-  var warning_tint := Color("#a8e99c") if bool(enemy.get("is_verdant_boss",false)) else Color(1.0,0.32,0.2,0.55)
+  var warning_tint := Color("#82e4ff") if bool(enemy.get("is_frost_boss",false)) else (Color("#a8e99c") if bool(enemy.get("is_verdant_boss",false)) else Color(1.0,0.32,0.2,0.55))
   _draw_eterium_glyph(p,0,290.0 if is_boss else 118.0,glyph_rotation,warning_tint)
   var warning_alpha := 0.42+warning_progress*0.48
   if is_boss:
@@ -1979,7 +2016,7 @@ func _draw_enemy(enemy: Dictionary) -> void:
    draw_line(p,p+enemy_facing*48.0,Color(1.0,0.4,0.25,warning_alpha),3.0,true)
  if is_boss:
   var boss_pulse := 0.72 + sin(now/0.19)*0.16
-  var boss_ring := Color("#9cdd8e") if bool(enemy.get("is_verdant_boss",false)) else Color("#ef7165")
+  var boss_ring := Color("#82dfff") if bool(enemy.get("is_frost_boss",false)) else (Color("#9cdd8e") if bool(enemy.get("is_verdant_boss",false)) else Color("#ef7165"))
   draw_circle(p,76.0,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.09*boss_pulse))
   draw_arc(p,72.0,now*0.12,now*0.12+TAU,48,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.55+boss_pulse*0.12),4.0,true)
  if attacking:
@@ -2001,6 +2038,8 @@ func _draw_enemy(enemy: Dictionary) -> void:
   draw_texture_rect(CRYSTAL_GUARDIAN_TEXTURE,sprite_rect,false,body_color)
  elif bool(enemy.get("is_verdant_boss",false)):
   draw_texture_rect(VERDANT_GUARDIAN_TEXTURE,sprite_rect,false,body_color)
+ elif bool(enemy.get("is_frost_boss",false)):
+  draw_texture_rect(FROST_GUARDIAN_TEXTURE,sprite_rect,false,body_color)
  elif is_boss:
   draw_texture_rect_region(SPRITE_ATLAS,sprite_rect,Rect2((5+kind)*128,frame*128,128,128),body_color,false)
  else:
