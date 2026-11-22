@@ -487,13 +487,38 @@ func _location_interact() -> void:
    return
   _say("Podejdź do portalu wyjściowego albo do Serca Splotu.")
   return
+ if in_frost_sanctum:
+  if player_pos.distance_to(FROST_EXIT) <= 112.0:
+   _leave_frost_sanctum()
+   return
+  if player_pos.distance_to(FROST_RELIC) <= 112.0:
+   if not frost_guardian_defeated:
+    _say("Serce burzowego kryształu jest zamrożone. Najpierw pokonaj Władcę.")
+    return
+   if frost_relic_claimed:
+    _say("Serce Burzowego Kryształu zostało już uwolnione.")
+    return
+   frost_relic_claimed = true
+   inventory["Odłamek Eterium"] = int(inventory.get("Odłamek Eterium",0)) + 3
+   inventory["Skóra bestii"] = int(inventory.get("Skóra bestii",0)) + 2
+   gold += 130
+   _grant_xp(210)
+   _say("SERCE BURZOWEGO KRYSZTAŁU UWOLNIONE! +3 odłamki, +2 skóry, +130 złota, +210 XP.")
+   _update_hud()
+   _save_game(true)
+   return
+  _say("Podejdź do portalu wyjściowego albo do Serca Burzowego Kryształu.")
+  return
+ if player_pos.distance_to(FROST_ENTRY) <= 120.0:
+  _enter_frost_sanctum()
+  return
  if player_pos.distance_to(VERDANT_ENTRY) <= 120.0:
   _enter_verdant_sanctum()
   return
  if player_pos.distance_to(CRYPT_ENTRY) <= 120.0:
   _enter_crystal_sanctum()
   return
- _say("Portale znajdują się w Zielonych Ostępach i przy wejściu do Krypty Kryształów.")
+ _say("Portale znajdują się w Zielonych Ostępach, Koronie Gór i przy wejściu do Krypty Kryształów.")
 
 func _serialize_loot_drops(source_drops: Array) -> Array[Dictionary]:
  var saved: Array[Dictionary] = []
@@ -979,11 +1004,13 @@ func _update_location_label() -> void:
   region_label.text = "LOKACJA • SANKTUARIUM GEODY"
  elif in_verdant_sanctum:
   region_label.text = "LOKACJA • SANKTUARIUM KORZENI"
+ elif in_frost_sanctum:
+  region_label.text = "LOKACJA • SANKTUARIUM BURZOWEGO KRYSZTAŁU"
  else:
   region_label.text = "REGION • " + current_region.to_upper()
 
 func _update_region(award_discovery: bool = true) -> void:
- var next_region := "Krypta Kryształów" if in_crystal_sanctum else ("Zielone Ostępy" if in_verdant_sanctum else _region_for_position(player_pos))
+ var next_region := "Krypta Kryształów" if in_crystal_sanctum else ("Zielone Ostępy" if in_verdant_sanctum else ("Korona Gór" if in_frost_sanctum else _region_for_position(player_pos)))
  if next_region == current_region:
   _update_location_label()
   return
@@ -1181,6 +1208,11 @@ func _kill_enemy(index: int) -> void:
   gold += 150
   _grant_xp(220)
   _say("STRAŻNIK SPLOTU POKONANY! Serce pradawnego drzewa odzyskuje blask.")
+ elif bool(enemy.get("is_frost_boss",false)):
+  frost_guardian_defeated = true
+  gold += 180
+  _grant_xp(260)
+  _say("WŁADCA BURZOWEGO KRYSZTAŁU POKONANY! Lodowe serce nawałnicy jest odsłonięte.")
  elif bool(enemy.get("is_boss",false)):
   boss_defeated = true
   quest = 6
@@ -1189,7 +1221,7 @@ func _kill_enemy(index: int) -> void:
   _say("STRAŻNIK RDZENIA POKONANY! +250 złota, +300 XP.")
  else:
   _say("Pokonano %s! +%d XP, +%d złota." % [enemy["name"],xp_reward,gold_reward])
- if quest == 5 and bool(enemy.get("is_boss",false)) and not is_crypt_boss and not is_verdant_boss:
+ if quest == 5 and bool(enemy.get("is_boss",false)) and not is_crypt_boss and not is_verdant_boss and not bool(enemy.get("is_frost_boss",false)):
   quest = 6
  if quest == 1 and kills >= 5:
   quest = 2
@@ -1283,7 +1315,7 @@ func _show_panel(panel_name: String) -> void:
  _button(header, "X", func(): panel.hide(), 38, 34)
  if panel_name == "Mapa":
   var map_view := TextureRect.new()
-  map_view.texture = CRYSTAL_SANCTUM_TEXTURE if in_crystal_sanctum else (VERDANT_SANCTUM_TEXTURE if in_verdant_sanctum else WORLD_TEXTURE)
+  map_view.texture = CRYSTAL_SANCTUM_TEXTURE if in_crystal_sanctum else (VERDANT_SANCTUM_TEXTURE if in_verdant_sanctum else (FROST_SANCTUM_TEXTURE if in_frost_sanctum else WORLD_TEXTURE))
   map_view.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
   map_view.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
   map_view.custom_minimum_size = Vector2(610, 365)
@@ -1342,10 +1374,10 @@ func _show_panel(panel_name: String) -> void:
   var discovered_text := ""
   for region_name in REGION_NAMES:
    discovered_text += ("✓ " if discovered_regions.has(region_name) else "· ") + region_name + "   "
-  var location_text := "Sanktuarium Geody — osobna lokacja" if in_crystal_sanctum else ("Sanktuarium Korzeni — osobna lokacja" if in_verdant_sanctum else "Świat otwarty")
+  var location_text := "Sanktuarium Geody — osobna lokacja" if in_crystal_sanctum else ("Sanktuarium Korzeni — osobna lokacja" if in_verdant_sanctum else ("Sanktuarium Burzowego Kryształu — osobna lokacja" if in_frost_sanctum else "Świat otwarty"))
   body.text = "%s\\n%s\\nAktualny region: %s\\nOdkryte regiony: %d/%d\\n%s\\nPozycja: %d, %d" % [objective_text,location_text,current_region,discovered_regions.size(),REGION_NAMES.size(),discovered_text,int(player_pos.x),int(player_pos.y)]
  elif panel_name == "Kodeks":
-  body.text = "AETHERION — KRONIKI ETERIUM\n\nPIĘĆ RODÓW\nTerranie — wszechstronni i wytrwali.\nVarkari — silni wojownicy o niezłomnej woli.\nElarianie — urodzeni przewodnicy energii.\nSylvari — strażnicy dzikiej równowagi.\nNoctari — badacze mocy ukrytej w cieniu.\n\nFAUNA REGIONÓW\nZielone Ostępy: Mchowy Kieł, Pnączowy Strażnik.\nKorona Gór: Szronowy Raptor, Burzowy Odłamek.\nKrypta Kryształów: Kryształowy Pająk, Eterowy Skryba.\nZłote Pustkowia: Piaskowy Szperacz, Strażnik Wydm.\nWschodnie Ruiny: Pęknięty Legionista, Runiczny Tropiciel.\nPopielne Ziemie: Popielny Łupieżca, Żarowy Golem.\nSzlak Eterium: Eterowy Widmowiec, Strażnik Szczeliny.\n\nOSOBNE LOKACJE\nSanktuarium Geody: Matriarcha Geody strzeże Geodowego Rdzenia.\nSanktuarium Korzeni: Strażnik Splotu broni serca pradawnego drzewa.\n\nETERIUM\nEterium jest pierwotną siłą przenikającą świat. Wzmacnia techniki, pozwala przekraczać granice ciała i budzi Przebudzenie Rdzenia — lecz jego moc wymaga dyscypliny."
+  body.text = "AETHERION — KRONIKI ETERIUM\n\nPIĘĆ RODÓW\nTerranie — wszechstronni i wytrwali.\nVarkari — silni wojownicy o niezłomnej woli.\nElarianie — urodzeni przewodnicy energii.\nSylvari — strażnicy dzikiej równowagi.\nNoctari — badacze mocy ukrytej w cieniu.\n\nFAUNA REGIONÓW\nZielone Ostępy: Mchowy Kieł, Pnączowy Strażnik.\nKorona Gór: Szronowy Raptor, Burzowy Odłamek.\nKrypta Kryształów: Kryształowy Pająk, Eterowy Skryba.\nZłote Pustkowia: Piaskowy Szperacz, Strażnik Wydm.\nWschodnie Ruiny: Pęknięty Legionista, Runiczny Tropiciel.\nPopielne Ziemie: Popielny Łupieżca, Żarowy Golem.\nSzlak Eterium: Eterowy Widmowiec, Strażnik Szczeliny.\n\nOSOBNE LOKACJE\nSanktuarium Geody: Matriarcha Geody strzeże Geodowego Rdzenia.\nSanktuarium Korzeni: Strażnik Splotu broni serca pradawnego drzewa.\nSanktuarium Burzowego Kryształu: Władca Burzowego Kryształu strzeże lodowego serca nawałnicy.\n\nETERIUM\nEterium jest pierwotną siłą przenikającą świat. Wzmacnia techniki, pozwala przekraczać granice ciała i budzi Przebudzenie Rdzenia — lecz jego moc wymaga dyscypliny."
  else:
   body.text = "Technika Eterium: koszt 20, fala obszarowa, cooldown 4 s.\\nPromień Eterium: koszt 28, zasięg 285, potrójne obrażenia, cooldown 6 s.\\nSzarża: koszt 16, zasięg 310, cooldown 5 s.\\nPrzebudzenie Rdzenia: 16 s."
  box.add_child(body)
@@ -1434,7 +1466,7 @@ func _serialize_enemy_states(source_enemies: Array = []) -> Array[Dictionary]:
  var states: Array[Dictionary] = []
  var selected_enemies: Array = enemies if source_enemies.is_empty() else source_enemies
  for enemy in selected_enemies:
-  if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)) and not bool(enemy.get("is_verdant_boss",false)):
+  if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)) and not bool(enemy.get("is_verdant_boss",false)) and not bool(enemy.get("is_frost_boss",false)):
    continue
   var enemy_pos: Vector2 = enemy["pos"]
   states.append({
@@ -1458,7 +1490,7 @@ func _restore_enemy_states(saved_states, bounds_size: Vector2 = WORLD_SIZE) -> v
    states_by_id[spawn_id] = saved_state
  for index in range(enemies.size()):
   var enemy: Dictionary = enemies[index]
-  if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)) and not bool(enemy.get("is_verdant_boss",false)):
+  if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)) and not bool(enemy.get("is_verdant_boss",false)) and not bool(enemy.get("is_frost_boss",false)):
    continue
   var spawn_id := str(enemy.get("spawn_id",""))
   if not states_by_id.has(spawn_id):
@@ -1487,33 +1519,42 @@ func _save_game(silent: bool=false) -> void:
   return
  if in_verdant_sanctum:
   verdant_player_pos = player_pos
+ if in_frost_sanctum:
+  frost_player_pos = player_pos
  var in_instance := _is_in_instance()
  var world_enemy_source: Array[Dictionary] = overworld_enemies if in_instance else enemies
  var crypt_enemy_source: Array[Dictionary] = enemies if in_crystal_sanctum else crypt_enemies
  var verdant_enemy_source: Array[Dictionary] = enemies if in_verdant_sanctum else verdant_enemies
+ var frost_enemy_source: Array[Dictionary] = enemies if in_frost_sanctum else frost_enemies
  var world_loot_source: Array[Dictionary] = overworld_loot_drops if in_instance else loot_drops
  var crypt_loot_source: Array[Dictionary] = loot_drops if in_crystal_sanctum else crypt_loot_drops
  var verdant_loot_source: Array[Dictionary] = loot_drops if in_verdant_sanctum else verdant_loot_drops
+ var frost_loot_source: Array[Dictionary] = loot_drops if in_frost_sanctum else frost_loot_drops
  var boss_state: Dictionary = {}
  for enemy in world_enemy_source:
-  if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)):
+  if bool(enemy.get("is_boss",false)) and not bool(enemy.get("is_crypt_boss",false)) and not bool(enemy.get("is_verdant_boss",false)) and not bool(enemy.get("is_frost_boss",false)):
    var boss_pos: Vector2 = enemy["pos"]
    boss_state = {"name":str(enemy["name"]),"pos":[boss_pos.x,boss_pos.y],"hp":float(enemy["hp"]),"max_hp":float(enemy["max_hp"]),"damage":float(enemy["damage"]),"speed":float(enemy["speed"])}
    break
  var saved_overworld_pos: Vector2 = overworld_player_pos if in_instance else player_pos
  var saved_verdant_pos: Vector2 = player_pos if in_verdant_sanctum else verdant_player_pos
+ var saved_frost_pos: Vector2 = player_pos if in_frost_sanctum else frost_player_pos
  var data := {
-  "save_version":6,
+  "save_version":7,
   "race":race,
   "pos":[player_pos.x,player_pos.y],
   "overworld_pos":[saved_overworld_pos.x,saved_overworld_pos.y],
   "verdant_pos":[saved_verdant_pos.x,saved_verdant_pos.y],
+  "frost_pos":[saved_frost_pos.x,saved_frost_pos.y],
   "in_crystal_sanctum":in_crystal_sanctum,
   "in_verdant_sanctum":in_verdant_sanctum,
+  "in_frost_sanctum":in_frost_sanctum,
   "crypt_guardian_defeated":crypt_guardian_defeated,
   "crypt_relic_claimed":crypt_relic_claimed,
   "verdant_guardian_defeated":verdant_guardian_defeated,
   "verdant_relic_claimed":verdant_relic_claimed,
+  "frost_guardian_defeated":frost_guardian_defeated,
+  "frost_relic_claimed":frost_relic_claimed,
   "hp":hp,
   "ether":ether,
   "level":level,
@@ -1531,11 +1572,13 @@ func _save_game(silent: bool=false) -> void:
   "loot_drops":_serialize_loot_drops(world_loot_source),
   "crypt_loot_drops":_serialize_loot_drops(crypt_loot_source),
   "verdant_loot_drops":_serialize_loot_drops(verdant_loot_source),
+  "frost_loot_drops":_serialize_loot_drops(frost_loot_source),
   "boss_state":boss_state,
   "discovered_regions":discovered_regions,
   "enemy_states":_serialize_enemy_states(world_enemy_source),
   "crypt_enemy_states":_serialize_enemy_states(crypt_enemy_source),
-  "verdant_enemy_states":_serialize_enemy_states(verdant_enemy_source)
+  "verdant_enemy_states":_serialize_enemy_states(verdant_enemy_source),
+  "frost_enemy_states":_serialize_enemy_states(frost_enemy_source)
  }
  var file := FileAccess.open(SAVE_PATH,FileAccess.WRITE)
  if file:
@@ -1558,7 +1601,7 @@ func _load_game() -> void:
   _say("Uszkodzony zapis.")
   return
  var save_version := int(data.get("save_version",1))
- if save_version < 1 or save_version > 6:
+ if save_version < 1 or save_version > 7:
   _say("Zapis pochodzi z nieobsługiwanej wersji gry.")
   return
  _spawn_enemies()
@@ -1572,10 +1615,13 @@ func _load_game() -> void:
  quest = clampi(int(data.get("quest",0)),0,6)
  in_crystal_sanctum = bool(data.get("in_crystal_sanctum",false))
  in_verdant_sanctum = bool(data.get("in_verdant_sanctum",false)) and not in_crystal_sanctum
+ in_frost_sanctum = bool(data.get("in_frost_sanctum",false)) and not in_crystal_sanctum and not in_verdant_sanctum
  crypt_guardian_defeated = bool(data.get("crypt_guardian_defeated",false))
  crypt_relic_claimed = bool(data.get("crypt_relic_claimed",false))
  verdant_guardian_defeated = bool(data.get("verdant_guardian_defeated",false))
  verdant_relic_claimed = bool(data.get("verdant_relic_claimed",false))
+ frost_guardian_defeated = bool(data.get("frost_guardian_defeated",false))
+ frost_relic_claimed = bool(data.get("frost_relic_claimed",false))
  discovered_regions.clear()
  var saved_regions = data.get("discovered_regions",[])
  if typeof(saved_regions) == TYPE_ARRAY:
@@ -1587,10 +1633,13 @@ func _load_game() -> void:
   discovered_regions.append("Kamienny Krąg")
  overworld_player_pos = _parse_saved_position(data.get("overworld_pos",data.get("pos",[])),WORLD_SIZE,START_POS)
  verdant_player_pos = _parse_saved_position(data.get("verdant_pos",[]),VERDANT_SIZE,VERDANT_START)
+ frost_player_pos = _parse_saved_position(data.get("frost_pos",[]),FROST_SIZE,FROST_START)
  var active_size := _active_world_size()
  player_pos = _parse_saved_position(data.get("pos",[]),active_size,_active_spawn_position())
  if in_verdant_sanctum:
   verdant_player_pos = player_pos
+ if in_frost_sanctum:
+  frost_player_pos = player_pos
  inventory = {"Mikstura HP":3,"Odłamek Eterium":0,"Skóra bestii":0}
  var saved_inventory = data.get("inventory",{})
  if typeof(saved_inventory) == TYPE_DICTIONARY:
@@ -1636,6 +1685,7 @@ func _load_game() -> void:
  var restored_world_loot := _deserialize_loot_drops(data.get("loot_drops",[]),WORLD_SIZE)
  var restored_crypt_loot := _deserialize_loot_drops(data.get("crypt_loot_drops",[]),CRYPT_SIZE)
  var restored_verdant_loot := _deserialize_loot_drops(data.get("verdant_loot_drops",[]),VERDANT_SIZE)
+ var restored_frost_loot := _deserialize_loot_drops(data.get("frost_loot_drops",[]),FROST_SIZE)
  _restore_enemy_states(data.get("enemy_states",[]),WORLD_SIZE)
  if boss_spawned and not boss_defeated:
   var saved_boss = data.get("boss_state",{})
@@ -1658,18 +1708,26 @@ func _load_game() -> void:
  enemies = _create_verdant_enemies()
  _restore_enemy_states(data.get("verdant_enemy_states",[]),VERDANT_SIZE)
  var restored_verdant_enemies: Array[Dictionary] = enemies
+ enemies = _create_frost_enemies()
+ _restore_enemy_states(data.get("frost_enemy_states",[]),FROST_SIZE)
+ var restored_frost_enemies: Array[Dictionary] = enemies
  overworld_enemies = restored_world_enemies
  crypt_enemies = restored_crypt_enemies
  verdant_enemies = restored_verdant_enemies
+ frost_enemies = restored_frost_enemies
  overworld_loot_drops = restored_world_loot
  crypt_loot_drops = restored_crypt_loot
  verdant_loot_drops = restored_verdant_loot
+ frost_loot_drops = restored_frost_loot
  if in_crystal_sanctum:
   enemies = crypt_enemies
   loot_drops = crypt_loot_drops
  elif in_verdant_sanctum:
   enemies = verdant_enemies
   loot_drops = verdant_loot_drops
+ elif in_frost_sanctum:
+  enemies = frost_enemies
+  loot_drops = frost_loot_drops
  else:
   enemies = overworld_enemies
   loot_drops = overworld_loot_drops
