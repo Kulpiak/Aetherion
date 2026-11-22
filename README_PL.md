@@ -95,3 +95,11 @@ Lokalny zapis v4 zachowuje dla każdego regionalnego punktu odrodzenia stan poko
 - Nieznane identyfikatory receptur są odrzucane, a ponowne wytwarzanie posiadanego wyposażenia nie zużywa materiałów.
 - Wytworzenie mikstury i założenie wykonanego wyposażenia zapisuje postęp od razu, bez czekania na 30-sekundowy autosave.
 - CI uruchamia osobny test receptur: koszty materiałów, bonusy statystyk, duplikaty, brak materiałów oraz zapis/odczyt wytworzonego wyposażenia.
+
+## Trzecia osobna lokacja — Sanktuarium Burzowego Kryształu
+- W Koronie Gór dodano portal do osobnej mapy 1280×800 z autorskim wektorowym środowiskiem lodowych grani, aurory i centralnego ołtarza burzowego kryształu.
+- W środku spotkasz Szronowe Raptory i Burzowe Odłamki oraz unikalnego bossa Władcę Burzowego Kryształu z osobnym sprite'em SVG i chłodną, niebieską sygnalizacją ataku.
+- Pokonanie bossa daje 180 złota i 260 XP. Uwolnienie Serca Burzowego Kryształu daje 3 odłamki Eterium, 2 skóry bestii, 130 złota i 210 XP.
+- Lokalny zapis v7 zachowuje pozycję, stan przeciwników i łupów, pokonanie bossa oraz odebranie reliktu. Migracja zapisów v1–v6 pozostaje obsługiwana.
+- GitHub Actions uruchamia osobny test migracji v6, wejścia/wyjścia, izolacji stanu świata, zdrowia bossa, nagród i trwałości reliktu przed eksportem Android APK.
+- To trzecia osobna lokacja; pozostałe regiony nadal wymagają własnych map i zawartości.
