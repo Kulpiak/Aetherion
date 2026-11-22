@@ -37,6 +37,8 @@ func _run_tests() -> void:
  var guardian: Dictionary = game.enemies[guardian_index]
  guardian["hp"] = 413.0
  game.enemies[guardian_index] = guardian
+ game.player_pos = Vector2(720,610)
+ game.loot_drops.append({"item":"Odłamek Eterium","pos":Vector2(710,620),"life":42.0})
  game._save_game(true)
  guardian["hp"] = 1.0
  game.enemies[guardian_index] = guardian
@@ -45,6 +47,8 @@ func _run_tests() -> void:
  _check(game.in_frost_sanctum, "save restores the active frost instance")
  guardian_index = _enemy_index_by_id(game,"frost_guardian")
  _check(guardian_index >= 0 and is_equal_approx(float(game.enemies[guardian_index].get("hp",0.0)),413.0), "v7 restores the Storm Warden health")
+ _check(game.player_pos.is_equal_approx(Vector2(720,610)), "v7 restores the player position inside the sanctum")
+ _check(game.loot_drops.size() == 1 and str(game.loot_drops[0].get("item","")) == "Odłamek Eterium", "v7 restores sanctum loot drops")
  _check(is_equal_approx(float(game.overworld_enemies[0].get("hp",0.0)),29.0), "overworld enemy state remains isolated while inside")
  _check(game.overworld_player_pos.is_equal_approx(overworld_return), "overworld return position is preserved")
 
