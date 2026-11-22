@@ -4,7 +4,7 @@ Projekt gry 2D pixel-art top-down na Androida, tworzony w Godot 4.x / GDScript.
 
 ## Plan
 1. Grywalny offline PvE.
-2. Rozbudowa świata, ras, questów i walki.
+2. Rozbudowa świata, ras, questów i walki — obecnie trzy osobne sanktuaria i osiem regionów świata.
 3. Testy Android i stabilny APK.
 4. Backend autorytatywny i multiplayer jako późniejszy etap.
 
