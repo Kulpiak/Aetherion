@@ -73,7 +73,7 @@ func _test_storm_attack(game) -> void:
 	game.enemies[boss_index] = boss
 	game.hp = 100.0
 	game.player_invuln = 0.0
-	var hp_before_escape := game.hp
+	var hp_before_escape: float = float(game.hp)
 	game._process(0.06)
 	boss = game.enemies[boss_index]
 	_check(is_equal_approx(game.hp, hp_before_escape), "leaving the marked radius avoids storm damage")
