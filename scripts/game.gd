@@ -67,6 +67,10 @@ const FROST_ENTRY := Vector2(1650, 420)
 const FROST_START := Vector2(640, 590)
 const FROST_EXIT := Vector2(640, 730)
 const FROST_RELIC := Vector2(640, 145)
+const FROST_STORM_RANGE := 248.0
+const FROST_STORM_RADIUS := 118.0
+const FROST_STORM_WINDUP := 1.28
+const FROST_STORM_ACTIVE := 0.48
 const START_POS := Vector2(480, 380)
 const RUINS_POS := Vector2(1600, 720)
 const RACES := {
@@ -313,7 +317,7 @@ func _create_frost_enemies() -> Array[Dictionary]:
  result.append({"spawn_id":"frost_01","name":"Burzowy Odłamek","pos":Vector2(930,300),"hp":198.0,"max_hp":198.0,"damage":26.0,"speed":42.0,"alive":true,"type":3,"region":"Korona Gór","spawn_bounds":bounds,"xp_reward":92,"gold_reward":28,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.62,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
  result.append({"spawn_id":"frost_02","name":"Szronowy Raptor","pos":Vector2(350,500),"hp":172.0,"max_hp":172.0,"damage":22.0,"speed":72.0,"alive":true,"type":2,"region":"Korona Gór","spawn_bounds":bounds,"xp_reward":80,"gold_reward":24,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.58,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
  result.append({"spawn_id":"frost_03","name":"Burzowy Odłamek","pos":Vector2(930,500),"hp":198.0,"max_hp":198.0,"damage":26.0,"speed":42.0,"alive":true,"type":3,"region":"Korona Gór","spawn_bounds":bounds,"xp_reward":92,"gold_reward":28,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.62,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
- result.append({"spawn_id":"frost_guardian","name":"Władca Burzowego Kryształu","pos":Vector2(640,390),"hp":840.0,"max_hp":840.0,"damage":34.0,"speed":38.0,"alive":true,"type":3,"region":"Korona Gór","spawn_bounds":bounds,"xp_reward":0,"gold_reward":0,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":1.18,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true,"is_boss":true,"is_frost_boss":true})
+ result.append({"spawn_id":"frost_guardian","name":"Władca Burzowego Kryształu","pos":Vector2(640,390),"hp":840.0,"max_hp":840.0,"damage":34.0,"speed":38.0,"alive":true,"type":3,"region":"Korona Gór","spawn_bounds":bounds,"xp_reward":0,"gold_reward":0,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":1.18,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true,"is_boss":true,"is_frost_boss":true,"storm_radius":FROST_STORM_RADIUS,"windup_target":Vector2.ZERO,"storm_blast_center":Vector2.ZERO,"storm_blast_left":0.0})
  return result
 
 func _enter_frost_sanctum() -> void:
@@ -873,26 +877,30 @@ func _process(delta: float) -> void:
    continue
   enemy["attack_anim"] = maxf(0.0,float(enemy.get("attack_anim",0.0))-delta)
   enemy["hit_flash"] = maxf(0.0,float(enemy.get("hit_flash",0.0))-delta)
+  enemy["storm_blast_left"] = maxf(0.0,float(enemy.get("storm_blast_left",0.0))-delta)
   var difference: Vector2 = player_pos - enemy["pos"]
   var is_boss := bool(enemy.get("is_boss",false))
-  var attack_range := 112.0 if is_boss else 48.0
+  var is_frost_boss := bool(enemy.get("is_frost_boss",false))
+  var attack_range := FROST_STORM_RANGE if is_frost_boss else (112.0 if is_boss else 48.0)
   var windup := float(enemy.get("windup",0.0))
   if windup > 0.0:
    windup = maxf(0.0,windup-delta)
    enemy["windup"] = windup
-   if windup <= 0.0 and player_pos.distance_to(enemy["pos"]) <= attack_range:
-    enemy["attack_anim"] = 0.34
-    if dash_anim > 0.0:
-     _say("Uniknięto ataku dzięki Szarży!")
-    elif player_invuln <= 0.0:
-     player_hit_flash = 0.18
-     player_invuln = 0.62
-     hp -= maxf(2.0,enemy["damage"]-float(defense))
-     if hp <= 0.0:
-      hp = max_hp
-      player_pos = _active_spawn_position()
-      gold = maxi(0,gold-8)
-      _say("Odrodzenie przy kręgu. Utracono 8 złota.")
+   if windup <= 0.0:
+    if is_frost_boss:
+     var storm_center: Vector2 = enemy.get("windup_target",player_pos)
+     var storm_radius := float(enemy.get("storm_radius",FROST_STORM_RADIUS))
+     enemy["attack_anim"] = FROST_STORM_ACTIVE
+     enemy["storm_blast_center"] = storm_center
+     enemy["storm_blast_left"] = FROST_STORM_ACTIVE
+     if player_pos.distance_to(storm_center) <= storm_radius:
+      if _receive_enemy_damage(enemy,"Uniknięto nawałnicy dzięki Szarży!"):
+       _say("NAWAŁNICA BURZOWA! Otrzymujesz obrażenia.")
+     else:
+      _say("Uniknięto nawałnicy — opuściłeś oznaczony obszar.")
+    elif player_pos.distance_to(enemy["pos"]) <= attack_range:
+     enemy["attack_anim"] = 0.34
+     _receive_enemy_damage(enemy,"Uniknięto ataku dzięki Szarży!")
   elif difference.length() < 300.0 and difference.length() > attack_range:
    enemy["facing"] = difference.normalized()
    enemy["walk_phase"] = float(enemy.get("walk_phase",0.0)) + delta * 9.0
@@ -902,8 +910,12 @@ func _process(delta: float) -> void:
    enemy["timer"] += delta
    if enemy["timer"] > 1.3:
     enemy["timer"] = 0.0
-    enemy["windup"] = 0.82 if is_boss else 0.52
-    enemy["windup_total"] = enemy["windup"]
+    var windup_duration := FROST_STORM_WINDUP if is_frost_boss else (0.82 if is_boss else 0.52)
+    enemy["windup"] = windup_duration
+    enemy["windup_total"] = windup_duration
+    if is_frost_boss:
+     enemy["windup_target"] = player_pos
+     enemy["storm_radius"] = FROST_STORM_RADIUS
   else:
    enemy["timer"] = maxf(0.0,float(enemy.get("timer",0.0))-delta*0.5)
   enemies[i] = enemy
@@ -930,6 +942,22 @@ func _process(delta: float) -> void:
    loot_drops[i] = drop
  _update_hud()
  queue_redraw()
+
+func _receive_enemy_damage(enemy: Dictionary, dodge_message: String) -> bool:
+ if dash_anim > 0.0:
+  _say(dodge_message)
+  return false
+ if player_invuln > 0.0:
+  return false
+ player_hit_flash = 0.18
+ player_invuln = 0.62
+ hp -= maxf(2.0,float(enemy.get("damage",2.0))-float(defense))
+ if hp <= 0.0:
+  hp = max_hp
+  player_pos = _active_spawn_position()
+  gold = maxi(0,gold-8)
+  _say("Odrodzenie przy kręgu. Utracono 8 złota.")
+ return true
 
 func _init_ambient_particles() -> void:
  ambient_particles.clear()
@@ -1985,7 +2013,7 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var sprite_size := 126.0 if is_boss else 80.0
  var now := float(Time.get_ticks_msec()) / 1000.0
  var distance_to_player := player_pos.distance_to(p)
- var attack_range := 112.0 if is_boss else 48.0
+ var attack_range := FROST_STORM_RANGE if is_frost_boss else (112.0 if is_boss else 48.0)
  var chasing := distance_to_player < 300.0
  var windup_left := float(enemy.get("windup",0.0))
  var windup_total := maxf(0.01,float(enemy.get("windup_total",0.52)))
@@ -2009,13 +2037,36 @@ func _draw_enemy(enemy: Dictionary) -> void:
   _draw_eterium_glyph(p,0,290.0 if is_boss else 118.0,glyph_rotation,warning_tint)
   var warning_alpha := 0.42+warning_progress*0.48
   if is_boss:
-   var warning_circle := Color("#82e4ff") if is_frost_boss else Color(1.0,0.28,0.2,1.0)
-   draw_circle(p,112.0,Color(warning_circle.r,warning_circle.g,warning_circle.b,0.035+warning_progress*0.045))
-   draw_arc(p,112.0,0.0,TAU,56,Color(warning_circle.r,warning_circle.g,warning_circle.b,warning_alpha),4.5,true)
+   if not is_frost_boss:
+    var warning_circle := Color(1.0,0.28,0.2,1.0)
+    draw_circle(p,112.0,Color(warning_circle.r,warning_circle.g,warning_circle.b,0.035+warning_progress*0.045))
+    draw_arc(p,112.0,0.0,TAU,56,Color(warning_circle.r,warning_circle.g,warning_circle.b,warning_alpha),4.5,true)
   else:
    var warning_angle := enemy_facing.angle()
    draw_arc(p,43.0,warning_angle-0.82,warning_angle+0.82,24,Color(1.0,0.32,0.2,warning_alpha),4.0,true)
    draw_line(p,p+enemy_facing*48.0,Color(1.0,0.4,0.25,warning_alpha),3.0,true)
+ if is_frost_boss and windup_left > 0.0:
+  var storm_center: Vector2 = enemy.get("windup_target",player_pos)
+  var storm_radius := float(enemy.get("storm_radius",FROST_STORM_RADIUS))
+  var storm_scale := 0.76+warning_progress*0.24
+  var storm_color := Color("#82e4ff")
+  draw_circle(storm_center,storm_radius*storm_scale,Color(storm_color.r,storm_color.g,storm_color.b,0.075+warning_progress*0.09))
+  draw_arc(storm_center,storm_radius*storm_scale,now*0.72,now*0.72+TAU,56,Color(storm_color.r,storm_color.g,storm_color.b,0.48+warning_progress*0.48),4.0,true)
+  for mark_index in range(8):
+   var mark_angle := TAU*float(mark_index)/8.0-now*0.12
+   var mark_start := storm_center+Vector2.RIGHT.rotated(mark_angle)*(storm_radius*0.78)
+   var mark_end := storm_center+Vector2.RIGHT.rotated(mark_angle)*(storm_radius*1.04)
+   draw_line(mark_start,mark_end,Color("#baf5ff"),3.0,true)
+  draw_string(ThemeDB.fallback_font,storm_center+Vector2(-66,-storm_radius-12),"NAWAŁNICA",HORIZONTAL_ALIGNMENT_CENTER,-1,12,Color("#d7f8ff"))
+ if is_frost_boss and float(enemy.get("storm_blast_left",0.0)) > 0.0:
+  var blast_left := float(enemy.get("storm_blast_left",0.0))
+  var blast_progress := clampf(1.0-blast_left/FROST_STORM_ACTIVE,0.0,1.0)
+  var blast_center: Vector2 = enemy.get("storm_blast_center",player_pos)
+  var blast_radius := float(enemy.get("storm_radius",FROST_STORM_RADIUS))
+  var wave_radius := blast_radius*(0.28+blast_progress*0.72)
+  draw_circle(blast_center,wave_radius,Color(0.32,0.82,1.0,0.08*(1.0-blast_progress)))
+  draw_arc(blast_center,wave_radius,0.0,TAU,56,Color("#9beeff",1.0-blast_progress*0.35),5.0,true)
+  draw_arc(blast_center,blast_radius,now*0.4,now*0.4+TAU,56,Color(0.68,0.94,1.0,0.25*(1.0-blast_progress)),2.0,true)
  if is_boss:
   var boss_pulse := 0.72 + sin(now/0.19)*0.16
   var boss_ring := Color("#82dfff") if is_frost_boss else (Color("#9cdd8e") if bool(enemy.get("is_verdant_boss",false)) else Color("#ef7165"))
