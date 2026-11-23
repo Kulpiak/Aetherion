@@ -103,3 +103,10 @@ Lokalny zapis v4 zachowuje dla każdego regionalnego punktu odrodzenia stan poko
 - Lokalny zapis v7 zachowuje pozycję, stan przeciwników i łupów, pokonanie bossa oraz odebranie reliktu. Migracja zapisów v1–v6 pozostaje obsługiwana.
 - GitHub Actions uruchamia osobny test migracji v6, wejścia/wyjścia, izolacji stanu świata, zdrowia bossa, nagród i trwałości reliktu przed eksportem Android APK.
 - To trzecia osobna lokacja; pozostałe regiony nadal wymagają własnych map i zawartości.
+
+
+## Walka z Władcą Burzowego Kryształu
+- Unikalny boss Sanktuarium Burzowego Kryształu używa teraz Burzowej Nawałnicy: zasięg rozpoczęcia 248 jednostek, oznaczony obszar rażenia o promieniu 118 jednostek i 1,28 s czasu ostrzeżenia.
+- Miejsce uderzenia zostaje zablokowane w chwili rozpoczęcia telegraphu. Gracz może opuścić krąg albo użyć Szarży Eterium; pozostanie w oznaczonym obszarze powoduje obrażenia uwzględniające obronę i istniejącą nietykalność po trafieniu.
+- Uderzenie ma osobny, krótki efekt fali uderzeniowej. Pozostali przeciwnicy zachowują dotychczasowy system ataków.
+- GitHub Actions uruchamia testy blokady celu, uniku poza obszar, obrażeń, Szarży i nietykalności przed eksportem Android APK.
