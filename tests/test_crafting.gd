@@ -64,7 +64,7 @@ func _run_tests() -> void:
 	game._craft_item("Mikstura HP")
 	_check(int(game.inventory["Mikstura HP"]) == potions_after, "insufficient materials do not create a potion")
 
-	var owned_count_before := game.owned_gear.size()
+	var owned_count_before: int = game.owned_gear.size()
 	game._craft_item("Pancerz ŁOWCY")
 	_check(game.owned_gear.size() == owned_count_before, "unknown or incorrectly cased recipe IDs cannot create phantom gear")
 
