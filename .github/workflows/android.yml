@@ -114,6 +114,13 @@ jobs:
           godot --headless --path . --script res://tests/test_frost_sanctum.gd 2>&1 | tee /tmp/godot-frost-tests.log
           grep -q "AETHERION_FROST_TESTS: PASS" /tmp/godot-frost-tests.log
 
+      - name: Run Storm Warden combat tests
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --script res://tests/test_stormwarden_combat.gd 2>&1 | tee /tmp/godot-storm-combat-tests.log
+          grep -q "AETHERION_STORM_COMBAT_TESTS: PASS" /tmp/godot-storm-combat-tests.log
+
       - name: Run crafting recipe tests
         shell: bash
         run: |
