@@ -107,6 +107,13 @@ jobs:
           godot --headless --path . --script res://tests/test_verdant_sanctum.gd 2>&1 | tee /tmp/godot-verdant-tests.log
           grep -q "AETHERION_VERDANT_TESTS: PASS" /tmp/godot-verdant-tests.log
 
+      - name: Run Root Warden combat tests
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --script res://tests/test_rootwarden_combat.gd 2>&1 | tee /tmp/godot-rootwarden-combat-tests.log
+          grep -q "AETHERION_ROOTWARDEN_COMBAT_TESTS: PASS" /tmp/godot-rootwarden-combat-tests.log
+
       - name: Run Storm Crystal Sanctum instance tests
         shell: bash
         run: |

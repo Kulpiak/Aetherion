@@ -120,3 +120,11 @@ Nie oznaczamy funkcji jako gotowych ani APK jako przetestowanego, dopóki nie pr
 - Zapis v6 zachowuje osobno stan przeciwników, łupów, bossa i reliktu Sanktuarium Korzeni, a także pozycję gracza wewnątrz lokacji. Zapisy v1–v5 są nadal obsługiwane.
 - Dodano headless test migracji v5 oraz pełnego cyklu wejścia, walki, zapisu, nagrody i powrotu; test jest częścią workflow Android przed eksportem APK.
 - To druga osobna lokacja. Pozostałe regiony nadal wymagają własnych map, a grafika bohaterów i fauna potrzebują dalszych pełnych animacji i docelowego dopracowania.
+
+
+## Iteracja walki — Strażnik Splotu: Więzy Korzeni
+- Dodano odrębną technikę obszarową bossa Sanktuarium Korzeni: po 1,05 s ostrzeżenia tworzy eliptyczne pole korzeni o promieniach 126×74 jednostki, blokujące zapamiętaną pozycję gracza zamiast śledzić go w trakcie ostrzeżenia.
+- Uderzenie rozstrzyga się w zapisanym punkcie; opuszczenie pola lub aktywna Szarża Eterium pozwala uniknąć obrażeń. Trafienie korzysta ze wspólnej redukcji obrażeń i nietykalności.
+- Ostrzeżenie i uderzenie otrzymały osobną zieloną oprawę wektorową, rozróżniającą tę technikę od czerwonego ataku Strażnika Rdzenia i lodowej Burzowej Nawałnicy.
+- Dodano `tests/test_rootwarden_combat.gd` i etap CI przed testami Sanktuarium Burzowego Kryształu.
+- Test obejmuje obecność bossa, parametry pola, blokadę celu, możliwość ucieczki, obrażenia po trafieniu, unik Szarżą i ochronę przez nietykalność.

@@ -71,6 +71,10 @@ const FROST_STORM_RANGE := 248.0
 const FROST_STORM_RADIUS := 118.0
 const FROST_STORM_WINDUP := 1.28
 const FROST_STORM_ACTIVE := 0.48
+const VERDANT_ROOT_RANGE := 220.0
+const VERDANT_ROOT_RADIUS := Vector2(126.0, 74.0)
+const VERDANT_ROOT_WINDUP := 1.05
+const VERDANT_ROOT_ACTIVE := 0.56
 const START_POS := Vector2(480, 380)
 const RUINS_POS := Vector2(1600, 720)
 const RACES := {
@@ -307,7 +311,7 @@ func _create_verdant_enemies() -> Array[Dictionary]:
  result.append({"spawn_id":"verdant_01","name":"Mchowy Wartownik","pos":Vector2(930,300),"hp":188.0,"max_hp":188.0,"damage":22.0,"speed":39.0,"alive":true,"type":1,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":72,"gold_reward":24,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.62,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
  result.append({"spawn_id":"verdant_02","name":"Pnączowy Kieł","pos":Vector2(350,500),"hp":148.0,"max_hp":148.0,"damage":18.0,"speed":58.0,"alive":true,"type":0,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":58,"gold_reward":18,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.58,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
  result.append({"spawn_id":"verdant_03","name":"Mchowy Wartownik","pos":Vector2(930,500),"hp":188.0,"max_hp":188.0,"damage":22.0,"speed":39.0,"alive":true,"type":1,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":72,"gold_reward":24,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.62,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
- result.append({"spawn_id":"verdant_guardian","name":"Strażnik Splotu","pos":Vector2(640,385),"hp":760.0,"max_hp":760.0,"damage":28.0,"speed":36.0,"alive":true,"type":1,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":0,"gold_reward":0,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":1.12,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true,"is_boss":true,"is_verdant_boss":true})
+ result.append({"spawn_id":"verdant_guardian","name":"Strażnik Splotu","pos":Vector2(640,385),"hp":760.0,"max_hp":760.0,"damage":28.0,"speed":36.0,"alive":true,"type":1,"region":"Zielone Ostępy","spawn_bounds":bounds,"xp_reward":0,"gold_reward":0,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":VERDANT_ROOT_WINDUP,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true,"is_boss":true,"is_verdant_boss":true,"root_radius":VERDANT_ROOT_RADIUS,"root_windup_target":Vector2.ZERO,"root_burst_center":Vector2.ZERO,"root_burst_left":0.0})
  return result
 
 func _create_frost_enemies() -> Array[Dictionary]:
@@ -878,10 +882,12 @@ func _process(delta: float) -> void:
   enemy["attack_anim"] = maxf(0.0,float(enemy.get("attack_anim",0.0))-delta)
   enemy["hit_flash"] = maxf(0.0,float(enemy.get("hit_flash",0.0))-delta)
   enemy["storm_blast_left"] = maxf(0.0,float(enemy.get("storm_blast_left",0.0))-delta)
+  enemy["root_burst_left"] = maxf(0.0,float(enemy.get("root_burst_left",0.0))-delta)
   var difference: Vector2 = player_pos - enemy["pos"]
   var is_boss := bool(enemy.get("is_boss",false))
   var is_frost_boss := bool(enemy.get("is_frost_boss",false))
-  var attack_range := FROST_STORM_RANGE if is_frost_boss else (112.0 if is_boss else 48.0)
+  var is_verdant_boss := bool(enemy.get("is_verdant_boss",false))
+  var attack_range := FROST_STORM_RANGE if is_frost_boss else (VERDANT_ROOT_RANGE if is_verdant_boss else (112.0 if is_boss else 48.0))
   var windup := float(enemy.get("windup",0.0))
   if windup > 0.0:
    windup = maxf(0.0,windup-delta)
@@ -898,6 +904,21 @@ func _process(delta: float) -> void:
        _say("NAWAŁNICA BURZOWA! Otrzymujesz obrażenia.")
      else:
       _say("Uniknięto nawałnicy — opuściłeś oznaczony obszar.")
+    elif is_verdant_boss:
+     var root_center: Vector2 = enemy.get("root_windup_target",player_pos)
+     var root_radius: Vector2 = enemy.get("root_radius",VERDANT_ROOT_RADIUS)
+     enemy["attack_anim"] = VERDANT_ROOT_ACTIVE
+     enemy["root_burst_center"] = root_center
+     enemy["root_burst_left"] = VERDANT_ROOT_ACTIVE
+     var root_offset := Vector2(
+      (player_pos.x-root_center.x)/maxf(1.0,root_radius.x),
+      (player_pos.y-root_center.y)/maxf(1.0,root_radius.y)
+     )
+     if root_offset.length_squared() <= 1.0:
+      if _receive_enemy_damage(enemy,"Uniknięto więzów korzeni dzięki Szarży!"):
+       _say("WIĘZY KORZENI! Strażnik Splotu dosięga cię splątanym kręgiem.")
+     else:
+      _say("Uniknięto korzeni — opuściłeś splątany krąg.")
     elif player_pos.distance_to(enemy["pos"]) <= attack_range:
      enemy["attack_anim"] = 0.34
      _receive_enemy_damage(enemy,"Uniknięto ataku dzięki Szarży!")
@@ -910,12 +931,15 @@ func _process(delta: float) -> void:
    enemy["timer"] += delta
    if enemy["timer"] > 1.3:
     enemy["timer"] = 0.0
-    var windup_duration := FROST_STORM_WINDUP if is_frost_boss else (0.82 if is_boss else 0.52)
+    var windup_duration := FROST_STORM_WINDUP if is_frost_boss else (VERDANT_ROOT_WINDUP if is_verdant_boss else (0.82 if is_boss else 0.52))
     enemy["windup"] = windup_duration
     enemy["windup_total"] = windup_duration
     if is_frost_boss:
      enemy["windup_target"] = player_pos
      enemy["storm_radius"] = FROST_STORM_RADIUS
+    elif is_verdant_boss:
+     enemy["root_windup_target"] = player_pos
+     enemy["root_radius"] = VERDANT_ROOT_RADIUS
   else:
    enemy["timer"] = maxf(0.0,float(enemy.get("timer",0.0))-delta*0.5)
   enemies[i] = enemy
@@ -2010,10 +2034,11 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var kind := int(enemy["type"])
  var is_boss := bool(enemy.get("is_boss",false))
  var is_frost_boss := bool(enemy.get("is_frost_boss",false))
+ var is_verdant_boss := bool(enemy.get("is_verdant_boss",false))
  var sprite_size := 126.0 if is_boss else 80.0
  var now := float(Time.get_ticks_msec()) / 1000.0
  var distance_to_player := player_pos.distance_to(p)
- var attack_range := FROST_STORM_RANGE if is_frost_boss else (112.0 if is_boss else 48.0)
+ var attack_range := FROST_STORM_RANGE if is_frost_boss else (VERDANT_ROOT_RANGE if is_verdant_boss else (112.0 if is_boss else 48.0))
  var chasing := distance_to_player < 300.0
  var windup_left := float(enemy.get("windup",0.0))
  var windup_total := maxf(0.01,float(enemy.get("windup_total",0.52)))
@@ -2037,7 +2062,7 @@ func _draw_enemy(enemy: Dictionary) -> void:
   _draw_eterium_glyph(p,0,290.0 if is_boss else 118.0,glyph_rotation,warning_tint)
   var warning_alpha := 0.42+warning_progress*0.48
   if is_boss:
-   if not is_frost_boss:
+   if not is_frost_boss and not is_verdant_boss:
     var warning_circle := Color(1.0,0.28,0.2,1.0)
     draw_circle(p,112.0,Color(warning_circle.r,warning_circle.g,warning_circle.b,0.035+warning_progress*0.045))
     draw_arc(p,112.0,0.0,TAU,56,Color(warning_circle.r,warning_circle.g,warning_circle.b,warning_alpha),4.5,true)
@@ -2067,14 +2092,47 @@ func _draw_enemy(enemy: Dictionary) -> void:
   draw_circle(blast_center,wave_radius,Color(0.32,0.82,1.0,0.08*(1.0-blast_progress)))
   draw_arc(blast_center,wave_radius,0.0,TAU,56,Color("#9beeff",1.0-blast_progress*0.35),5.0,true)
   draw_arc(blast_center,blast_radius,now*0.4,now*0.4+TAU,56,Color(0.68,0.94,1.0,0.25*(1.0-blast_progress)),2.0,true)
+ if is_verdant_boss and windup_left > 0.0:
+  var root_center: Vector2 = enemy.get("root_windup_target",player_pos)
+  var root_radius: Vector2 = enemy.get("root_radius",VERDANT_ROOT_RADIUS)
+  var root_scale := 0.78+warning_progress*0.22
+  var root_points := PackedVector2Array()
+  for root_point_index in range(48):
+   var root_angle := TAU*float(root_point_index)/48.0
+   root_points.append(root_center+Vector2(cos(root_angle)*root_radius.x*root_scale,sin(root_angle)*root_radius.y*root_scale))
+  draw_colored_polygon(root_points,Color(0.35,0.78,0.34,0.055+warning_progress*0.07))
+  root_points.append(root_points[0])
+  draw_polyline(root_points,Color(0.58,0.94,0.47,0.48+warning_progress*0.46),4.0,true)
+  for root_mark_index in range(8):
+   var root_mark_angle := TAU*float(root_mark_index)/8.0-now*0.18
+   var root_inner := root_center+Vector2(cos(root_mark_angle)*root_radius.x*0.78,sin(root_mark_angle)*root_radius.y*0.78)
+   var root_outer := root_center+Vector2(cos(root_mark_angle)*(root_radius.x+20.0),sin(root_mark_angle)*(root_radius.y+15.0))
+   draw_line(root_inner,root_outer,Color("#b7f39a",0.85),4.0,true)
+  draw_string(ThemeDB.fallback_font,root_center+Vector2(-55.0,-root_radius.y-13.0),"WIĘZY KORZENI",HORIZONTAL_ALIGNMENT_CENTER,-1,12,Color("#dcffd0"))
+ if is_verdant_boss and float(enemy.get("root_burst_left",0.0)) > 0.0:
+  var root_burst_left := float(enemy.get("root_burst_left",0.0))
+  var root_burst_progress := clampf(1.0-root_burst_left/VERDANT_ROOT_ACTIVE,0.0,1.0)
+  var root_burst_center: Vector2 = enemy.get("root_burst_center",player_pos)
+  var root_burst_radius := VERDANT_ROOT_RADIUS*(0.42+root_burst_progress*0.62)
+  var burst_points := PackedVector2Array()
+  for burst_point_index in range(48):
+   var burst_angle := TAU*float(burst_point_index)/48.0
+   burst_points.append(root_burst_center+Vector2(cos(burst_angle)*root_burst_radius.x,sin(burst_angle)*root_burst_radius.y))
+  burst_points.append(burst_points[0])
+  draw_polyline(burst_points,Color(0.72,1.0,0.53,1.0-root_burst_progress*0.45),6.0,true)
+  for root_spike_index in range(6):
+   var spike_angle := TAU*float(root_spike_index)/6.0+root_burst_progress*0.25
+   var spike_start := root_burst_center+Vector2(cos(spike_angle)*root_burst_radius.x,sin(spike_angle)*root_burst_radius.y)
+   var spike_end := root_burst_center+Vector2(cos(spike_angle)*(root_burst_radius.x+24.0),sin(spike_angle)*(root_burst_radius.y+18.0))
+   draw_line(spike_start,spike_end,Color("#c9ff9a",1.0-root_burst_progress*0.35),5.0,true)
  if is_boss:
   var boss_pulse := 0.72 + sin(now/0.19)*0.16
-  var boss_ring := Color("#82dfff") if is_frost_boss else (Color("#9cdd8e") if bool(enemy.get("is_verdant_boss",false)) else Color("#ef7165"))
+  var boss_ring := Color("#82dfff") if is_frost_boss else (Color("#9cdd8e") if is_verdant_boss else Color("#ef7165"))
   draw_circle(p,76.0,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.09*boss_pulse))
   draw_arc(p,72.0,now*0.12,now*0.12+TAU,48,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.55+boss_pulse*0.12),4.0,true)
  if attacking:
   var attack_progress := 1.0 - float(enemy.get("attack_anim",0.0))/0.34
-  var attack_tint := Color("#82e4ff") if is_frost_boss else Color(1.0,0.28,0.22,1.0)
+  var attack_tint := Color("#82e4ff") if is_frost_boss else (Color("#a8ef8c") if is_verdant_boss else Color(1.0,0.28,0.22,1.0))
   draw_arc(p,37.0 if not is_boss else 66.0,0.0,TAU,28,Color(attack_tint.r,attack_tint.g,attack_tint.b,0.72),3.0,true)
   if is_boss:
    var shock_radius := 42.0 + attack_progress*54.0
