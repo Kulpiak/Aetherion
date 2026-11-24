@@ -79,6 +79,7 @@ func _test_root_snare(game) -> void:
  _check(is_equal_approx(game.hp,100.0), "leaving the root ellipse avoids damage")
  _check(boss.get("root_burst_center",Vector2.ZERO).is_equal_approx(target), "the root impact resolves at the locked target")
  _check(float(boss.get("root_burst_left",0.0)) > 0.0, "the impact creates a visible root burst")
+ _check(is_equal_approx(float(boss.get("attack_anim",0.0)),GAME_SCRIPT.VERDANT_ROOT_ACTIVE), "the boss attack animation uses the full root-burst duration")
 
  game.player_pos = target
  game.hp = 100.0

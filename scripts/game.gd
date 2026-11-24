@@ -2131,7 +2131,8 @@ func _draw_enemy(enemy: Dictionary) -> void:
   draw_circle(p,76.0,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.09*boss_pulse))
   draw_arc(p,72.0,now*0.12,now*0.12+TAU,48,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.55+boss_pulse*0.12),4.0,true)
  if attacking:
-  var attack_progress := 1.0 - float(enemy.get("attack_anim",0.0))/0.34
+  var attack_duration := VERDANT_ROOT_ACTIVE if is_verdant_boss else (FROST_STORM_ACTIVE if is_frost_boss else 0.34)
+  var attack_progress := clampf(1.0-float(enemy.get("attack_anim",0.0))/attack_duration,0.0,1.0)
   var attack_tint := Color("#82e4ff") if is_frost_boss else (Color("#a8ef8c") if is_verdant_boss else Color(1.0,0.28,0.22,1.0))
   draw_arc(p,37.0 if not is_boss else 66.0,0.0,TAU,28,Color(attack_tint.r,attack_tint.g,attack_tint.b,0.72),3.0,true)
   if is_boss:
