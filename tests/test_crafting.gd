@@ -74,7 +74,9 @@ func _run_tests() -> void:
 	game.inventory["Skóra bestii"] = 0
 	game.inventory["Odłamek Eterium"] = 0
 	game.equipment = {"Broń":"Ostrze Wędrowca","Pancerz":"Tunika Wędrowca"}
-	game.owned_gear = ["Ostrze Wędrowca","Tunika Wędrowca"]
+	game.owned_gear.clear()
+	game.owned_gear.append("Ostrze Wędrowca")
+	game.owned_gear.append("Tunika Wędrowca")
 	game._load_game()
 	_check(int(game.inventory["Skóra bestii"]) == 11 and int(game.inventory["Odłamek Eterium"]) == 8, "save/load preserves remaining crafting materials")
 	_check(game.owned_gear.has("Ostrze Eterium") and game.owned_gear.has("Pancerz Łowcy"), "save/load preserves both crafted gear items")
