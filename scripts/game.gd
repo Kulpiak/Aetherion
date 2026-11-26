@@ -2107,7 +2107,7 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var geode_wave_left := float(enemy.get("geode_wave_left",0.0))
  var geode_charge_total := maxf(0.01,float(enemy.get("geode_charge_total",CRYPT_GEODE_WINDUP)))
  var warning_progress := clampf(1.0-geode_wave_left/geode_charge_total,0.0,1.0) if geode_active else (clampf(1.0-windup_left/windup_total,0.0,1.0) if windup_left > 0.0 else 0.0)
- var is_moving := chasing and distance_to_player > attack_range and windup_left <= 0.0
+ var is_moving := chasing and distance_to_player > attack_range and windup_left <= 0.0 and not geode_active
  var attacking := float(enemy.get("attack_anim",0.0)) > 0.0
  var phase := float(enemy.get("walk_phase",0.0))
  var stride := sin(phase*2.0)
