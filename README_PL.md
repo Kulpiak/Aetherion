@@ -110,3 +110,10 @@ Lokalny zapis v4 zachowuje dla każdego regionalnego punktu odrodzenia stan poko
 - Miejsce uderzenia zostaje zablokowane w chwili rozpoczęcia telegraphu. Gracz może opuścić krąg albo użyć Szarży Eterium; pozostanie w oznaczonym obszarze powoduje obrażenia uwzględniające obronę i istniejącą nietykalność po trafieniu.
 - Uderzenie ma osobny, krótki efekt fali uderzeniowej. Pozostali przeciwnicy zachowują dotychczasowy system ataków.
 - GitHub Actions uruchamia testy blokady celu, uniku poza obszar, obrażeń, Szarży i nietykalności przed eksportem Android APK.
+
+## Walka z Matriarchą Geody — Rozszczepienie Geody
+- Matriarcha Geody używa teraz autorskiej techniki obszarowej: namierza pozycję gracza i tworzy trzy rozdzielone punkty kryształowego zagrożenia.
+- Pierwszy kryształ ładuje się przez 0,92 s, a kolejne fale następują co 0,72 s. Każdy punkt ma promień 64 jednostek i jest blokowany na początku sekwencji.
+- Każda eksplozja zadaje rzeczywiste obrażenia uwzględniające obronę, Szarżę Eterium i istniejącą nietykalność. Ucieczka z kolejnych stref pozwala uniknąć trafienia.
+- Dodano oryginalny wektorowy sprite odłamka geody, telegraph trzech punktów i krótką falę uderzeniową w kolorystyce fioletowo-kryształowej.
+- GitHub Actions uruchamia osobny test trzech fal, blokady celów, obrażeń, uniku, nietykalności i ładowania assetu przed eksportem Android APK.
