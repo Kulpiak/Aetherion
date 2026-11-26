@@ -47,6 +47,7 @@ const REGION_CREATURE_ATLAS: Texture2D = preload("res://assets/aetherion_region_
 const PLAYER_DIRECTION_ATLAS: Texture2D = preload("res://assets/aetherion_player_directions.svg")
 const CRYSTAL_SANCTUM_TEXTURE: Texture2D = preload("res://assets/aetherion_crystal_sanctum.svg")
 const CRYSTAL_GUARDIAN_TEXTURE: Texture2D = preload("res://assets/aetherion_crystal_guardian.svg")
+const GEODE_SHARD_TEXTURE: Texture2D = preload("res://assets/aetherion_geode_shard.svg")
 const VERDANT_SANCTUM_TEXTURE: Texture2D = preload("res://assets/aetherion_verdant_sanctum.svg")
 const VERDANT_GUARDIAN_TEXTURE: Texture2D = preload("res://assets/aetherion_rootwarden.svg")
 const FROST_SANCTUM_TEXTURE: Texture2D = preload("res://assets/aetherion_frost_sanctum.svg")
@@ -75,6 +76,12 @@ const VERDANT_ROOT_RANGE := 220.0
 const VERDANT_ROOT_RADIUS := Vector2(126.0, 74.0)
 const VERDANT_ROOT_WINDUP := 1.05
 const VERDANT_ROOT_ACTIVE := 0.56
+const CRYPT_GEODE_RANGE := 268.0
+const CRYPT_GEODE_RADIUS := 64.0
+const CRYPT_GEODE_WINDUP := 0.92
+const CRYPT_GEODE_WAVE_INTERVAL := 0.72
+const CRYPT_GEODE_ACTIVE := 0.38
+const CRYPT_GEODE_WAVE_COUNT := 3
 const START_POS := Vector2(480, 380)
 const RUINS_POS := Vector2(1600, 720)
 const RACES := {
@@ -264,6 +271,20 @@ func _random_point_in_bounds(bounds: Rect2, margin: float = 48.0) -> Vector2:
   rng.randf_range(bounds.position.y+safe_margin,bounds.position.y+bounds.size.y-safe_margin)
  )
 
+func _geode_target_positions(center: Vector2) -> Array[Vector2]:
+ var offsets: Array[Vector2] = [
+  Vector2(-78.0,-38.0),
+  Vector2(78.0,-38.0),
+  Vector2(0.0,88.0)
+ ]
+ var targets: Array[Vector2] = []
+ for offset in offsets:
+  var target := center + offset
+  target.x = clampf(target.x,CRYPT_GEODE_RADIUS+18.0,CRYPT_SIZE.x-CRYPT_GEODE_RADIUS-18.0)
+  target.y = clampf(target.y,CRYPT_GEODE_RADIUS+18.0,CRYPT_SIZE.y-CRYPT_GEODE_RADIUS-18.0)
+  targets.append(target)
+ return targets
+
 func _create_crypt_enemies() -> Array[Dictionary]:
  var bounds := Rect2(210.0,170.0,860.0,450.0)
  var result: Array[Dictionary] = []
@@ -271,7 +292,7 @@ func _create_crypt_enemies() -> Array[Dictionary]:
  result.append({"spawn_id":"crypt_01","name":"Eterowy Skryba","pos":Vector2(915,285),"hp":156.0,"max_hp":156.0,"damage":20.0,"speed":48.0,"alive":true,"type":5,"region":"Krypta Kryształów","spawn_bounds":bounds,"xp_reward":62,"gold_reward":20,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.58,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
  result.append({"spawn_id":"crypt_02","name":"Kryształowy Pająk","pos":Vector2(365,505),"hp":138.0,"max_hp":138.0,"damage":18.0,"speed":62.0,"alive":true,"type":4,"region":"Krypta Kryształów","spawn_bounds":bounds,"xp_reward":54,"gold_reward":18,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.58,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
  result.append({"spawn_id":"crypt_03","name":"Eterowy Skryba","pos":Vector2(915,505),"hp":156.0,"max_hp":156.0,"damage":20.0,"speed":48.0,"alive":true,"type":5,"region":"Krypta Kryształów","spawn_bounds":bounds,"xp_reward":62,"gold_reward":20,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":0.58,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true})
- result.append({"spawn_id":"crypt_guardian","name":"Matriarcha Geody","pos":Vector2(640,390),"hp":520.0,"max_hp":520.0,"damage":25.0,"speed":42.0,"alive":true,"type":5,"region":"Krypta Kryształów","spawn_bounds":bounds,"xp_reward":0,"gold_reward":0,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":1.05,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true,"is_boss":true,"is_crypt_boss":true})
+ result.append({"spawn_id":"crypt_guardian","name":"Matriarcha Geody","pos":Vector2(640,390),"hp":520.0,"max_hp":520.0,"damage":25.0,"speed":42.0,"alive":true,"type":5,"region":"Krypta Kryształów","spawn_bounds":bounds,"xp_reward":0,"gold_reward":0,"timer":0.0,"respawn":0.0,"attack_anim":0.0,"windup":0.0,"windup_total":CRYPT_GEODE_WINDUP,"hit_flash":0.0,"walk_phase":0.0,"facing":Vector2.DOWN,"instance":true,"is_boss":true,"is_crypt_boss":true,"geode_targets":[],"geode_wave_index":0,"geode_wave_left":0.0,"geode_charge_total":CRYPT_GEODE_WINDUP,"geode_attack_active":false,"geode_blast_center":Vector2.ZERO,"geode_blast_left":0.0,"geode_blast_index":-1})
  return result
 
 func _is_in_instance() -> bool:
@@ -883,13 +904,43 @@ func _process(delta: float) -> void:
   enemy["hit_flash"] = maxf(0.0,float(enemy.get("hit_flash",0.0))-delta)
   enemy["storm_blast_left"] = maxf(0.0,float(enemy.get("storm_blast_left",0.0))-delta)
   enemy["root_burst_left"] = maxf(0.0,float(enemy.get("root_burst_left",0.0))-delta)
+  enemy["geode_blast_left"] = maxf(0.0,float(enemy.get("geode_blast_left",0.0))-delta)
   var difference: Vector2 = player_pos - enemy["pos"]
   var is_boss := bool(enemy.get("is_boss",false))
+  var is_crypt_boss := bool(enemy.get("is_crypt_boss",false))
   var is_frost_boss := bool(enemy.get("is_frost_boss",false))
   var is_verdant_boss := bool(enemy.get("is_verdant_boss",false))
-  var attack_range := FROST_STORM_RANGE if is_frost_boss else (VERDANT_ROOT_RANGE if is_verdant_boss else (112.0 if is_boss else 48.0))
+  var attack_range := CRYPT_GEODE_RANGE if is_crypt_boss else (FROST_STORM_RANGE if is_frost_boss else (VERDANT_ROOT_RANGE if is_verdant_boss else (112.0 if is_boss else 48.0)))
   var windup := float(enemy.get("windup",0.0))
-  if windup > 0.0:
+  if is_crypt_boss and bool(enemy.get("geode_attack_active",false)):
+   var geode_wave_left := maxf(0.0,float(enemy.get("geode_wave_left",0.0))-delta)
+   enemy["geode_wave_left"] = geode_wave_left
+   if geode_wave_left <= 0.0:
+    var geode_targets: Array = enemy.get("geode_targets",[])
+    var geode_wave_index := int(enemy.get("geode_wave_index",0))
+    if geode_wave_index < geode_targets.size():
+     var geode_center: Vector2 = geode_targets[geode_wave_index]
+     enemy["geode_blast_center"] = geode_center
+     enemy["geode_blast_index"] = geode_wave_index
+     enemy["geode_blast_left"] = CRYPT_GEODE_ACTIVE
+     enemy["attack_anim"] = CRYPT_GEODE_ACTIVE
+     if player_pos.distance_to(geode_center) <= CRYPT_GEODE_RADIUS:
+      if _receive_enemy_damage(enemy,"Uniknięto rozszczepienia dzięki Szarży!"):
+       _say("ROZSZCZEPIENIE GEODY! Kryształowa fala zadaje obrażenia.")
+     else:
+      _say("Uniknięto rozszczepienia — opuściłeś naładowany kryształ.")
+     geode_wave_index += 1
+     enemy["geode_wave_index"] = geode_wave_index
+     if geode_wave_index < geode_targets.size():
+      enemy["geode_wave_left"] = CRYPT_GEODE_WAVE_INTERVAL
+      enemy["geode_charge_total"] = CRYPT_GEODE_WAVE_INTERVAL
+     else:
+      enemy["geode_attack_active"] = false
+      enemy["geode_wave_left"] = 0.0
+      enemy["timer"] = 0.0
+    else:
+     enemy["geode_attack_active"] = false
+  elif windup > 0.0:
    windup = maxf(0.0,windup-delta)
    enemy["windup"] = windup
    if windup <= 0.0:
@@ -931,15 +982,24 @@ func _process(delta: float) -> void:
    enemy["timer"] += delta
    if enemy["timer"] > 1.3:
     enemy["timer"] = 0.0
-    var windup_duration := FROST_STORM_WINDUP if is_frost_boss else (VERDANT_ROOT_WINDUP if is_verdant_boss else (0.82 if is_boss else 0.52))
-    enemy["windup"] = windup_duration
-    enemy["windup_total"] = windup_duration
-    if is_frost_boss:
-     enemy["windup_target"] = player_pos
-     enemy["storm_radius"] = FROST_STORM_RADIUS
-    elif is_verdant_boss:
-     enemy["root_windup_target"] = player_pos
-     enemy["root_radius"] = VERDANT_ROOT_RADIUS
+    if is_crypt_boss:
+     enemy["windup"] = 0.0
+     enemy["windup_total"] = CRYPT_GEODE_WINDUP
+     enemy["geode_targets"] = _geode_target_positions(player_pos)
+     enemy["geode_wave_index"] = 0
+     enemy["geode_wave_left"] = CRYPT_GEODE_WINDUP
+     enemy["geode_charge_total"] = CRYPT_GEODE_WINDUP
+     enemy["geode_attack_active"] = true
+    else:
+     var windup_duration := FROST_STORM_WINDUP if is_frost_boss else (VERDANT_ROOT_WINDUP if is_verdant_boss else (0.82 if is_boss else 0.52))
+     enemy["windup"] = windup_duration
+     enemy["windup_total"] = windup_duration
+     if is_frost_boss:
+      enemy["windup_target"] = player_pos
+      enemy["storm_radius"] = FROST_STORM_RADIUS
+     elif is_verdant_boss:
+      enemy["root_windup_target"] = player_pos
+      enemy["root_radius"] = VERDANT_ROOT_RADIUS
   else:
    enemy["timer"] = maxf(0.0,float(enemy.get("timer",0.0))-delta*0.5)
   enemies[i] = enemy
@@ -2033,16 +2093,20 @@ func _draw_enemy(enemy: Dictionary) -> void:
  var p: Vector2 = enemy["pos"]
  var kind := int(enemy["type"])
  var is_boss := bool(enemy.get("is_boss",false))
+ var is_crypt_boss := bool(enemy.get("is_crypt_boss",false))
  var is_frost_boss := bool(enemy.get("is_frost_boss",false))
  var is_verdant_boss := bool(enemy.get("is_verdant_boss",false))
  var sprite_size := 126.0 if is_boss else 80.0
  var now := float(Time.get_ticks_msec()) / 1000.0
  var distance_to_player := player_pos.distance_to(p)
- var attack_range := FROST_STORM_RANGE if is_frost_boss else (VERDANT_ROOT_RANGE if is_verdant_boss else (112.0 if is_boss else 48.0))
+ var attack_range := CRYPT_GEODE_RANGE if is_crypt_boss else (FROST_STORM_RANGE if is_frost_boss else (VERDANT_ROOT_RANGE if is_verdant_boss else (112.0 if is_boss else 48.0)))
  var chasing := distance_to_player < 300.0
  var windup_left := float(enemy.get("windup",0.0))
  var windup_total := maxf(0.01,float(enemy.get("windup_total",0.52)))
- var warning_progress := clampf(1.0-windup_left/windup_total,0.0,1.0) if windup_left > 0.0 else 0.0
+ var geode_active := is_crypt_boss and bool(enemy.get("geode_attack_active",false))
+ var geode_wave_left := float(enemy.get("geode_wave_left",0.0))
+ var geode_charge_total := maxf(0.01,float(enemy.get("geode_charge_total",CRYPT_GEODE_WINDUP)))
+ var warning_progress := clampf(1.0-geode_wave_left/geode_charge_total,0.0,1.0) if geode_active else (clampf(1.0-windup_left/windup_total,0.0,1.0) if windup_left > 0.0 else 0.0)
  var is_moving := chasing and distance_to_player > attack_range and windup_left <= 0.0
  var attacking := float(enemy.get("attack_anim",0.0)) > 0.0
  var phase := float(enemy.get("walk_phase",0.0))
@@ -2058,11 +2122,11 @@ func _draw_enemy(enemy: Dictionary) -> void:
  draw_ellipse_shadow(p+Vector2(0,13),sprite_size*0.48*(1.0+absf(stride)*0.025),14.0 if is_boss else 8.0)
  if windup_left > 0.0:
   var glyph_rotation := now * 0.32
-  var warning_tint := Color("#82e4ff") if is_frost_boss else (Color("#a8e99c") if bool(enemy.get("is_verdant_boss",false)) else Color(1.0,0.32,0.2,0.55))
+  var warning_tint := Color("#d8b2ff") if is_crypt_boss else (Color("#82e4ff") if is_frost_boss else (Color("#a8e99c") if is_verdant_boss else Color(1.0,0.32,0.2,0.55)))
   _draw_eterium_glyph(p,0,290.0 if is_boss else 118.0,glyph_rotation,warning_tint)
   var warning_alpha := 0.42+warning_progress*0.48
   if is_boss:
-   if not is_frost_boss and not is_verdant_boss:
+   if not is_crypt_boss and not is_frost_boss and not is_verdant_boss:
     var warning_circle := Color(1.0,0.28,0.2,1.0)
     draw_circle(p,112.0,Color(warning_circle.r,warning_circle.g,warning_circle.b,0.035+warning_progress*0.045))
     draw_arc(p,112.0,0.0,TAU,56,Color(warning_circle.r,warning_circle.g,warning_circle.b,warning_alpha),4.5,true)
@@ -2125,15 +2189,44 @@ func _draw_enemy(enemy: Dictionary) -> void:
    var spike_start := root_burst_center+Vector2(cos(spike_angle)*root_burst_radius.x,sin(spike_angle)*root_burst_radius.y)
    var spike_end := root_burst_center+Vector2(cos(spike_angle)*(root_burst_radius.x+24.0),sin(spike_angle)*(root_burst_radius.y+18.0))
    draw_line(spike_start,spike_end,Color("#c9ff9a",1.0-root_burst_progress*0.35),5.0,true)
+ if is_crypt_boss and geode_active:
+  var geode_targets: Array = enemy.get("geode_targets",[])
+  var geode_wave_index := int(enemy.get("geode_wave_index",0))
+  for mark_index in range(geode_targets.size()):
+   var geode_target: Vector2 = geode_targets[mark_index]
+   var current_mark := mark_index == geode_wave_index
+   var mark_alpha := (0.34+warning_progress*0.58) if current_mark else 0.22
+   var mark_radius := CRYPT_GEODE_RADIUS*(0.78+warning_progress*0.22) if current_mark else 15.0
+   draw_circle(geode_target,mark_radius,Color(0.62,0.39,0.95,mark_alpha*0.16))
+   draw_arc(geode_target,mark_radius,now*(0.65 if current_mark else 0.22),now*(0.65 if current_mark else 0.22)+TAU,48,Color(0.79,0.65,1.0,mark_alpha),4.0 if current_mark else 2.0,true)
+   if current_mark:
+    draw_set_transform(geode_target,now*0.24,Vector2.ONE*0.42)
+    draw_texture_rect(GEODE_SHARD_TEXTURE,Rect2(-64.0,-64.0,128.0,128.0),false,Color(1.0,0.92,1.0,0.9))
+    draw_set_transform(Vector2.ZERO,0.0,Vector2.ONE)
+    draw_string(ThemeDB.fallback_font,geode_target+Vector2(-80.0,-CRYPT_GEODE_RADIUS-15.0),"ROZSZCZEPIENIE %d/%d" % [geode_wave_index+1,CRYPT_GEODE_WAVE_COUNT],HORIZONTAL_ALIGNMENT_CENTER,-1,12,Color("#f0ddff"))
+   else:
+    draw_circle(geode_target,6.0,Color("#b99ae8",0.72))
+ if is_crypt_boss and float(enemy.get("geode_blast_left",0.0)) > 0.0:
+  var geode_blast_left := float(enemy.get("geode_blast_left",0.0))
+  var geode_blast_progress := clampf(1.0-geode_blast_left/CRYPT_GEODE_ACTIVE,0.0,1.0)
+  var geode_blast_center: Vector2 = enemy.get("geode_blast_center",p)
+  var geode_wave_radius := CRYPT_GEODE_RADIUS*(0.32+geode_blast_progress*0.68)
+  draw_circle(geode_blast_center,geode_wave_radius,Color(0.62,0.38,0.95,0.16*(1.0-geode_blast_progress)))
+  draw_arc(geode_blast_center,geode_wave_radius,0.0,TAU,48,Color("#e2c9ff",1.0-geode_blast_progress*0.32),5.0,true)
+  for shard_index in range(5):
+   var shard_angle := TAU*float(shard_index)/5.0+geode_blast_progress*0.34
+   var shard_start := geode_blast_center+Vector2.RIGHT.rotated(shard_angle)*(geode_wave_radius*0.72)
+   var shard_end := geode_blast_center+Vector2.RIGHT.rotated(shard_angle)*(geode_wave_radius+18.0)
+   draw_line(shard_start,shard_end,Color("#cba9ff",1.0-geode_blast_progress*0.45),4.0,true)
  if is_boss:
   var boss_pulse := 0.72 + sin(now/0.19)*0.16
-  var boss_ring := Color("#82dfff") if is_frost_boss else (Color("#9cdd8e") if is_verdant_boss else Color("#ef7165"))
+  var boss_ring := Color("#d6b2ff") if is_crypt_boss else (Color("#82dfff") if is_frost_boss else (Color("#9cdd8e") if is_verdant_boss else Color("#ef7165")))
   draw_circle(p,76.0,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.09*boss_pulse))
   draw_arc(p,72.0,now*0.12,now*0.12+TAU,48,Color(boss_ring.r,boss_ring.g,boss_ring.b,0.55+boss_pulse*0.12),4.0,true)
  if attacking:
-  var attack_duration := VERDANT_ROOT_ACTIVE if is_verdant_boss else (FROST_STORM_ACTIVE if is_frost_boss else 0.34)
+  var attack_duration := CRYPT_GEODE_ACTIVE if is_crypt_boss else (VERDANT_ROOT_ACTIVE if is_verdant_boss else (FROST_STORM_ACTIVE if is_frost_boss else 0.34))
   var attack_progress := clampf(1.0-float(enemy.get("attack_anim",0.0))/attack_duration,0.0,1.0)
-  var attack_tint := Color("#82e4ff") if is_frost_boss else (Color("#a8ef8c") if is_verdant_boss else Color(1.0,0.28,0.22,1.0))
+  var attack_tint := Color("#d8b2ff") if is_crypt_boss else (Color("#82e4ff") if is_frost_boss else (Color("#a8ef8c") if is_verdant_boss else Color(1.0,0.28,0.22,1.0)))
   draw_arc(p,37.0 if not is_boss else 66.0,0.0,TAU,28,Color(attack_tint.r,attack_tint.g,attack_tint.b,0.72),3.0,true)
   if is_boss:
    var shock_radius := 42.0 + attack_progress*54.0
