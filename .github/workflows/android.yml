@@ -100,6 +100,13 @@ jobs:
           godot --headless --path . --script res://tests/test_crystal_sanctum.gd 2>&1 | tee /tmp/godot-crypt-tests.log
           grep -q "AETHERION_CRYPT_TESTS: PASS" /tmp/godot-crypt-tests.log
 
+      - name: Run Geode Matriarch combat tests
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --script res://tests/test_geode_matriarch_combat.gd 2>&1 | tee /tmp/godot-geode-combat-tests.log
+          grep -q "AETHERION_GEODE_COMBAT_TESTS: PASS" /tmp/godot-geode-combat-tests.log
+
       - name: Run Verdant Sanctum instance tests
         shell: bash
         run: |
