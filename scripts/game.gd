@@ -279,7 +279,8 @@ func _geode_target_positions(center: Vector2) -> Array[Vector2]:
  ]
  var targets: Array[Vector2] = []
  for offset in offsets:
-  var target := center + offset
+  var offset_vector: Vector2 = offset
+  var target: Vector2 = center + offset_vector
   target.x = clampf(target.x,CRYPT_GEODE_RADIUS+18.0,CRYPT_SIZE.x-CRYPT_GEODE_RADIUS-18.0)
   target.y = clampf(target.y,CRYPT_GEODE_RADIUS+18.0,CRYPT_SIZE.y-CRYPT_GEODE_RADIUS-18.0)
   targets.append(target)
