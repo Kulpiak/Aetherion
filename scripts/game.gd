@@ -91,6 +91,21 @@ const RACES := {
  "Sylvari":{"hp":130,"ep":110,"atk":11,"def":6},
  "Noctari":{"hp":112,"ep":120,"atk":14,"def":3}
 }
+const AWAKENING_PRIMARY_COLORS := [
+ Color("#e8bf68"),
+ Color("#f07854"),
+ Color("#76dff2"),
+ Color("#a7d978"),
+ Color("#a68ce4")
+]
+const AWAKENING_ACCENT_COLORS := [
+ Color("#fff0bd"),
+ Color("#ffd7a1"),
+ Color("#eaffff"),
+ Color("#e6f5b8"),
+ Color("#e5d9ff")
+]
+const AWAKENING_MOTE_COUNTS := [4,2,8,5,3]
 const REGION_NAMES := ["Kamienny Krąg","Zielone Ostępy","Korona Gór","Krypta Kryształów","Złote Pustkowia","Wschodnie Ruiny","Popielne Ziemie","Szlak Eterium"]
 const REGION_ENCOUNTERS := [
  {"name":"Kamienny Krąg","bounds":Rect2(180.0,130.0,440.0,390.0),"creatures":[]},
@@ -2335,6 +2350,78 @@ func _draw_eterium_glyph(center: Vector2, glyph_index: int, size: float, rotatio
  draw_texture_rect_region(ETERIUM_GLYPH_ATLAS,Rect2(-64.0,-64.0,128.0,128.0),Rect2(safe_index*128,0,128,128),tint,false)
  draw_set_transform(Vector2.ZERO,0.0,Vector2.ONE)
 
+func _awakening_primary_color(race_index: int) -> Color:
+ return AWAKENING_PRIMARY_COLORS[clampi(race_index,0,AWAKENING_PRIMARY_COLORS.size()-1)]
+
+func _awakening_accent_color(race_index: int) -> Color:
+ return AWAKENING_ACCENT_COLORS[clampi(race_index,0,AWAKENING_ACCENT_COLORS.size()-1)]
+
+func _awakening_mote_count(race_index: int) -> int:
+ return int(AWAKENING_MOTE_COUNTS[clampi(race_index,0,AWAKENING_MOTE_COUNTS.size()-1)])
+
+func _race_crest_region(race_index: int) -> Rect2:
+ var safe_index := clampi(race_index,0,4)
+ return Rect2(safe_index*128,0,128,128)
+
+func _draw_race_crest(center: Vector2, race_index: int, size: float, rotation: float, tint: Color) -> void:
+ draw_set_transform(center,rotation,Vector2.ONE*(size/128.0))
+ draw_texture_rect_region(RACE_CREST_ATLAS,Rect2(-64.0,-64.0,128.0,128.0),_race_crest_region(race_index),tint,false)
+ draw_set_transform(Vector2.ZERO,0.0,Vector2.ONE)
+
+func _draw_race_awakening(center: Vector2, race_index: int, aura_time: float, aura_pulse: float) -> void:
+ var primary := _awakening_primary_color(race_index)
+ var accent := _awakening_accent_color(race_index)
+ var crest_size := 118.0 + sin(aura_time*4.6)*5.0
+ _draw_race_crest(center,race_index,crest_size,aura_time*0.12,Color(primary.r,primary.g,primary.b,0.18))
+ draw_arc(center,49.0+sin(aura_time*6.5)*3.0,0.0,TAU,48,Color(primary.r,primary.g,primary.b,0.72),2.6,true)
+ var arc_direction := -1.0 if race_index == 4 else 1.0
+ draw_arc(center,37.0,aura_time*0.9*arc_direction,aura_time*0.9*arc_direction+PI*1.55,40,Color(accent.r,accent.g,accent.b,0.84),2.0,true)
+ var mote_count := _awakening_mote_count(race_index)
+ for mote_index in range(mote_count):
+  var angle := -aura_time*(0.72 if race_index == 4 else 1.15)+TAU*float(mote_index)/float(mote_count)
+  var mote_radius := 56.0+sin(aura_time*5.0+float(mote_index))*4.0
+  var mote := center+Vector2.RIGHT.rotated(angle)*mote_radius
+  var axis := Vector2.RIGHT.rotated(angle)
+  var normal := axis.rotated(PI*0.5)
+  var mote_size := 4.5+sin(aura_time*6.0+float(mote_index))*1.0
+  draw_circle(mote,6.0,Color(primary.r,primary.g,primary.b,0.12))
+  match race_index:
+   0:
+    var shard_points := PackedVector2Array([
+     mote+axis*mote_size,
+     mote+normal*mote_size*0.55,
+     mote-axis*mote_size,
+     mote-normal*mote_size*0.55
+    ])
+    draw_colored_polygon(shard_points,Color(primary.r,primary.g,primary.b,0.92))
+    draw_polyline(PackedVector2Array([shard_points[0],shard_points[1],shard_points[2],shard_points[3],shard_points[0]]),accent,1.2,true)
+   1:
+    var ember_trail := PackedVector2Array([
+     mote-axis*mote_size*1.7-normal*mote_size*0.35,
+     mote-axis*mote_size*0.45,
+     mote+axis*mote_size*1.6
+    ])
+    draw_polyline(ember_trail,Color(primary.r,primary.g,primary.b,0.95),3.0,true)
+    draw_line(mote-axis*mote_size*0.7,mote+axis*mote_size*0.9,accent,1.2,true)
+   2:
+    draw_line(mote-axis*mote_size,mote+axis*mote_size*1.8,primary,2.2,true)
+    draw_line(mote-normal*mote_size*0.75,mote+normal*mote_size*0.75,accent,1.2,true)
+    draw_circle(mote,2.1,accent)
+   3:
+    var leaf_points := PackedVector2Array([
+     mote-axis*mote_size,
+     mote+axis*mote_size*0.25+normal*mote_size*0.7,
+     mote+axis*mote_size*2.0,
+     mote+axis*mote_size*0.25-normal*mote_size*0.7
+    ])
+    draw_colored_polygon(leaf_points,Color(primary.r,primary.g,primary.b,0.9))
+    draw_line(mote-axis*mote_size*0.55,mote+axis*mote_size*1.65,accent,1.1,true)
+   _:
+    draw_line(mote-axis*mote_size,mote+axis*mote_size,primary,1.8,true)
+    draw_line(mote-normal*mote_size,mote+normal*mote_size,accent,1.4,true)
+    draw_circle(mote,2.2,accent)
+ draw_circle(center,29.0,Color(primary.r,primary.g,primary.b,0.10*aura_pulse))
+
 func _draw_player() -> void:
  var moving: bool = bool(held["left"]) or bool(held["right"]) or bool(held["up"]) or bool(held["down"]) or Input.is_action_pressed("ui_left") or Input.is_action_pressed("ui_right") or Input.is_action_pressed("ui_up") or Input.is_action_pressed("ui_down")
  var bob := sin(walk_phase)*2.0 if moving else 0.0
@@ -2343,7 +2430,8 @@ func _draw_player() -> void:
  draw_ellipse_shadow(p+Vector2(0,15),25,9)
  var glyph_time := float(Time.get_ticks_msec()) / 1000.0
  if transformed:
-  _draw_eterium_glyph(p+Vector2(0,5),3,116.0,glyph_time*0.48,Color(1.0,0.73,0.3,0.56))
+  var awakening_color := _awakening_primary_color(race_index)
+  _draw_race_crest(p+Vector2(0,5),race_index,116.0,glyph_time*0.48,Color(awakening_color.r,awakening_color.g,awakening_color.b,0.22))
  var frame := 1 if moving and int(Time.get_ticks_msec()/145)%2 == 0 else 0
  var invuln_flash := player_invuln > 0.0 and int(Time.get_ticks_msec()/90)%2 == 0
  var hero_tint := Color(1.0,0.55,0.48,1.0) if player_hit_flash > 0.0 else (Color(0.55,0.9,1.0,0.58) if invuln_flash else Color.WHITE)
@@ -2363,18 +2451,9 @@ func _draw_player() -> void:
  draw_set_transform(Vector2.ZERO,0.0,Vector2.ONE)
  if transform_burst > 0.0:
   var burst_progress := 1.0-transform_burst
-  _draw_eterium_glyph(p,2,132.0+burst_progress*150.0,glyph_time*1.1,Color(1.0,0.82,0.43,transform_burst*0.86))
+  var burst_accent := _awakening_accent_color(race_index)
+  _draw_race_crest(p,race_index,132.0+burst_progress*150.0,glyph_time*1.1,Color(burst_accent.r,burst_accent.g,burst_accent.b,transform_burst*0.54))
  if transformed:
   var aura_time := float(Time.get_ticks_msec()) / 1000.0
   var aura_pulse := 0.78 + sin(aura_time*10.0)*0.18
-  draw_arc(p+Vector2(0,3),43.0+sin(aura_time*7.0)*4.0,0.0,TAU,40,Color(1.0,0.55,0.12,0.72),3.0,true)
-  draw_arc(p+Vector2(0,3),34.0, aura_time*1.8, aura_time*1.8+PI*1.45,32,Color(1.0,0.83,0.35,0.8),2.0,true)
-  for aura_index in range(6):
-   var aura_angle := aura_time*2.4 + TAU*float(aura_index)/6.0
-   var aura_radius := 37.0 + sin(aura_time*8.0+float(aura_index))*5.0
-   var aura_point := p + Vector2.RIGHT.rotated(aura_angle)*aura_radius
-   draw_circle(aura_point,3.0*aura_pulse,Color(1.0,0.78,0.32,0.9))
-   draw_circle(aura_point,6.0,Color(1.0,0.52,0.12,0.22))
-  draw_rect(Rect2(p.x-22,p.y-35+bob,44,4),Color("#ffb34f"))
-  draw_rect(Rect2(p.x-18,p.y-34+bob,36,2),Color("#fff0a6"))
-  draw_circle(p,29,Color(1.0,0.65,0.2,0.13))
+  _draw_race_awakening(p+Vector2(0,3),race_index,aura_time,aura_pulse)
