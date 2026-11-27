@@ -2371,7 +2371,6 @@ func _draw_race_crest(center: Vector2, race_index: int, size: float, rotation: f
 func _draw_race_awakening(center: Vector2, race_index: int, aura_time: float, aura_pulse: float) -> void:
  var primary := _awakening_primary_color(race_index)
  var accent := _awakening_accent_color(race_index)
- var crest_size := 118.0 + sin(aura_time*4.6)*5.0
  draw_arc(center,49.0+sin(aura_time*6.5)*3.0,0.0,TAU,48,Color(primary.r,primary.g,primary.b,0.72),2.6,true)
  var arc_direction := -1.0 if race_index == 4 else 1.0
  draw_arc(center,37.0,aura_time*0.9*arc_direction,aura_time*0.9*arc_direction+PI*1.55,40,Color(accent.r,accent.g,accent.b,0.84),2.0,true)
