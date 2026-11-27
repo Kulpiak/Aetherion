@@ -93,6 +93,13 @@ jobs:
           godot --headless --path . --script res://tests/test_enemy_save.gd 2>&1 | tee /tmp/godot-save-tests.log
           grep -q "AETHERION_SAVE_TESTS: PASS" /tmp/godot-save-tests.log
 
+      - name: Run race Core Awakening tests
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --script res://tests/test_race_awakening.gd 2>&1 | tee /tmp/godot-awakening-tests.log
+          grep -q "AETHERION_AWAKENING_TESTS: PASS" /tmp/godot-awakening-tests.log
+
       - name: Run Crystal Sanctum instance tests
         shell: bash
         run: |
