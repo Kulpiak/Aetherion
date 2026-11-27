@@ -18,3 +18,14 @@ Serwer, konta online, gildie, czat, handel między graczami, otwarte PvP, pełna
 
 ## Zasady projektu
 Nie kopiujemy nazw, postaci, światów, muzyki ani assetów z istniejących marek. Nie deklarujemy działającego builda bez potwierdzenia w GitHub Actions i testu na urządzeniu.
+
+## Przebudzenie Rdzenia — tożsamość pięciu ras
+Aktywacja Przebudzenia zachowuje wspólny koszt i czas działania, ale otrzymuje własną oprawę dla każdej rasy:
+- **Terranie:** złoty kompas rdzenia i cztery ostre odłamki energii.
+- **Varkari:** żarowa paleta oraz dwa smugi przypominające kły.
+- **Elarianie:** lodowo-cyjanowy blask i osiem promieni kryształu.
+- **Sylvari:** zielony sygnet żywego liścia i pięć motywów liści.
+- **Noctari:** księżycowo-fioletowa poświata i trzy gwiezdne znaki.
+
+Efekty korzystają z istniejącego atlasu herbów ras i są rysowane bezpośrednio przy postaci. Ten etap zmienia wyłącznie czytelność wizualną Przebudzenia; nie zmienia obrażeń, kosztu Eterium ani czasu trwania.
+
