@@ -22,7 +22,7 @@ Nie kopiujemy nazw, postaci, światów, muzyki ani assetów z istniejących mare
 ## Przebudzenie Rdzenia — tożsamość pięciu ras
 Aktywacja Przebudzenia zachowuje wspólny koszt i czas działania, ale otrzymuje własną oprawę dla każdej rasy:
 - **Terranie:** złoty kompas rdzenia i cztery ostre odłamki energii.
-- **Varkari:** żarowa paleta oraz dwa smugi przypominające kły.
+- **Varkari:** żarowa paleta oraz dwie smugi przypominające kły.
 - **Elarianie:** lodowo-cyjanowy blask i osiem promieni kryształu.
 - **Sylvari:** zielony sygnet żywego liścia i pięć motywów liści.
 - **Noctari:** księżycowo-fioletowa poświata i trzy gwiezdne znaki.
