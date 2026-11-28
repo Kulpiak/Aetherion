@@ -45,6 +45,7 @@ const WORLD_TEXTURE: Texture2D = preload("res://assets/aetherion_world.svg")
 const REGION_LANDMARK_ATLAS: Texture2D = preload("res://assets/aetherion_region_landmarks.svg")
 const REGION_CREATURE_ATLAS: Texture2D = preload("res://assets/aetherion_region_creatures.svg")
 const PLAYER_DIRECTION_ATLAS: Texture2D = preload("res://assets/aetherion_player_directions.svg")
+const RACE_ATTACK_ATLAS: Texture2D = preload("res://assets/aetherion_race_attack_glyphs.svg")
 const CRYSTAL_SANCTUM_TEXTURE: Texture2D = preload("res://assets/aetherion_crystal_sanctum.svg")
 const CRYSTAL_GUARDIAN_TEXTURE: Texture2D = preload("res://assets/aetherion_crystal_guardian.svg")
 const GEODE_SHARD_TEXTURE: Texture2D = preload("res://assets/aetherion_geode_shard.svg")
@@ -2318,17 +2319,23 @@ func _draw_combat_effects() -> void:
    draw_line(spark_pos-Vector2.RIGHT.rotated(spark_angle)*spark_size,spark_pos+Vector2.RIGHT.rotated(spark_angle)*spark_size,Color(0.75,0.98,1.0,0.9),2.0,true)
   draw_circle(attack_target,18.0*(1.0-progress)+4.0,Color(0.4,0.88,1.0,0.35))
  if attack_anim > 0.0:
-  var progress := 1.0 - attack_anim / 0.24
-  var sweep := progress * 1.25
-  _draw_eterium_glyph(attack_target,1,62.0+sin(progress*PI)*24.0,attack_angle+sweep,Color(0.72,0.97,1.0,1.0-progress*0.35))
-  var center := player_pos + Vector2(0,-5)
-  var radius := 43.0 + sin(progress * PI) * 9.0
-  draw_arc(center,radius,attack_angle-1.05+sweep,attack_angle+1.05+sweep,18,Color(0.95,0.96,1.0,0.95),5.0,true)
-  var tip := center + Vector2.RIGHT.rotated(attack_angle+sweep) * radius
-  draw_line(center + Vector2.RIGHT.rotated(attack_angle-0.72+sweep)*19.0,tip,Color("#8ce9e4"),3.0,true)
-  var spark := attack_target + Vector2(0,-12)
-  draw_line(spark+Vector2(-9,-8),spark+Vector2(9,8),Color("#fff0bd"),3.0,true)
-  draw_line(spark+Vector2(-9,8),spark+Vector2(9,-8),Color("#8ce9e4"),3.0,true)
+  var progress := clampf(1.0-attack_anim/0.24,0.0,1.0)
+  var sweep := progress*1.25
+  var race_index := maxi(0,RACES.keys().find(race))
+  var attack_primary := _awakening_primary_color(race_index)
+  var attack_accent := _awakening_accent_color(race_index)
+  var slash_center := player_pos.lerp(attack_target,0.62)+Vector2(0,-5)
+  var slash_size := 94.0+sin(progress*PI)*42.0
+  _draw_race_attack_glyph(slash_center,race_index,slash_size,attack_angle+(progress-0.5)*0.18,Color(1.0,1.0,1.0,0.94-progress*0.34))
+  _draw_eterium_glyph(attack_target,1,62.0+sin(progress*PI)*24.0,attack_angle+sweep,Color(attack_primary.r,attack_primary.g,attack_primary.b,1.0-progress*0.35))
+  var center := player_pos+Vector2(0,-5)
+  var radius := 43.0+sin(progress*PI)*9.0
+  draw_arc(center,radius,attack_angle-1.05+sweep,attack_angle+1.05+sweep,18,Color(attack_accent.r,attack_accent.g,attack_accent.b,0.92),4.0,true)
+  var tip := center+Vector2.RIGHT.rotated(attack_angle+sweep)*radius
+  draw_line(center+Vector2.RIGHT.rotated(attack_angle-0.72+sweep)*19.0,tip,attack_primary,3.2,true)
+  var spark := attack_target+Vector2(0,-12)
+  draw_line(spark+Vector2(-9,-8),spark+Vector2(9,8),attack_accent,3.0,true)
+  draw_line(spark+Vector2(-9,8),spark+Vector2(9,-8),attack_primary,2.4,true)
  if skill_anim > 0.0:
   var progress := 1.0 - skill_anim / 0.72
   var radius := 35.0 + progress * 145.0
@@ -2348,6 +2355,15 @@ func _draw_eterium_glyph(center: Vector2, glyph_index: int, size: float, rotatio
  var safe_index := clampi(glyph_index,0,3)
  draw_set_transform(center,rotation,Vector2.ONE*(size/128.0))
  draw_texture_rect_region(ETERIUM_GLYPH_ATLAS,Rect2(-64.0,-64.0,128.0,128.0),Rect2(safe_index*128,0,128,128),tint,false)
+ draw_set_transform(Vector2.ZERO,0.0,Vector2.ONE)
+
+func _race_attack_region(race_index: int) -> Rect2:
+ var safe_index := clampi(race_index,0,4)
+ return Rect2(safe_index*128,0,128,128)
+
+func _draw_race_attack_glyph(center: Vector2, race_index: int, size: float, rotation: float, tint: Color) -> void:
+ draw_set_transform(center,rotation,Vector2.ONE*(size/128.0))
+ draw_texture_rect_region(RACE_ATTACK_ATLAS,Rect2(-64.0,-64.0,128.0,128.0),_race_attack_region(race_index),tint,false)
  draw_set_transform(Vector2.ZERO,0.0,Vector2.ONE)
 
 func _awakening_primary_color(race_index: int) -> Color:

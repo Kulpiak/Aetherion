@@ -29,3 +29,14 @@ Aktywacja Przebudzenia zachowuje wspólny koszt i czas działania, ale otrzymuje
 
 Efekty korzystają z istniejącego atlasu herbów ras i są rysowane bezpośrednio przy postaci. Ten etap zmienia wyłącznie czytelność wizualną Przebudzenia; nie zmienia obrażeń, kosztu Eterium ani czasu trwania.
 
+
+## Ataki podstawowe — sygnatura pięciu ras
+
+Podstawowe cięcie korzysta z osobnego, oryginalnego atlasu SVG `assets/aetherion_race_attack_glyphs.svg`. Każda rasa ma własny motyw i paletę:
+- **Terranie:** złote, kompasowe odłamki ostrza.
+- **Varkari:** podwójny żarowy ślad i kły płomienia.
+- **Elarianie:** lodowe ostrze z kryształowymi fasetami.
+- **Sylvari:** żywa winorośl i liściasty ślad cięcia.
+- **Noctari:** księżycowy sierp i gwiezdne iskry.
+
+Atlas jest renderowany przy celu ataku, obracany zgodnie z kierunkiem postaci i skalowany w czasie animacji uderzenia. Koszt, obrażenia, zasięg i czas odnowienia ataku pozostają bez zmian. Test regresji sprawdza pięć komórek atlasu, widoczną zawartość, unikalność palet i bezpieczne indeksowanie.

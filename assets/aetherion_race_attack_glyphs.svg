@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="128" viewBox="0 0 640 128">
+<defs>
+ <linearGradient id="terran" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#80502d"/><stop offset=".42" stop-color="#e4b85e"/><stop offset=".78" stop-color="#fff0b7"/><stop offset="1" stop-color="#fffdf0"/></linearGradient>
+ <linearGradient id="varkari" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#6f2535"/><stop offset=".42" stop-color="#e4513d"/><stop offset=".78" stop-color="#ffad61"/><stop offset="1" stop-color="#fff0c0"/></linearGradient>
+ <linearGradient id="elarian" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#28617f"/><stop offset=".42" stop-color="#63c9e2"/><stop offset=".78" stop-color="#d5fbff"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+ <linearGradient id="sylvari" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#285442"/><stop offset=".42" stop-color="#6eae63"/><stop offset=".78" stop-color="#c5e99a"/><stop offset="1" stop-color="#f4ffd8"/></linearGradient>
+ <linearGradient id="noctari" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#33284f"/><stop offset=".42" stop-color="#8065bc"/><stop offset=".78" stop-color="#cbb7ff"/><stop offset="1" stop-color="#fff4ff"/></linearGradient>
+</defs>
+<!-- Terranie: sun-forged compass cut -->
+<g transform="translate(64 64)" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M-53 29C-24 4 12-29 53-32" fill="none" stroke="#d7a24f" stroke-opacity=".2" stroke-width="25"/>
+ <path d="M-53 29C-24 4 12-29 53-32" fill="none" stroke="url(#terran)" stroke-width="11"/>
+ <path d="M-49 31C-21 7 15-24 51-29" fill="none" stroke="#fff3c9" stroke-width="2.1" opacity=".92"/>
+ <path d="M-39 17L-31 5L-23 13L-31 25Z M-15-2L-7-14L1-6L-7 6Z M10-21L18-33L26-25L18-13Z" fill="url(#terran)" stroke="#fff0bd" stroke-width="1.5"/>
+ <path d="M42-43L47-30L60-25L47-20L42-7L37-20L24-25L37-30Z" fill="#fff0bd" stroke="#b37b3c" stroke-width="2"/>
+ <path d="M-52 29L-43 27M-31 10L-24 4M-4-12L4-18" fill="none" stroke="#fff8df" stroke-width="2.5"/>
+</g>
+<!-- Varkari: twin ember fangs -->
+<g transform="translate(192 64)" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M-55 32C-30 12-4-13 48-40" fill="none" stroke="#e4513d" stroke-opacity=".2" stroke-width="25"/>
+ <path d="M-55 32C-30 12-4-13 48-40" fill="none" stroke="url(#varkari)" stroke-width="10"/>
+ <path d="M-45 43C-17 19 18-3 56-13" fill="none" stroke="url(#varkari)" stroke-width="6"/>
+ <path d="M-39 19C-28-1-29-17-16-29C-15-9-24 9-39 19Z M5-3C17-22 32-37 49-48C44-26 29-8 5-3Z" fill="url(#varkari)" stroke="#ffd5a1" stroke-width="1.7"/>
+ <path d="M-52 28L-43 18L-40 29L-49 38Z M34-24L43-38L49-28L40-17Z" fill="#ffb16b" stroke="#fff0c0" stroke-width="1.4"/>
+ <path d="M-20 15L-12 8M18-11L27-19" stroke="#fff0c0" stroke-width="2.2"/>
+</g>
+<!-- Elarianie: crystalline frost blade -->
+<g transform="translate(320 64)" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M-54 31C-20 4 15-27 53-33" fill="none" stroke="#65d6ed" stroke-opacity=".2" stroke-width="25"/>
+ <path d="M-54 31C-20 4 15-27 53-33" fill="none" stroke="url(#elarian)" stroke-width="9"/>
+ <path d="M-49 31C-16 5 19-25 51-31" fill="none" stroke="#efffff" stroke-width="2.4"/>
+ <path d="M-38 18L-29 0L-20 13L-31 26Z M-14-1L-4-22L8-7L-5 8Z M13-20L24-42L36-25L22-11Z" fill="url(#elarian)" stroke="#e9ffff" stroke-width="1.8"/>
+ <path d="M-49 7L-38 3L-32 12L-42 19Z M38-7L49-17L55-5L44 2Z" fill="#bff7ff" stroke="#4baac7" stroke-width="1.5"/>
+ <path d="M-2-2L5-15L12-2L5 11Z" fill="#ffffff" stroke="#79d9eb" stroke-width="1.5"/>
+</g>
+<!-- Sylvari: living vine and leaf cut -->
+<g transform="translate(448 64)" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M-55 31C-22 9 12-20 52-34" fill="none" stroke="#6ea968" stroke-opacity=".2" stroke-width="22"/>
+ <path d="M-55 31C-22 9 12-20 52-34" fill="none" stroke="url(#sylvari)" stroke-width="7"/>
+ <path d="M-52 35C-20 13 14-16 54-30" fill="none" stroke="#e8ffc5" stroke-width="1.8"/>
+ <path d="M-34 16C-48 5-46-9-31-15C-20-4-23 8-34 16Z M-12 0C-22-15-15-28 1-30C8-16 2-4-12 0Z M15-17C8-33 18-44 34-42C37-26 28-17 15-17Z" fill="url(#sylvari)" stroke="#efffc9" stroke-width="1.7"/>
+ <path d="M-34 16L-28 1M-12 0L-7-20M15-17L27-35" stroke="#386b4d" stroke-width="1.5"/>
+ <path d="M-50 31C-42 28-38 24-34 19M30-21C39-24 45-29 51-37" fill="none" stroke="#c7ed94" stroke-width="3"/>
+ <circle cx="-50" cy="31" r="3" fill="#f2ffd9"/><circle cx="51" cy="-37" r="3" fill="#f2ffd9"/>
+</g>
+<!-- Noctari: lunar crescent and shadow stars -->
+<g transform="translate(576 64)" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M-55 29C-22-2 14-31 53-28" fill="none" stroke="#8065bc" stroke-opacity=".22" stroke-width="24"/>
+ <path d="M-55 29C-22-2 14-31 53-28" fill="none" stroke="url(#noctari)" stroke-width="10"/>
+ <path d="M-48 34C-13 2 21-25 51-24" fill="none" stroke="#f1e9ff" stroke-width="2" opacity=".92"/>
+ <path d="M-20 18C-3-7 20-29 43-34C28-12 11 8-20 18Z" fill="#7e68b9" stroke="#d9c9ff" stroke-width="1.8"/>
+ <path d="M-43 21L-38 9L-33 21L-21 26L-33 31L-38 43L-43 31L-55 26Z" fill="#d7c5ff" stroke="#6f5aa7" stroke-width="1.4"/>
+ <path d="M20-20L25-31L30-20L41-15L30-10L25 1L20-10L9-15Z" fill="#fff4ff" stroke="#9e89d2" stroke-width="1.4"/>
+ <circle cx="48" cy="-44" r="3.2" fill="#ffffff"/><circle cx="-4" cy="-38" r="2.4" fill="#d9ccff"/>
+</g>
+</svg>
